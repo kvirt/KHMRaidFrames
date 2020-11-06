@@ -1,0 +1,16 @@
+## Interface: 90001
+## Title: KHM Raid Frames
+## Notes: Extended Standart Raid\Party Frames
+## Version: 1.0.1
+## Author: kvirtx
+## SavedVariables: KHMRaidFramesDB
+
+Libs\embeds.xml
+Locales\Locales.xml
+
+KHMRaidFrames.lua
+DefaultConfig.lua
+SetUpConfig.lua
+VirtualFrames.lua
+
+
