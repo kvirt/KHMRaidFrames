@@ -9,8 +9,10 @@ Libs\embeds.xml
 Locales\Locales.xml
 
 KHMRaidFrames.lua
+GlowFrames.lua
 DefaultConfig.lua
 SetUpConfig.lua
 VirtualFrames.lua
+UnitAuras.lua
 
 

@@ -15,6 +15,10 @@ local mirror_positions = {
 }
 
 function KHMRaidFrames:Setup()
+    self.maxFrames = 10
+    self.glowingFrames = {}
+    self.extraFrames = {}
+      
     self.virtualFrames = self:GetVirtualFrames()
     self.virtual = {        
         buffFrames = false,
@@ -33,14 +37,19 @@ function KHMRaidFrames:Setup()
 
     self.config = LibStub("AceConfigRegistry-3.0")
     self.config:RegisterOptionsTable("KHMRaidFrames", self:SetupOptions())
-    self.config:RegisterOptionsTable("CRF Profiles", profiles)
+    self.config:RegisterOptionsTable("KHM Profiles", profiles)
 
     self.dialog = LibStub("AceConfigDialog-3.0")
-    local optionsFrame = self.dialog:AddToBlizOptions("KHMRaidFrames", "KHMRaidFrames")
-    self.dialog:AddToBlizOptions("CRF Profiles", L["Profiles"], "KHMRaidFrames")
+    self.dialog.general = self.dialog:AddToBlizOptions("KHMRaidFrames", L["KHMRaidFrames"])
+    self.dialog.profiles = self.dialog:AddToBlizOptions("KHM Profiles", L["Profiles"], "KHMRaidFrames")
 
-    self:SecureHookScript(optionsFrame, "OnShow", "OnOptionShow")
-    self:SecureHookScript(optionsFrame, "OnHide", "OnOptionHide")
+    self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
+    self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
+    
+    self:RegisterChatCommand("khm", function() 
+        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+    end)  
 end
 
 function KHMRaidFrames:OnEnable()
@@ -67,15 +76,10 @@ function KHMRaidFrames:OnEnable()
     )
 
     self:RefreshConfig()   
-
-    self:RegisterChatCommand("crf", function()
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-    end)     
 end
 
 function KHMRaidFrames:ProfileReload()
-    ReloadUI()
+    self.config:NotifyChange("KHMRaidFrames")
 end
 
 function KHMRaidFrames:OnOptionShow()
@@ -106,7 +110,7 @@ end
 
 function KHMRaidFrames:RefreshConfig()
     if InCombatLockdown() then
-        print("Can not refresh settings while in combat")
+        print("Can not refresh settings while in combat")   
         return
     end
 
@@ -182,6 +186,8 @@ function KHMRaidFrames:SetUpSubFrames(groupIndex, groupFrame)
 
         if frame and frame:IsShown() and frame.unit then
             for _, frameType in ipairs({"buffFrames", "debuffFrames", "dispelDebuffFrames"}) do
+                self:AddSubFrames(frame, db[frameType], frameType)
+                print(#frame[frameType])
                 typedframes = frame[frameType]
                 self:ResizeHideHooks(typedframes, db[frameType], frameType == "debuffFrames")                
                 self:SetUpFramesInternal(frame, typedframes, db[frameType])
@@ -266,7 +272,8 @@ function KHMRaidFrames:SetUpFramesInternal(frame, typedframes, db)
                 mirror_positions[db.growDirection][1], 
                 typedframes[frameNum - 1], 
                 mirror_positions[db.growDirection][2],
-                0, 0)
+                0, 0
+            )
         end
 
         typedframe:SetSize(db.size, db.size)      

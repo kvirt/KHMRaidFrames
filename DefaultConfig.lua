@@ -16,6 +16,7 @@ end
 function KHMRaidFrames:Defaults()
     local buffSize = 11 * self:GetFrameScale()
     local defaults_settings = {profile = {party = {}, raid = {}}}
+
     local commons = {
             frames = {
                 hideGroupTitles = false,
@@ -28,6 +29,18 @@ function KHMRaidFrames:Defaults()
                 size = 12,
                 xOffset = -3,
                 yOffset = -2,
+                glow = {
+                    type = "pixel",
+                    options = self:GetGlowOptions(),
+                    exclude = {},
+                    tracking = {
+                        "magic",
+                        "poison",
+                        "curse",
+                        "disease",
+                    },
+                    enabledFor = "None",
+                },
             },
             debuffFrames = {
                 num = 3,
@@ -35,7 +48,14 @@ function KHMRaidFrames:Defaults()
                 growDirection = "RIGHT",
                 size = buffSize,
                 xOffset = 3,
-                yOffset = yOffset,              
+                yOffset = yOffset,
+                glow = {
+                    type = "pixel",
+                    options = self:GetGlowOptions(),
+                    exclude = {},
+                    tracking = {},
+                    enabledFor = "None",                                          
+                },             
             },
             buffFrames = {
                 num = 3,
@@ -43,7 +63,14 @@ function KHMRaidFrames:Defaults()
                 growDirection = "LEFT",
                 size = buffSize,
                 xOffset = -3,
-                yOffset = yOffset,               
+                yOffset = yOffset,
+                glow = {
+                    type = "pixel",
+                    options = self:GetGlowOptions(),
+                    exclude = {},
+                    tracking = {},
+                    enabledFor = "None",                                          
+                },              
             },      
     }
     defaults_settings.profile.party = commons
@@ -54,7 +81,7 @@ end
 
 function KHMRaidFrames:RestoreDefaults(partyType, frameType)
     if InCombatLockdown() then
-        print("Can not refresh settings while in combat")
+        print("Can not refresh settings while in combat")      
         return
     end
 

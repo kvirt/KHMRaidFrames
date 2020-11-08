@@ -70,7 +70,7 @@ function KHMRaidFrames:SetupOptionsByType(frameType)
         name = L["Buffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameType("buffFrames", db, frameType),        
+        args = self:SetupOptionsByFrameTypeProxy("buffFrames", db, frameType),        
     }
     options.debuffFrames = {
         type = "group",
@@ -78,7 +78,7 @@ function KHMRaidFrames:SetupOptionsByType(frameType)
         name = L["Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameType("debuffFrames", db, frameType),        
+        args = self:SetupOptionsByFrameTypeProxy("debuffFrames", db, frameType),        
     }
     options.dispelDebuffFrames = {
         type = "group",
@@ -86,11 +86,34 @@ function KHMRaidFrames:SetupOptionsByType(frameType)
         name = L["Dispell Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameType("dispelDebuffFrames", db, frameType),  
+        args = self:SetupOptionsByFrameTypeProxy("dispelDebuffFrames", db, frameType),  
     }
 
     return options
 end        
+
+function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, partyType)
+    local options = {}
+
+    options.properties = {
+        type = "group",
+        order = 1,
+        name = L["Properties"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupOptionsByFrameType(frameType, db, partyType),     
+    }
+    options.glows = {
+        type = "group",
+        order = 2,
+        name = L["Glow"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupGlowOptions(frameType, db, partyType),        
+    }
+
+    return options    
+end
 
 function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
     local halfWidth = 1.6
@@ -140,19 +163,15 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
             type = "header",
             name = "",
             order = 4,
-        },                  
-        [frameType.."Skip2"] = {
-            type = "header",
-            name = "",
-            order = 5,
-        },         
+        },                         
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
             width = "full",
             type = "execute",
-            order = 6,
+            confirm = true,
+            order = 5,
             func = function(info,val)
                 self:RestoreDefaults(partyType, frameType)
             end,
@@ -162,9 +181,11 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
 end
 
 function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
-    local halfWidth = 1.6
+    local halfWidth = 1.5
 
     db = db[frameType]
+    local num
+    if frameType ~= "dispelDebuffFrames" then num = self.maxFrames else num = 4 end
 
     local options = {                
         ["num"..frameType] = {
@@ -174,7 +195,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             width = halfWidth,
             type = "range",
             min = 0,
-            max = 3,
+            max = num,
             step = 1,
             order = 1,          
             set = function(info,val)
@@ -258,12 +279,12 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
                 self:RefreshConfig()
             end,
             get = function(info) return db.growDirection end
-        },
+        },       
         [frameType.."Skip"] = {
             type = "header",
             name = "",
             order = 4,
-        },        
+        },                
         [frameType.."Virtual"] = {
             name = L["Show\\Hide Test Frames"],
             desc = "",
@@ -287,6 +308,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             width = "full",
             type = "execute",
             order = 7,
+            confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(partyType, frameType)
             end,

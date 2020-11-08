@@ -11,7 +11,7 @@ function KHMRaidFrames:GetVirtualFrames()
     local frame
 
     for frameType, _ in pairs(frames) do
-        for i=1, 3 do
+        for i=1, self.maxFrames do
             if not frames[i] then
                 frame = CreateFrame("Frame", nil, UIParent)
                 table.insert(frames[frameType], frame)
