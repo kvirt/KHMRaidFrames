@@ -1,5 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
-local _G = _G
+local _G, tonumber, tinsert, math = _G, tonumber, tinsert, math
 
 local mirror_positions = {
     ["LEFT"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
@@ -7,6 +7,14 @@ local mirror_positions = {
     ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
     ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
 }
+
+local rows_positions = {
+    ["LEFT"] = {"TOPRIGHT", "TOPLEFT"},
+    ["BOTTOM"] = {"TOPRIGHT", "BOTTOMRIGHT"},
+    ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
+    ["TOP"] = {"BOTTOMRIGHT", "TOPRIGHT"},         
+}
+
 
 function KHMRaidFrames:AddSubFrames(frame, db, frameType)
     if not frame then return end
@@ -16,7 +24,7 @@ function KHMRaidFrames:AddSubFrames(frame, db, frameType)
     if frameType == "buffFrames" then
         template = "CompactBuffTemplate"
     elseif frameType == "debuffFrames" then
-         template = "CompactDebuffTemplate"
+        template = "CompactDebuffTemplate"
     elseif frameType == "dispelDebuffFrames" then
         template = "CompactDispelDebuffTemplate"
     end  
@@ -26,13 +34,7 @@ function KHMRaidFrames:AddSubFrames(frame, db, frameType)
             if not self.extraFrames[frameName..i] then 
                 local typedFrame = CreateFrame("Button", frameName..i, frame, template)
                 typedFrame:ClearAllPoints()
-                typedFrame:SetSize(db.size, db.size)
-                typedFrame:SetPoint(                
-                    mirror_positions[db.growDirection][1], 
-                     _G[frameName..i - 1], 
-                    mirror_positions[db.growDirection][2],
-                    0, 0
-                )
+                typedFrame:Hide()
                 self.extraFrames[frameName..i] = true
             end
         end
@@ -41,14 +43,46 @@ end
 
 function KHMRaidFrames:GetFrameProperties(frame)
     local matches = frame:GetName():gmatch("%u+%l+%d*")
-    local _ groupType, _, _, id = matches(), matches(), matches(), matches(), matches()
-    groupType = groupType:lower()
-    local frameType = id:sub(1, -2)
-    id = id:sub(-1)
-    return groupType, frameType, id
+    local _, groupType = matches(), matches()
+    return groupType:lower()
 end
 
-local function SetDebuffsHelper(debuffFrames, frameNum, maxDebuffs, filter, isBossAura, isBossBuff, auras)
+function KHMRaidFrames:CompactUnitFrame_Util_IsBossAura(...)
+    return select(12, ...);
+end
+
+function KHMRaidFrames:CompactUnitFrame_Util_ShouldDisplayDebuff(...)
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura, isBossAura = ...;
+
+    if not self:FilterAuras(name, debuffType, spellId, "debuffFrames") then
+        return false
+    end
+
+    local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT");
+    if ( hasCustom ) then
+        return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") );   --Would only be "mine" in the case of something like forbearance.
+    else
+        return true;
+    end
+end
+
+function KHMRaidFrames:CompactUnitFrame_UtilShouldDisplayBuff(...)
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = ...;
+
+    if not self:FilterAuras(name, debuffType, spellId, "buffFrames") then
+        return false
+    end
+
+    local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT");
+
+    if ( hasCustom ) then
+        return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"));
+    else
+        return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId);
+    end
+end
+
+function KHMRaidFrames:SetDebuffsHelper(debuffFrames, frameNum, maxDebuffs, filter, isBossAura, isBossBuff, auras)
     if auras then
         for i = 1,#auras do
             local aura = auras[i];
@@ -71,20 +105,21 @@ local function SetDebuffsHelper(debuffFrames, frameNum, maxDebuffs, filter, isBo
     return frameNum, maxDebuffs;
 end
 
-local function NumElements(arr)
+function KHMRaidFrames:NumElements(arr)
     return arr and #arr or 0;
 end
 
 local dispellableDebuffTypes = { Magic = true, Curse = true, Disease = true, Poison = true};
 
-hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
-    if not UnitIsPlayer(frame.displayedUnit) then
-        return
-    end
+function KHMRaidFrames:UpdateAuras(frame)
+    local db = self.db.profile[self:GetFrameProperties(frame)]
+    local maxBuffs = db.buffFrames.num
+    local maxDebuffs = db.debuffFrames.num
+    local maxDispelDebuffs = db.dispelDebuffFrames.num
 
-    local doneWithBuffs = not frame.buffFrames or not frame.optionTable.displayBuffs or frame.maxBuffs == 0;
-    local doneWithDebuffs = not frame.debuffFrames or not frame.optionTable.displayDebuffs or frame.maxDebuffs == 0;
-    local doneWithDispelDebuffs = not frame.dispelDebuffFrames or not frame.optionTable.displayDispelDebuffs or frame.maxDispelDebuffs == 0;
+    local doneWithBuffs = not frame.buffFrames or not frame.optionTable.displayBuffs or maxBuffs == 0;
+    local doneWithDebuffs = not frame.debuffFrames or not frame.optionTable.displayDebuffs or maxDebuffs == 0;
+    local doneWithDispelDebuffs = not frame.dispelDebuffFrames or not frame.optionTable.displayDispelDebuffs or maxDispelDebuffs == 0;
 
     local numUsedBuffs = 0;
     local numUsedDebuffs = 0;
@@ -95,17 +130,17 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
     -- The following is the priority order for debuffs
     local bossDebuffs, bossBuffs, priorityDebuffs, nonBossDebuffs;
     local index = 1;
-    local batchCount = frame.maxDebuffs;
+    local batchCount = maxDebuffs
 
     if not doneWithDebuffs then
         AuraUtil.ForEachAura(frame.displayedUnit, "HARMFUL", batchCount, function(...)
-            if CompactUnitFrame_Util_IsBossAura(...) then
+            if self:CompactUnitFrame_Util_IsBossAura(...) then
                 if not bossDebuffs then
                     bossDebuffs = {};
                 end
                 tinsert(bossDebuffs, {index, ...});
                 numUsedDebuffs = numUsedDebuffs + 1;
-                if numUsedDebuffs == frame.maxDebuffs then
+                if numUsedDebuffs == maxDebuffs then
                     doneWithDebuffs = true;
                     return true;
                 end
@@ -114,7 +149,7 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
                     priorityDebuffs = {};
                 end
                 tinsert(priorityDebuffs, {index, ...});
-            elseif not displayOnlyDispellableDebuffs and CompactUnitFrame_Util_ShouldDisplayDebuff(...) then
+            elseif not displayOnlyDispellableDebuffs and self:CompactUnitFrame_Util_ShouldDisplayDebuff(...) then
                 if not nonBossDebuffs then
                     nonBossDebuffs = {};
                 end
@@ -127,12 +162,10 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
     end
 
     if not doneWithBuffs or not doneWithDebuffs then
-        local maxDebuffs =  or frame.maxDebuffs
-        local maxBuffs =  or frame.maxBuffs
         index = 1;
-        batchCount = math.max(frame.maxDebuffs, maxBuffs);
+        batchCount = math.max(maxBuffs, maxDebuffs);
         AuraUtil.ForEachAura(frame.displayedUnit, "HELPFUL", batchCount, function(...)
-            if CompactUnitFrame_Util_IsBossAura(...) then
+            if self:CompactUnitFrame_Util_IsBossAura(...) then
                 -- Boss Auras are considered Debuffs for our purposes.
                 if not doneWithDebuffs then
                     if not bossBuffs then
@@ -140,11 +173,11 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
                     end
                     tinsert(bossBuffs, {index, ...});
                     numUsedDebuffs = numUsedDebuffs + 1;
-                    if numUsedDebuffs == frame.maxDebuffs then
+                    if numUsedDebuffs == maxDebuffs then
                         doneWithDebuffs = true;
                     end
                 end
-            elseif CompactUnitFrame_UtilShouldDisplayBuff(...) then
+            elseif self:CompactUnitFrame_UtilShouldDisplayBuff(...) then
                 if not doneWithBuffs then
                     numUsedBuffs = numUsedBuffs + 1;
                     local buffFrame = frame.buffFrames[numUsedBuffs];
@@ -160,8 +193,8 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
         end);
     end
 
-    numUsedDebuffs = math.min(frame.maxDebuffs, numUsedDebuffs + NumElements(priorityDebuffs));
-    if numUsedDebuffs == frame.maxDebuffs then
+    numUsedDebuffs = math.min(maxDebuffs, numUsedDebuffs + self:NumElements(priorityDebuffs));
+    if numUsedDebuffs == maxDebuffs then
         doneWithDebuffs = true;
     end
 
@@ -175,17 +208,17 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
     end
 
     if not doneWithDispelDebuffs or not doneWithDebuffs then
-        batchCount = math.max(frame.maxDebuffs, frame.maxDispelDebuffs);
+        batchCount = math.max(maxDebuffs, maxDispelDebuffs);
         index = 1;
         AuraUtil.ForEachAura(frame.displayedUnit, "HARMFUL|RAID", batchCount, function(...)
             if not doneWithDebuffs and displayOnlyDispellableDebuffs then
-                if CompactUnitFrame_Util_ShouldDisplayDebuff(...) and not CompactUnitFrame_Util_IsBossAura(...) and not CompactUnitFrame_Util_IsPriorityDebuff(...) then
+                if self:CompactUnitFrame_Util_ShouldDisplayDebuff(...) and not self:CompactUnitFrame_Util_IsBossAura(...) and not CompactUnitFrame_Util_IsPriorityDebuff(...) then
                     if not nonBossDebuffs then
                         nonBossDebuffs = {};
                     end
                     tinsert(nonBossDebuffs, {index, ...});
                     numUsedDebuffs = numUsedDebuffs + 1;
-                    if numUsedDebuffs == frame.maxDebuffs then
+                    if numUsedDebuffs == maxDebuffs then
                         doneWithDebuffs = true;
                     end
                 end
@@ -197,7 +230,7 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
                     numUsedDispelDebuffs = numUsedDispelDebuffs + 1;
                     local dispellDebuffFrame = frame.dispelDebuffFrames[numUsedDispelDebuffs];
                     CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
-                    if numUsedDispelDebuffs == frame.maxDispelDebuffs then
+                    if numUsedDispelDebuffs == maxDispelDebuffs then
                         doneWithDispelDebuffs = true;
                     end
                 end
@@ -208,33 +241,73 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(frame)
     end
 
     local frameNum = 1;
-    local maxDebuffs = frame.maxDebuffs;
+    local maxDebuffs = maxDebuffs
 
     do
         local isBossAura = true;
         local isBossBuff = false;
-        frameNum, maxDebuffs = SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HARMFUL", isBossAura, isBossBuff, bossDebuffs);
+        frameNum, maxDebuffs = self:SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HARMFUL", isBossAura, isBossBuff, bossDebuffs);
     end
     do
         local isBossAura = true;
         local isBossBuff = true;
-        frameNum, maxDebuffs = SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HELPFUL", isBossAura, isBossBuff, bossBuffs);
+        frameNum, maxDebuffs = self:SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HELPFUL", isBossAura, isBossBuff, bossBuffs);
     end
     do
         local isBossAura = false;
         local isBossBuff = false;
-        frameNum, maxDebuffs = SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HARMFUL", isBossAura, isBossBuff, priorityDebuffs);
+        frameNum, maxDebuffs = self:SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HARMFUL", isBossAura, isBossBuff, priorityDebuffs);
     end
     do
         local isBossAura = false;
         local isBossBuff = false;
-        frameNum, maxDebuffs = SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HARMFUL|RAID", isBossAura, isBossBuff, nonBossDebuffs);
+        frameNum, maxDebuffs = self:SetDebuffsHelper(frame.debuffFrames, frameNum, maxDebuffs, "HARMFUL|RAID", isBossAura, isBossBuff, nonBossDebuffs);
     end
     numUsedDebuffs = frameNum - 1;
 
     CompactUnitFrame_HideAllBuffs(frame, numUsedBuffs + 1);
     CompactUnitFrame_HideAllDebuffs(frame, numUsedDebuffs + 1);
     CompactUnitFrame_HideAllDispelDebuffs(frame, numUsedDispelDebuffs + 1);
+end
 
-    BigDebuffs:ShowBigDebuffs(frame)
-end)
+function KHMRaidFrames:GetFramePosition(frame, typedframes, db, frameNum)
+    local anchor1, relativeFrame, anchor2
+
+    if frameNum == 1 then
+        anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
+    elseif frameNum % (db.numInRow) == 1 then
+        anchor1, relativeFrame, anchor2 = rows_positions[db.rowsGrowDirection][1], typedframes[frameNum - db.numInRow], rows_positions[db.rowsGrowDirection][2]
+    else
+        anchor1, relativeFrame, anchor2 = mirror_positions[db.growDirection][1], typedframes[frameNum - 1], mirror_positions[db.growDirection][2]           
+    end
+
+    return anchor1, relativeFrame, anchor2
+end
+
+function KHMRaidFrames:FilterAuras(name, debuffType, spellId, frameType)
+    local db, excluded
+
+    if IsInRaid() then
+        db = self.db.profile.raid[frameType]
+    else
+        db = self.db.profile.party[frameType]
+    end
+
+    excluded = self:FilterAurasInternal(name, debuffType, spellId, db.exclude, true)
+
+    if excluded then return false end
+
+    return self:FilterAurasInternal(name, debuffType, spellId, db.tracking, false)
+end
+
+function KHMRaidFrames:FilterAurasInternal(name, debuffType, spellId, db, exclude)
+    if #db == 0 then return not exclude end
+
+    for _, aura in pairs(db) do
+        if aura == name or aura == debuffType or tonumber(aura) == spellId then
+            return true
+        end
+    end
+
+    return false
+end

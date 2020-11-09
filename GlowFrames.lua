@@ -42,14 +42,12 @@ function KHMRaidFrames:GetGlowOptions(key)
     if key and options[key] then return options[key] else return options end
 end
 
-function KHMRaidFrames:GetGlowFramesTypes()
-    return {
-        None = L["None"],
-        All = L["All"],
-        SubFrame = L["SubFrame"],
-        MainFrame = L["MainFrame"],
-    }
-end
+local glowEnabledFor = {
+    None = L["None"],
+    All = L["All"],
+    SubFrame = L["SubFrame"],
+    MainFrame = L["MainFrame"],
+}
 
 function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
     local fullWidth = 2.6
@@ -65,7 +63,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             descStyle = "inline",
             width = "full",
             type = "select",
-            values = self:GetGlowFramesTypes(),
+            values = glowEnabledFor,
             order = 1,          
             set = function(info,val)
                 db.glow.enabledFor = val
@@ -321,28 +319,172 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
     return options
 end
 
-function KHMRaidFrames:GlowFrame(frame, db)
-    local glowType = db.glow.type
-    local glowOptions = db.glow.options[glowType]
-    local options = glowOptions.options
-    local start = glowOptions.start
-    local stop = glowOptions.stop
+function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = ...
 
-    if self.glowingFrames[frame:GetName()] then
-        if glowType == "button" then
-            start(frame, options.color, options.frequency)
-        elseif glowType == "pixel" then
-            start(frame, options.color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, options.key or "")
-        elseif glowType == "auto" then
-            start(frame, options.color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset, options.key or "")
-        end
+    self:FilterGlowAuras(buffFrame, name, debuffType, spellId, "buffFrames")
+end
+
+function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = ...
+
+    self:FilterGlowAuras(debuffFrame, name, debuffType, spellId, "debuffFrames")
+end
+
+function KHMRaidFrames:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
+    self:FilterGlowAuras(dispellDebuffFrame, nil, debuffType, nil, "dispelDebuffFrames")
+end
+
+function KHMRaidFrames:CompactUnitFrame_HideAllBuffs(frame, startingIndex)
+    if IsInRaid() then
+        db = self.db.profile.raid.buffFrames.glow
     else
-        stop(frame)
+        db = self.db.profile.party.buffFrames.glow
+    end
+
+    if frame.buffFrames then
+        for i=startingIndex or 1, #frame.buffFrames do
+            self:StopGlowFrame(frame.buffFrames[i], frame, db)
+        end
     end
 end
 
-function KHMRaidFrames:FilterTrackingAuras(aura, db)
+function KHMRaidFrames:CompactUnitFrame_HideAllDebuffs(frame, startingIndex)
+    if IsInRaid() then
+        db = self.db.profile.raid.debuffFrames.glow
+    else
+        db = self.db.profile.party.debuffFrames.glow
+    end
+
+    if frame.debuffFrames then
+        for i=startingIndex or 1, #frame.debuffFrames do
+            self:StopGlowFrame(frame.debuffFrames[i], frame, db)
+        end
+    end
 end
 
-function KHMRaidFrames:FilterExcludedAuras(aura, db)
+function KHMRaidFrames:CompactUnitFrame_HideAllDispelDebuffs(frame, startingIndex)
+    if IsInRaid() then
+        db = self.db.profile.raid.dispelDebuffFrames.glow
+    else
+        db = self.db.profile.party.dispelDebuffFrames.glow
+    end
+    
+    if frame.dispelDebuffFrames then
+        for i=startingIndex or 1, #frame.dispelDebuffFrames do
+            self:StopGlowFrame(frame.dispelDebuffFrames[i], frame, db)
+        end
+    end
+end
+
+function KHMRaidFrames:StartGlowFrameInternal(frame, options, glowType, start)
+    if glowType == "button" then
+        start(frame, options.color, options.frequency)
+    elseif glowType == "pixel" then
+        start(frame, options.color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, options.key or "")
+    elseif glowType == "auto" then
+        start(frame, options.color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset, options.key or "")
+    end
+end
+
+function KHMRaidFrames:StartGlowFrame(frame, parentframe, db)
+    local glowType = db.type
+    local glowOptions = db.options[glowType]
+    local options = glowOptions.options
+    local start = glowOptions.start
+    local parentGlow = false
+
+    for k, v in pairs(self.framesAuras) do
+        if v then 
+            parentGlow = true 
+            break 
+        end
+    end
+
+    if db.enabledFor == "SubFrame" then
+        self:StartGlowFrameInternal(frame, options, glowType, start)
+    elseif db.enabledFor == "MainFrame" then
+        if parentGlow then
+            self:StartGlowFrameInternal(parentframe, options, glowType, start)
+        end
+    else
+        self:StartGlowFrameInternal(frame, options, glowType, start)
+
+        if parentGlow then
+            self:StartGlowFrameInternal(parentframe, options, glowType, start)
+        end
+    end 
+end
+
+function KHMRaidFrames:StopGlowFrame(frame, parentFrame, db)
+    local parentGlow = false
+
+    for k, v in pairs(self.framesAuras) do
+        if v then 
+            parentGlow = true 
+            break 
+        end
+    end
+
+    if db.enabledFor == "SubFrame" then
+        db.options[db.type].stop(frame)
+    elseif db.enabledFor == "MainFrame" then
+        if not parentGlow then
+            db.options[db.type].stop(parentFrame)
+        end
+    else
+        db.options[db.type].stop(frame)
+
+        if not parentGlow then
+            db.options[db.type].stop(parentFrame)
+        end
+    end    
+end
+
+function KHMRaidFrames:FilterGlowAuras(frame, name, debuffType, spellId, frameType)
+    local db, excluded, tracked
+
+    if IsInRaid() then
+        db = self.db.profile.raid[frameType].glow
+    else
+        db = self.db.profile.party[frameType].glow
+    end
+
+    if db.enabledFor == "None" then
+        return
+    end
+
+    local parentFrame = frame:GetParent()
+
+    excluded = self:FilterGlowAurasInternal(name, debuffType, spellId, db.exclude, true)
+
+    if exclude then
+        self:StopGlowFrame(frame, parentFrame, db)
+        return
+    end
+
+    tracked = self:FilterGlowAurasInternal(name, debuffType, spellId, db.tracking, false)
+
+    if tracked then
+        self:StartGlowFrame(frame, parentFrame, db)
+    else
+        self:StopGlowFrame(frame, parentFrame, db)
+    end
+end
+
+function KHMRaidFrames:FilterGlowAurasInternal(name, debuffType, spellId, db, exclude)
+    if #db == 0 then return not exclude end
+
+    local found = false
+
+    for _, aura in pairs(db) do
+        if aura == name or aura == debuffType or tonumber(aura) == spellId then
+            found = true
+            self.framesAuras[aura] = not exclude
+        else
+            self.framesAuras[aura] = exclude
+        end
+    end
+    
+    return found
 end

@@ -24,11 +24,15 @@ function KHMRaidFrames:Defaults()
             },        
             dispelDebuffFrames = {
                 num = 3,
+                numInRow = 3,
+                rowsGrowDirection = "TOP",
                 anchorPoint = "TOPRIGHT",
                 growDirection = "LEFT",
                 size = 12,
                 xOffset = -3,
                 yOffset = -2,
+                exclude = {},
+                tracking = {},               
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
@@ -44,11 +48,15 @@ function KHMRaidFrames:Defaults()
             },
             debuffFrames = {
                 num = 3,
+                numInRow = 3,
+                rowsGrowDirection = "TOP",                
                 anchorPoint = "BOTTOMLEFT",
                 growDirection = "RIGHT",
                 size = buffSize,
                 xOffset = 3,
                 yOffset = yOffset,
+                exclude = {},
+                tracking = {},                  
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
@@ -59,11 +67,15 @@ function KHMRaidFrames:Defaults()
             },
             buffFrames = {
                 num = 3,
+                numInRow = 3,
+                rowsGrowDirection = "TOP",                  
                 anchorPoint = "BOTTOMRIGHT",
                 growDirection = "LEFT",
                 size = buffSize,
                 xOffset = -3,
                 yOffset = yOffset,
+                exclude = {},
+                tracking = {},                  
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),

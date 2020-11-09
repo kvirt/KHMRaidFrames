@@ -7,16 +7,10 @@ local _G, tonumber = _G, tonumber
 local MAX_RAID_GROUPS, BOSS_DEBUFF_SIZE_INCREASE = MAX_RAID_GROUPS, BOSS_DEBUFF_SIZE_INCREASE
 local frameStyle = "useCompactPartyFrames"
 
-local mirror_positions = {
-    ["LEFT"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
-    ["BOTTOM"] = {"TOPLEFT", "BOTTOMLEFT"},
-    ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
-    ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
-}
 
 function KHMRaidFrames:Setup()
     self.maxFrames = 10
-    self.glowingFrames = {}
+    self.framesAuras = {}
     self.extraFrames = {}
       
     self.virtualFrames = self:GetVirtualFrames()
@@ -74,6 +68,25 @@ function KHMRaidFrames:OnEnable()
             self:UpdateLayout(container) 
         end
     )
+
+    self:SecureHook(
+        "CompactUnitFrame_UpdateAuras", 
+        function(frame)
+            if not UnitIsPlayer(frame.displayedUnit) or not frame:GetName() then
+                return
+            else
+                self:UpdateAuras(frame)
+            end
+        end
+    )
+
+    self:SecureHook("CompactUnitFrame_UtilSetBuff")
+    self:SecureHook("CompactUnitFrame_UtilSetDebuff")
+    self:SecureHook("CompactUnitFrame_UtilSetDispelDebuff")        
+
+    self:SecureHook("CompactUnitFrame_HideAllBuffs")
+    self:SecureHook("CompactUnitFrame_HideAllDebuffs")
+    self:SecureHook("CompactUnitFrame_HideAllDispelDebuffs") 
 
     self:RefreshConfig()   
 end
@@ -187,7 +200,6 @@ function KHMRaidFrames:SetUpSubFrames(groupIndex, groupFrame)
         if frame and frame:IsShown() and frame.unit then
             for _, frameType in ipairs({"buffFrames", "debuffFrames", "dispelDebuffFrames"}) do
                 self:AddSubFrames(frame, db[frameType], frameType)
-                print(#frame[frameType])
                 typedframes = frame[frameType]
                 self:ResizeHideHooks(typedframes, db[frameType], frameType == "debuffFrames")                
                 self:SetUpFramesInternal(frame, typedframes, db[frameType])
@@ -252,29 +264,27 @@ end
 
 function KHMRaidFrames:SetUpFramesInternal(frame, typedframes, db)
     local frameNum = 1
-    local typedframe
+    local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
     while frameNum <= #typedframes do
         typedframe = typedframes[frameNum]
 
         typedframe:ClearAllPoints()
+        anchor1, relativeFrame, anchor2 = self:GetFramePosition(frame, typedframes, db, frameNum)
 
         if frameNum == 1 then
-            typedframe:SetPoint(
-                db.anchorPoint, 
-                frame, 
-                db.anchorPoint, 
-                db.xOffset, 
-                db.yOffset
-            )
+            xOffset, yOffset = db.xOffset, db.yOffset
         else
-            typedframe:SetPoint(
-                mirror_positions[db.growDirection][1], 
-                typedframes[frameNum - 1], 
-                mirror_positions[db.growDirection][2],
-                0, 0
-            )
+            xOffset, yOffset = 0, 0
         end
+
+        typedframe:SetPoint(
+            anchor1, 
+            relativeFrame, 
+            anchor2, 
+            xOffset, 
+            yOffset
+        )
 
         typedframe:SetSize(db.size, db.size)      
 

@@ -44,3 +44,5 @@ L["Thickness"] = true
 L["Border"] = true
 L["Tracking"] = true 
 L["Exclude"] = true
+L["Num In Row"] = true 
+L["Rows Grow Direction"] = true
