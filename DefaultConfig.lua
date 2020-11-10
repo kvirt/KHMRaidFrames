@@ -36,14 +36,13 @@ function KHMRaidFrames:Defaults()
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
-                    exclude = {},
                     tracking = {
                         "magic",
                         "poison",
                         "curse",
                         "disease",
                     },
-                    enabledFor = "None",
+                    enabled = false
                 },
             },
             debuffFrames = {
@@ -60,9 +59,8 @@ function KHMRaidFrames:Defaults()
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
-                    exclude = {},
                     tracking = {},
-                    enabledFor = "None",                                          
+                    enabled = false                                          
                 },             
             },
             buffFrames = {
@@ -79,9 +77,8 @@ function KHMRaidFrames:Defaults()
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
-                    exclude = {},
                     tracking = {},
-                    enabledFor = "None",                                          
+                    enabled = false                                          
                 },              
             },      
     }

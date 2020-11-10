@@ -1,5 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
-LGF = LibStub("LibGetFrame-1.0")
+local LGF = LibStub("LibGetFrame-1.0")
 local _G, SecureButton_GetUnit, C_Timer, _ = _G, SecureButton_GetUnit, C_Timer, _
 
 function KHMRaidFrames:GetVirtualFrames()
@@ -78,7 +78,7 @@ function KHMRaidFrames:ShowVirtual(info)
     local db = self.db.profile[groupType][frameType]
 
     local typedframes = self.virtualFrames[frameType]
-    
+
     local frame = LGF.GetFrame("player", {framePriorities={"^CompactParty", "^CompactRaid"}})
 
     if not frame then

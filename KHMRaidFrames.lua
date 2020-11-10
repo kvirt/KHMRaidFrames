@@ -9,10 +9,14 @@ local frameStyle = "useCompactPartyFrames"
 
 
 function KHMRaidFrames:Setup()
-    self.maxFrames = 10
-    self.framesAuras = {}
+    self.maxFrames = 10 
     self.extraFrames = {}
-      
+    self.glowingFrames = {
+        buffFrames = {},
+        debuffFrames = {},
+        dispelDebuffFrames = {},        
+    }
+
     self.virtualFrames = self:GetVirtualFrames()
     self.virtual = {        
         buffFrames = false,
@@ -81,7 +85,8 @@ function KHMRaidFrames:OnEnable()
     )
 
     self:SecureHook("CompactUnitFrame_UtilSetBuff")
-    self:SecureHook("CompactUnitFrame_UtilSetDebuff")
+    -- hooked in resize\setposition function for blizzard's big debuff reason
+    -- self:SecureHook("CompactUnitFrame_UtilSetDebuff")
     self:SecureHook("CompactUnitFrame_UtilSetDispelDebuff")        
 
     self:SecureHook("CompactUnitFrame_HideAllBuffs")
@@ -238,7 +243,7 @@ function KHMRaidFrames:ResizeHideHooks(typedframes, db, needHook)
                 self:SecureHook(
                     "CompactUnitFrame_UtilSetDebuff", 
                     function(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...) 
-                        self:SetDebuff(debuffFrame, isBossAura, db) 
+                        self:SetDebuff(db, debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...) 
                     end
                 )
             end        
@@ -252,14 +257,16 @@ function KHMRaidFrames:OnShow(frame, db, frameNum)
     end
 end
 
-function KHMRaidFrames:SetDebuff(debuffFrame, isBossAura, db)
+function KHMRaidFrames:SetDebuff(db, debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)
     local size = db.size
 
     if isBossAura then
         size = size + BOSS_DEBUFF_SIZE_INCREASE
     end
 
-    debuffFrame:SetSize(size, size)    
+    debuffFrame:SetSize(size, size)
+
+    self:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)  
 end
 
 function KHMRaidFrames:SetUpFramesInternal(frame, typedframes, db)

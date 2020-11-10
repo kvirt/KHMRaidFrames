@@ -1,5 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
-local _G, tonumber, tinsert, math = _G, tonumber, tinsert, math
+local _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE
 
 local mirror_positions = {
     ["LEFT"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
@@ -47,6 +47,68 @@ function KHMRaidFrames:GetFrameProperties(frame)
     return groupType:lower()
 end
 
+function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)
+    -- make sure you are using the correct index here!
+    --isBossAura says make this look large.
+    --isBossBuff looks in HELPFULL auras otherwise it looks in HARMFULL ones
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = ...;
+    if name == nil then
+        -- for backwards compatibility - this functionality will be removed in a future update
+        if unit then
+            if (isBossBuff) then
+                name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(unit, index, filter);
+            else
+                name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(unit, index, filter);
+            end
+        else
+            return;
+        end
+    end
+    debuffFrame.filter = filter;
+    debuffFrame.icon:SetTexture(icon);
+    if ( count > 1 ) then
+        local countText = count;
+        if ( count >= 100 ) then
+            countText = BUFF_STACKS_OVERFLOW;
+        end
+        debuffFrame.count:Show();
+        debuffFrame.count:SetText(countText);
+    else
+        debuffFrame.count:Hide();
+    end
+    debuffFrame:SetID(index);
+    local enabled = expirationTime and expirationTime ~= 0;
+    if enabled then
+        local startTime = expirationTime - duration;
+        CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
+    else
+        CooldownFrame_Clear(debuffFrame.cooldown);
+    end
+
+    local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
+    debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
+
+    debuffFrame.isBossBuff = isBossBuff;
+
+    local size
+
+    if IsInRaid() then
+        size = self.db.profile.raid.debuffFrames.size
+    else
+        size = self.db.profile.party.debuffFrames.size
+    end
+
+    if isBossAura then
+        size = size + BOSS_DEBUFF_SIZE_INCREASE
+    end
+
+    debuffFrame:SetSize(size, size)
+
+    debuffFrame:Show();
+
+    self:FilterGlowAuras(debuffFrame, name, debuffType, spellId, "debuffFrames")    
+end
+
 function KHMRaidFrames:CompactUnitFrame_Util_IsBossAura(...)
     return select(12, ...);
 end
@@ -91,14 +153,17 @@ function KHMRaidFrames:SetDebuffsHelper(debuffFrames, frameNum, maxDebuffs, filt
             end
             local debuffFrame = debuffFrames[frameNum];
             local index, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, nameplateShowPersonal, spellId = aura[1], aura[2], aura[3], aura[4], aura[5], aura[6], aura[7], aura[8], aura[9], aura[10], aura[11];
-            local unit = nil;
-            CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, "HARMFUL", isBossAura, isBossBuff, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, nameplateShowPersonal, spellId);
-            frameNum = frameNum + 1;
 
-            if isBossAura then
-                --Boss auras are about twice as big as normal debuffs, so we may need to display fewer buffs
-                local bossDebuffScale = (debuffFrame.baseSize + BOSS_DEBUFF_SIZE_INCREASE)/debuffFrame.baseSize;
-                maxDebuffs = maxDebuffs - (bossDebuffScale - 1);
+            if self:FilterAuras(name, debuffType, spellId, "debuffFrames") then
+                local unit = nil;
+                self:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, "HARMFUL", isBossAura, isBossBuff, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, nameplateShowPersonal, spellId);
+                frameNum = frameNum + 1;
+
+                if isBossAura then
+                    --Boss auras are about twice as big as normal debuffs, so we may need to display fewer buffs
+                    local bossDebuffScale = (debuffFrame.baseSize + BOSS_DEBUFF_SIZE_INCREASE)/debuffFrame.baseSize;
+                    maxDebuffs = maxDebuffs - (bossDebuffScale - 1);
+                end
             end
         end
     end
