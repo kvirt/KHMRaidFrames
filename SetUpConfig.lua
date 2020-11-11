@@ -21,6 +21,7 @@ local grow_positions = {
     ["TOP"] = L["TOP"],
 }
 
+
 function KHMRaidFrames:SetupOptions()
     local options = {
         name = L["KHMRaidFrames"],
@@ -111,12 +112,23 @@ function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, partyType)
         childGroups = "tab",  
         args = self:SetupGlowOptions(frameType, db, partyType),        
     }
+    options.virtualFrames = {
+        name = L["Show\\Hide Test Frames"],
+        desc = "",
+        descStyle = "inline",
+        width = "full",
+        type = "execute",
+        order = 6,
+        func = function(info,val)
+            self:ShowVirtual(partyType)
+        end,
+    }
 
     return options    
 end
 
 function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
-    local halfWidth = 1.6
+    local halfWidth = "normal"
 
     db = db[frameType]
 
@@ -125,12 +137,12 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
             name = L["Hide Group Title"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "normal",
             type = "toggle",
             order = 2,
             set = function(info,val)
                 db.hideGroupTitles = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) 
                 return db.hideGroupTitles 
@@ -140,7 +152,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
             name = L["Texture"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "double",
             type = "select",
             values = function(info, val)
                 local textures = SharedMedia:HashTable("statusbar")
@@ -155,7 +167,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
             order = 3,        
             set = function(info,val)
                 db.texture = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.texture end
         },
@@ -175,16 +187,23 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
             func = function(info,val)
                 self:RestoreDefaults(partyType, frameType)
             end,
-        },                       
+        },                               
     }
     return options    
 end
 
 function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
-    local halfWidth = 1.5
-
     db = db[frameType]
-    local num
+    local num, frameName
+
+    if frameType == "dispelDebuffFrames" then
+        frameName = L["Dispell Debuffs"]
+    elseif frameType == "debuffFrames" then
+        frameName = L["Debuffs"]
+    else
+        frameName = L["Buffs"]
+    end
+
     if frameType ~= "dispelDebuffFrames" then num = self.maxFrames else num = 4 end
 
     local options = {                
@@ -192,7 +211,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             name = L["Num"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "normal",
             type = "range",
             min = 0,
             max = num,
@@ -200,7 +219,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             order = 1,          
             set = function(info,val)
                 db.num = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.num end
         },       
@@ -208,7 +227,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             name = L["Size"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "double",
             type = "range",
             min = 1,
             max = 100,
@@ -216,7 +235,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             order = 1,           
             set = function(info,val)
                 db.size = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.size end
         },
@@ -224,7 +243,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             name = L["Num In Row"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "normal",
             type = "range",
             min = 0,
             max = num,
@@ -232,37 +251,23 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             order = 2,          
             set = function(info,val)
                 db.numInRow = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.numInRow end
-        },
-        [frameType.."rowsGrowDirection"] = {
-            name = L["Rows Grow Direction"],
-            desc = "",
-            descStyle = "inline",
-            width = halfWidth,
-            type = "select",
-            values = grow_positions,
-            order = 2,
-            set = function(info,val)
-                db.rowsGrowDirection = val
-                self:RefreshConfig()
-            end,
-            get = function(info) return db.rowsGrowDirection end
-        },                 
+        },                
         ["xOffset"..frameType] = {
             name = L["X Offset"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "normal",
             type = "range",
             min = -100,
             max = 100,
             step = 1,
-            order = 3,          
+            order = 2,          
             set = function(info,val)
                 db.xOffset = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.xOffset end
         },
@@ -270,29 +275,43 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             name = L["Y Offset"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "normal",
             type = "range",
             min = -100,
             max = 100,
             step = 1,
-            order = 3,          
+            order = 2,          
             set = function(info,val)
                 db.yOffset = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.yOffset end
-        },                                      
+        },       
+        [frameType.."rowsGrowDirection"] = {
+            name = L["Rows Grow Direction"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "select",
+            values = grow_positions,
+            order = 3,
+            set = function(info,val)
+                db.rowsGrowDirection = val
+                self:SafeRefresh()
+            end,
+            get = function(info) return db.rowsGrowDirection end
+        },                                        
         [frameType.."AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "normal",
             type = "select",
             values = positions,
-            order = 4,           
+            order = 3,           
             set = function(info,val)
                 db.anchorPoint = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.anchorPoint end
         },
@@ -300,99 +319,64 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             name = L["Grow Direction"],
             desc = "",
             descStyle = "inline",
-            width = halfWidth,
+            width = "normal",
             type = "select",
             values = grow_positions,
-            order = 4,
+            order = 3,
             set = function(info,val)
                 db.growDirection = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.growDirection end
-        },       
-        [frameType.."Skip"] = {
-            type = "header",
-            name = "",
-            order = 5,
-        },                
-        [frameType.."Virtual"] = {
-            name = L["Show\\Hide Test Frames"],
-            desc = "",
-            descStyle = "inline",
-            width = "full",
-            type = "execute",
-            order = 6,
-            func = function(info,val)
-                self:ShowVirtual(info)
-            end,
-        },         
+        },                              
         [frameType.."Skip2"] = {
             type = "header",
             name = L["Tracking"],
-            order = 7,
+            order = 4,
         },
         ["tracking"..frameType] = {
             name = L["Tracking"],
-            desc = "",
-            descStyle = "inline",
+            desc = L["Use for tracking particular "]..frameName..L[", will ignore everything else if not empty"],
+            usage = self:TrackingHelpText(),
+            multiline = 5,            
             width = "full",
             type = "input",
-            multiline = true,
-            order = 8,                 
+            order = 5,                 
             set = function(info,val)
-                db.tracking = {}
-                local index = 1
-                for value in string.gmatch(val, "[^\n]+") do
-                    db.tracking[index] = value
-                    index = index + 1
-                end
-                self:RefreshConfig()
+                db.tracking = self:SanitizeStrings(val)
+                db.trackingStr = val
+
+                self:SafeRefresh()
             end,
             get = function(info)
-                local str = ""
-                for _, value in ipairs(db.tracking) do
-                    str = str..value.."\n"
-                end
-                return str
+                return db.trackingStr
             end            
         },
         ["exclude"..frameType] = {
             name = L["Exclude"],
-            desc = "",
-            descStyle = "inline",
+            desc = L["Use for exclude particular "]..frameName,
+            usage = self:TrackingHelpText(),
             width = "full",
             type = "input",
-            multiline = true,
-            order = 9,                   
+            multiline = 5, 
+            order = 6,                   
             set = function(info,val)
-                db.exclude = {}
-                local index = 1
-                for value in string.gmatch(val, "[^\n]+") do
-                    db.exclude[index] = value
-                    index = index + 1
-                end
-                self:RefreshConfig()
+                db.exclude = self:SanitizeStrings(val)
+                db.excludeStr = val
+
+                self:SafeRefresh()
             end,
             get = function(info)
-                local str = ""
-                for _, value in ipairs(db.exclude) do
-                    str = str..value.."\n"
-                end
-                return str
+                return db.excludeStr
             end              
-        },
-        [frameType.."Skip3"] = {
-            type = "header",
-            name = "",
-            order = 10,
-        },                       
+        },                      
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
             width = "full",
             type = "execute",
-            order = 11,
+            order = 7,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(partyType, frameType)

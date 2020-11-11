@@ -1,16 +1,20 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
+if not InCombatLockdown() then
+    CompactRaidFrameContainer_TryUpdate(CompactRaidFrameContainer)
+end
+
 local _G = _G
 local options = DefaultCompactUnitFrameSetupOptions
 local powerBarHeight = 8
 local powerBarUsedHeight = options.displayPowerBar and powerBarHeight or 0
 local CUF_AURA_BOTTOM_OFFSET = 2
-local yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight
+local NATIVE_UNIT_FRAME_HEIGHT = 36
+local NATIVE_UNIT_FRAME_WIDTH = 72
 
 function KHMRaidFrames:GetFrameScale()
-    local width, height = 72, 36
-
-    return min(options.height / height, options.width / width)
+    local componentScale = min(options.height / NATIVE_UNIT_FRAME_HEIGHT, options.width / NATIVE_UNIT_FRAME_WIDTH)
+    return componentScale
 end
 
 function KHMRaidFrames:Defaults()
@@ -32,16 +36,14 @@ function KHMRaidFrames:Defaults()
                 xOffset = -3,
                 yOffset = -2,
                 exclude = {},
-                tracking = {},               
+                excludeStr = "",
+                tracking = {},
+                trackingStr = "",             
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
-                    tracking = {
-                        "magic",
-                        "poison",
-                        "curse",
-                        "disease",
-                    },
+                    tracking = {},
+                    trackingStr = "",    
                     enabled = false
                 },
             },
@@ -53,13 +55,16 @@ function KHMRaidFrames:Defaults()
                 growDirection = "RIGHT",
                 size = buffSize,
                 xOffset = 3,
-                yOffset = yOffset,
+                yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
                 exclude = {},
-                tracking = {},                  
+                excludeStr = "",
+                tracking = {},
+                trackingStr = "",                    
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
+                    trackingStr = "",    
                     enabled = false                                          
                 },             
             },
@@ -71,13 +76,16 @@ function KHMRaidFrames:Defaults()
                 growDirection = "LEFT",
                 size = buffSize,
                 xOffset = -3,
-                yOffset = yOffset,
+                yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
                 exclude = {},
-                tracking = {},                  
+                excludeStr = "",
+                tracking = {},
+                trackingStr = "",                   
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
+                    trackingStr = "",    
                     enabled = false                                          
                 },              
             },      
@@ -100,5 +108,5 @@ function KHMRaidFrames:RestoreDefaults(partyType, frameType)
         self.db.profile[partyType][frameType][k] = v
     end
 
-    self:RefreshConfig()
+    self:SafeRefresh()
 end

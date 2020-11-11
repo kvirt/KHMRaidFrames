@@ -14,5 +14,9 @@ DefaultConfig.lua
 SetUpConfig.lua
 VirtualFrames.lua
 UnitAuras.lua
+Utils.lua
+Options.lua
+BlizzardCode.lua
+
 
 

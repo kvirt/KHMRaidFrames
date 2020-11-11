@@ -1,224 +1,86 @@
 local addonName, addonTable = ...
 addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "AceHook-3.0", "AceConsole-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
-local _G, tonumber = _G, tonumber
-local MAX_RAID_GROUPS, BOSS_DEBUFF_SIZE_INCREASE = MAX_RAID_GROUPS, BOSS_DEBUFF_SIZE_INCREASE
-local frameStyle = "useCompactPartyFrames"
+local _G = _G
 
-
-function KHMRaidFrames:Setup()
-    self.maxFrames = 10 
-    self.extraFrames = {}
-    self.glowingFrames = {
-        buffFrames = {},
-        debuffFrames = {},
-        dispelDebuffFrames = {},        
-    }
-
-    self.virtualFrames = self:GetVirtualFrames()
-    self.virtual = {        
-        buffFrames = false,
-        debuffFrames = false,
-        dispelDebuffFrames = false,
-    }
-
-    local defaults_settings = self:Defaults()
-    self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)
-
-    local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-
-    local LibDualSpec = LibStub('LibDualSpec-1.0')
-    LibDualSpec:EnhanceDatabase(self.db, "KHMRaidFrames")
-    LibDualSpec:EnhanceOptions(profiles, self.db)
-
-    self.config = LibStub("AceConfigRegistry-3.0")
-    self.config:RegisterOptionsTable("KHMRaidFrames", self:SetupOptions())
-    self.config:RegisterOptionsTable("KHM Profiles", profiles)
-
-    self.dialog = LibStub("AceConfigDialog-3.0")
-    self.dialog.general = self.dialog:AddToBlizOptions("KHMRaidFrames", L["KHMRaidFrames"])
-    self.dialog.profiles = self.dialog:AddToBlizOptions("KHM Profiles", L["Profiles"], "KHMRaidFrames")
-
-    self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
-    self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
-    
-    self:RegisterChatCommand("khm", function() 
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-    end)  
-end
-
-function KHMRaidFrames:OnEnable()
-    self:Setup()
-
-    self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
-    self.db.RegisterCallback(self, "OnProfileCopied", "ProfileReload")
-    self.db.RegisterCallback(self, "OnProfileReset", "ProfileReload") 
-
-    local deferrFrame = CreateFrame("Frame")
-    deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")  
-    deferrFrame:SetScript(
-        "OnEvent", 
-        function(frame, event)
-            self:UpdateLayout(_G["CompactRaidFrameContainer"])
-        end
-    ) 
-
-    self:SecureHook(
-        "CompactRaidFrameContainer_LayoutFrames", 
-        function(container) 
-            self:UpdateLayout(container) 
-        end
-    )
-
-    self:SecureHook(
-        "CompactUnitFrame_UpdateAuras", 
-        function(frame)
-            if not UnitIsPlayer(frame.displayedUnit) or not frame:GetName() then
-                return
-            else
-                self:UpdateAuras(frame)
-            end
-        end
-    )
-
-    self:SecureHook("CompactUnitFrame_UtilSetBuff")
-    -- hooked in resize\setposition function for blizzard's big debuff reason
-    -- self:SecureHook("CompactUnitFrame_UtilSetDebuff")
-    self:SecureHook("CompactUnitFrame_UtilSetDispelDebuff")        
-
-    self:SecureHook("CompactUnitFrame_HideAllBuffs")
-    self:SecureHook("CompactUnitFrame_HideAllDebuffs")
-    self:SecureHook("CompactUnitFrame_HideAllDispelDebuffs") 
-
-    self:RefreshConfig()   
-end
-
-function KHMRaidFrames:ProfileReload()
-    self.config:NotifyChange("KHMRaidFrames")
-end
-
-function KHMRaidFrames:OnOptionShow()
-    self:ShowRaidFrame()
-    self:RefreshConfig()
-end
-
-function KHMRaidFrames:OnOptionHide()
-    self:HideRaidFrame()
-    self:RefreshConfig()
-end
-
-function KHMRaidFrames:ShowRaidFrame()
-    if not InCombatLockdown() and not IsInGroup() and GetCVar(frameStyle) == "1" then
-        CompactRaidFrameContainer:Show()
-        CompactRaidFrameManager:Show()
-    end
-end
-
-function KHMRaidFrames:HideRaidFrame()
-    if not InCombatLockdown() and not IsInGroup() and GetCVar(frameStyle) == "1" then
-        CompactRaidFrameContainer:Hide()
-        CompactRaidFrameManager:Hide()
-    end
-
-    self:HideAllVirtual()
-end
 
 function KHMRaidFrames:RefreshConfig()
-    if InCombatLockdown() then
-        print("Can not refresh settings while in combat")   
-        return
+    self:AddSubFrames()
+
+    local doneWithVirtual = false
+
+    for frame in self:IterateRaidMembers() do
+        self:SetUpFrame(frame, "raid")
+        self:SetUpSubFrames(frame, "raid")
+
+        if self.virtual.shown and not doneWithVirtual then
+            self:SetUpVirtualSubFrames(frame, "raid")
+            doneWithVirtual = true
+        end
+
+        if not InCombatLockdown() then
+            CompactUnitFrame_UpdateAll(frame)
+        end          
     end
 
-    self.refresh = true
+    for frame in self:IterateGroupMembers() do
+        self:SetUpFrame(frame, "party")
+        self:SetUpSubFrames(frame, "party")
 
-    local crfc = _G["CompactRaidFrameContainer"]
-    if crfc and crfc:IsShown() then
-        for i=1, 8 do
-            local groupFrame = _G["CompactRaidGroup"..i]
-            if groupFrame then
-                self:SetUpFrames(i, groupFrame)
-                self:SetUpSubFrames(i, groupFrame)
-                self:SetUpVirtualSubFrames(i) 
-            end
+        if self.virtual.shown and not doneWithVirtual then
+            self:SetUpVirtualSubFrames(frame, "party")
+            doneWithVirtual = true
         end
 
-        local groupFrame = _G["CompactPartyFrame"]
-        if groupFrame then
-            self:SetUpFrames("PARTY", groupFrame)
-            self:SetUpSubFrames("PARTY", groupFrame)
-            self:SetUpVirtualSubFrames("PARTY") 
-        end
-    end   
- 
-    self.refresh = false    
+        if not InCombatLockdown() then
+            CompactUnitFrame_UpdateAll(frame)
+        end         
+    end    
+
+    for group in self:IterateRaidGroups() do
+        self:SetUpGroup(group, "raid")
+    end
+
+    self:SetUpGroup(_G["CompactPartyFrame"], "party")
 end
 
-function KHMRaidFrames:UpdateLayout(container)
-    local usedGroups = {}
-
-    for i=1, MAX_RAID_GROUPS do
-        usedGroups[i] = false
-    end
-
+function KHMRaidFrames:UpdateLayout()
     if IsInRaid() then
-        for i=1, GetNumGroupMembers() do
-            local name, rank, subgroup = GetRaidRosterInfo(i)
-            usedGroups[subgroup] = true
+        for frame in self:IterateRaidMembers() do
+            self:SetUpFrame(frame, "raid")
+            self:SetUpSubFrames(frame, "raid")
         end
-
-        for groupIndex, isUsed in ipairs(usedGroups) do
-            if isUsed and container.groupFilterFunc(groupIndex) then
-                self:SetUpAll(groupIndex)
-            end
-        end
+        
+        for group in self:IterateRaidGroups() do
+            self:SetUpGroup(group, "raid")
+        end        
     else
-        self:SetUpAll("PARTY")
+        for frame in self:IterateGroupMembers() do
+            self:SetUpFrame(frame, "party")
+            self:SetUpSubFrames(frame, "party") 
+        end
+
+        self:SetUpGroup(_G["CompactPartyFrame"], "party")  
     end
 end
 
-function KHMRaidFrames:SetUpAll(groupIndex)
-    local groupFrame
+function KHMRaidFrames:SetUpSubFrames(frame, groupType)
+    local typedframes
 
-    if type(groupIndex) == "number" then
-        groupFrame = _G["CompactRaidGroup"..groupIndex]
-    elseif groupIndex == "PARTY" then    
-        groupFrame = _G["CompactPartyFrame"]
-    end
+    local db = self.db.profile[groupType]
 
-    if not groupFrame then return end
+    if frame and frame:IsShown() and frame.unit then
+        for frameType in self:IterateSubFrameTypes() do
+            typedframes = frame[frameType]
 
-    self:SetUpFrames(groupIndex, groupFrame)
-    self:SetUpSubFrames(groupIndex, groupFrame)     
-end
+            self:ShowHideHooks(typedframes, db[frameType])         
+            self:SetUpSubFramesPositionsAndSize(frame, typedframes, db[frameType])
+        end              
+    end                   
+end  
 
-function KHMRaidFrames:SetUpSubFrames(groupIndex, groupFrame)
-    local typedframes, frame
-
-    local db = self:FrameType(groupIndex)
-
-    for index=1, 5 do
-        frame = _G[groupFrame:GetName().."Member"..index]
-
-        if frame and frame:IsShown() and frame.unit then
-            for _, frameType in ipairs({"buffFrames", "debuffFrames", "dispelDebuffFrames"}) do
-                self:AddSubFrames(frame, db[frameType], frameType)
-                typedframes = frame[frameType]
-                self:ResizeHideHooks(typedframes, db[frameType], frameType == "debuffFrames")                
-                self:SetUpFramesInternal(frame, typedframes, db[frameType])
-            end
-            if not InCombatLockdown() then
-                if self.refresh then
-                    CompactUnitFrame_UpdateAll(frame)
-                end
-            end                
-        end                   
-    end  
-end
-
-function KHMRaidFrames:ResizeHideHooks(typedframes, db, needHook)
+function KHMRaidFrames:ShowHideHooks(typedframes, db)
     local hooked, _
 
     for frameNum=1, #typedframes do
@@ -235,21 +97,8 @@ function KHMRaidFrames:ResizeHideHooks(typedframes, db, needHook)
 
             self:OnShow(typedframes[frameNum], db, frameNum)
         end
-
-        if needHook then
-            hooked, _ = self:IsHooked("CompactUnitFrame_UtilSetDebuff")
-
-            if not hooked then        
-                self:SecureHook(
-                    "CompactUnitFrame_UtilSetDebuff", 
-                    function(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...) 
-                        self:SetDebuff(db, debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...) 
-                    end
-                )
-            end        
-        end
-    end                                 
-end
+    end
+end                            
 
 function KHMRaidFrames:OnShow(frame, db, frameNum)
     if frameNum > db.num then
@@ -257,19 +106,7 @@ function KHMRaidFrames:OnShow(frame, db, frameNum)
     end
 end
 
-function KHMRaidFrames:SetDebuff(db, debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)
-    local size = db.size
-
-    if isBossAura then
-        size = size + BOSS_DEBUFF_SIZE_INCREASE
-    end
-
-    debuffFrame:SetSize(size, size)
-
-    self:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)  
-end
-
-function KHMRaidFrames:SetUpFramesInternal(frame, typedframes, db)
+function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
@@ -299,31 +136,20 @@ function KHMRaidFrames:SetUpFramesInternal(frame, typedframes, db)
     end     
 end
 
-function KHMRaidFrames:SetUpFrames(groupIndex, groupFrame)
-    local db = self:FrameType(groupIndex)
+function KHMRaidFrames:SetUpFrame(frame, groupType)
+    local db = self.db.profile[groupType]
+
+    if frame then
+        frame.healthBar:SetStatusBarTexture(db.frames.texture, "BORDER")
+    end
+end
+
+function KHMRaidFrames:SetUpGroup(frame, groupType)
+    local db = self.db.profile[groupType]
 
     if db.frames.hideGroupTitles then
-        groupFrame.title:Hide()
+        frame.title:Hide()
     else
-        groupFrame.title:Show()
-    end  
-
-    for i=1, 5 do
-        local frame = _G[groupFrame:GetName().."Member"..i]
-        if frame then
-            frame.healthBar:SetStatusBarTexture(db.frames.texture, "BORDER")
-        end
+        frame.title:Show()
     end
-end
-
-function KHMRaidFrames:FrameType(groupIndex)
-    local db
-
-    if type(groupIndex) == "number" then
-        db = self.db.profile.raid
-    elseif groupIndex == "PARTY" then    
-        db = self.db.profile.party
-    end
-
-    return db
-end
+end                    

@@ -44,9 +44,6 @@ function KHMRaidFrames:GetGlowOptions(key)
 end
 
 function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
-    local fullWidth = 2.6
-    local thirdWidth = fullWidth / 3    
-
     db = db[frameType]
     local frameName = "glow"..frameType
 
@@ -69,7 +66,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             name = L["Glow Type"],
             desc = "",
             descStyle = "inline",
-            width = thirdWidth,
+            width = "normal",
             type = "select",
             order = 2,
             disabled = function(info)
@@ -92,7 +89,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             name = L["Color"],
             desc = "",
             descStyle = "inline",
-            width = thirdWidth,
+            width = "normal",
             type = "color",
             order = 2,
             hasAlpha = true,
@@ -112,7 +109,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             name = L["Frequency"],
             desc = "",
             descStyle = "inline",
-            width = thirdWidth,
+            width = "normal",
             type = "range",
             min = -1,
             max = 1,
@@ -136,7 +133,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             name = L["Num"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "normal",
             type = "range",
             min = 1,
             max = 50,
@@ -155,39 +152,16 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             end,
             get = function(info) return db.glow.options[db.glow.type].options.N end
         },
-        ["th"..frameName] = {
-            name = L["Thickness"],
-            desc = "",
-            descStyle = "inline",
-            width = "full",
-            type = "range",
-            min = 0.1,
-            max = 10,
-            step = 0.1,
-            order = 5,
-            disabled = function(info)
-                return not db.glow.enabled
-            end,            
-            hidden = function(info)
-                local options = self:GetGlowOptions(db.glow.type)
-                if options.options["th"] ~= nil then return false else return true end
-            end,                       
-            set = function(info,val)
-                db.glow.options[db.glow.type].options.th = val
-                self:RefreshConfig()
-            end,
-            get = function(info) return db.glow.options[db.glow.type].options.th end
-        },
         ["xOffset"..frameName] = {
             name = L["X Offset"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "normal",
             type = "range",
             min = -100,
             max = 100,
             step = 1,
-            order = 6,
+            order = 5,
             disabled = function(info)
                 return not db.glow.enabled
             end,            
@@ -205,12 +179,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
             name = L["Y Offset"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "normal",
             type = "range",
             min = -100,
             max = 100,
             step = 1,
-            order = 7,
+            order = 6,
             disabled = function(info)
                 return not db.glow.enabled
             end,            
@@ -223,12 +197,35 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
                 self:RefreshConfig()
             end,
             get = function(info) return db.glow.options[db.glow.type].options.yOffset end
-        },        
+        },
+        ["th"..frameName] = {
+            name = L["Thickness"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 10,
+            step = 0.1,
+            order = 7,
+            disabled = function(info)
+                return not db.glow.enabled
+            end,            
+            hidden = function(info)
+                local options = self:GetGlowOptions(db.glow.type)
+                if options.options["th"] ~= nil then return false else return true end
+            end,                       
+            set = function(info,val)
+                db.glow.options[db.glow.type].options.th = val
+                self:RefreshConfig()
+            end,
+            get = function(info) return db.glow.options[db.glow.type].options.th end
+        },      
         ["border"..frameName] = {
             name = L["Border"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "normal",
             type = "toggle",
             order = 8,
             disabled = function(info)
@@ -255,31 +252,24 @@ function KHMRaidFrames:SetupGlowOptions(frameType, db, partyType)
         },                                        
         ["tracking"..frameName] = {
             name = L["Tracking"],
-            desc = "",
-            descStyle = "inline",
+            desc = L["Use for tracking particular "]..frameName,
             width = "full",
             type = "input",
-            multiline = true,
+            usage = self:TrackingHelpText(),
+            multiline = 5, 
             order = 10,
             disabled = function(info)
                 return not db.glow.enabled
             end,                 
             set = function(info,val)
-                db.glow.tracking = {}
-                local index = 1
-                for value in string.gmatch(val, "[^\n]+") do
-                    db.glow.tracking[index] = value
-                    index = index + 1
-                end
-                self:RefreshConfig()
+                db.glow.tracking = self:SanitizeStrings(val)
+                db.glow.trackingStr = val
+
+                self:SafeRefresh()
             end,
             get = function(info)
-                local str = ""
-                for _, value in ipairs(db.glow.tracking) do
-                    str = str..value.."\n"
-                end
-                return str
-            end            
+                return db.glow.trackingStr
+            end             
         },                        
     }
     return options
@@ -403,9 +393,12 @@ function KHMRaidFrames:FilterGlowAuras(frame, name, debuffType, spellId, frameTy
 end
 
 function KHMRaidFrames:FilterGlowAurasInternal(name, debuffType, spellId, db)
-    if #db == 0 then return false end
+    if #db == 0 then return false end 
 
-    for _, aura in pairs(db) do
+    name = name and name:lower()
+    debuffType = debuffType and debuffType:lower()
+
+    for _, aura in ipairs(db) do
         if aura == name or aura == debuffType or tonumber(aura) == spellId then
             return true
         end
