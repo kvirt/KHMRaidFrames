@@ -36,9 +36,7 @@ function KHMRaidFrames:Defaults()
                 xOffset = -3,
                 yOffset = -2,
                 exclude = {},
-                excludeStr = "",
-                tracking = {},
-                trackingStr = "",             
+                excludeStr = "",          
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
@@ -46,6 +44,13 @@ function KHMRaidFrames:Defaults()
                     trackingStr = "",    
                     enabled = false
                 },
+                frameGlow = {
+                    type = "pixel",
+                    options = self:GetGlowOptions(),
+                    tracking = {},
+                    trackingStr = "",    
+                    enabled = false                                          
+                },                  
             },
             debuffFrames = {
                 num = 3,
@@ -57,16 +62,21 @@ function KHMRaidFrames:Defaults()
                 xOffset = 3,
                 yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
                 exclude = {},
-                excludeStr = "",
-                tracking = {},
-                trackingStr = "",                    
+                excludeStr = "",                
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
                     enabled = false                                          
-                },             
+                },
+                frameGlow = {
+                    type = "pixel",
+                    options = self:GetGlowOptions(),
+                    tracking = {},
+                    trackingStr = "",    
+                    enabled = false                                          
+                },                               
             },
             buffFrames = {
                 num = 3,
@@ -78,16 +88,28 @@ function KHMRaidFrames:Defaults()
                 xOffset = -3,
                 yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
                 exclude = {},
-                excludeStr = "",
-                tracking = {},
-                trackingStr = "",                   
+                excludeStr = "",                 
                 glow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
                     enabled = false                                          
-                },              
+                },
+                frameGlow = {
+                    type = "pixel",
+                    options = self:GetGlowOptions(),
+                    tracking = {},
+                    trackingStr = "",    
+                    enabled = false                                          
+                },                              
+            },
+            raidIcon = {
+                enabled = true,
+                size = 30,
+                xOffset = 0,
+                yOffset = 0,
+                anchorPoint = "TOP",
             },      
     }
     defaults_settings.profile.party = commons

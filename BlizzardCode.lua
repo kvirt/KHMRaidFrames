@@ -131,10 +131,9 @@ end
 local dispellableDebuffTypes = { Magic = true, Curse = true, Disease = true, Poison = true}
 
 function KHMRaidFrames:UpdateAuras(frame)
-    local db = self.db.profile[self:GetFrameProperties(frame)]
-    local maxBuffs = db.buffFrames.num
-    local maxDebuffs = db.debuffFrames.num
-    local maxDispelDebuffs = db.dispelDebuffFrames.num
+    local maxBuffs = #frame.buffFrames
+    local maxDebuffs = #frame.debuffFrames
+    local maxDispelDebuffs = #frame.dispelDebuffFrames
 
     local doneWithBuffs = not frame.buffFrames or not frame.optionTable.displayBuffs or maxBuffs == 0
     local doneWithDebuffs = not frame.debuffFrames or not frame.optionTable.displayDebuffs or maxDebuffs == 0

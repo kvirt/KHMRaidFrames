@@ -14,10 +14,6 @@ function KHMRaidFrames:Setup()
         frames = {},
     } 
 
-    for subFrameType in self:IterateSubFrameTypes() do
-        self.glowingFrames[subFrameType] = {}
-    end
-
     self:GetVirtualFrames()
 
     local defaults_settings = self:Defaults()
@@ -40,20 +36,15 @@ function KHMRaidFrames:Setup()
     self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
     self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
 
-    self.dialog.general:RegisterEvent("PLAYER_REGEN_DISABLED")
-    self.dialog.general:SetScript(
-        "OnEvent", 
-        function(frame, event)
-            if event == "PLAYER_REGEN_DISABLED" then
-                self:HideAll()
-            end
-        end
-    ) 
-
     self:RegisterChatCommand("khm", function() 
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-    end)  
+    end)
+
+    self:RegisterChatCommand("лрь", function() 
+        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+    end)      
 end
 
 function KHMRaidFrames:OnEnable()
@@ -64,7 +55,8 @@ function KHMRaidFrames:OnEnable()
     self.db.RegisterCallback(self, "OnProfileReset", "ProfileReload") 
 
     local deferrFrame = CreateFrame("Frame")
-    deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")  
+    deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    deferrFrame:RegisterEvent("RAID_TARGET_UPDATE")  -- raid target icon        
     deferrFrame:SetScript(
         "OnEvent", 
         function(frame, event)
@@ -74,7 +66,7 @@ function KHMRaidFrames:OnEnable()
 
     self:SecureHook(
         "CompactRaidFrameContainer_LayoutFrames", 
-        function(container) 
+        function(container)
             self:UpdateLayout() 
         end
     )
@@ -96,7 +88,7 @@ function KHMRaidFrames:OnEnable()
 
     self:SecureHook("CompactUnitFrame_HideAllBuffs")
     self:SecureHook("CompactUnitFrame_HideAllDebuffs")
-    self:SecureHook("CompactUnitFrame_HideAllDispelDebuffs") 
+    self:SecureHook("CompactUnitFrame_HideAllDispelDebuffs")
 
     self:SafeRefresh()   
 end

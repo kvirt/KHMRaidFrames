@@ -79,21 +79,19 @@ function KHMRaidFrames:FilterAuras(name, debuffType, spellId, frameType)
         db = self.db.profile.party[frameType]
     end
 
-    excluded = self:FilterAurasInternal(name, debuffType, spellId, db.exclude, true)
+    excluded = self:FilterAurasInternal(name, debuffType, spellId, db.exclude)
 
-    if excluded then return false end
-
-    return self:FilterAurasInternal(name, debuffType, spellId, db.tracking, false)
+    if excluded then return false else return true end
 end
 
-function KHMRaidFrames:FilterAurasInternal(name, debuffType, spellId, db, exclude)
-    if #db == 0 then return not exclude end    
+function KHMRaidFrames:FilterAurasInternal(name, debuffType, spellId, db)
+    if #db == 0 then return false end    
 
-    name = name and name:lower()
-    debuffType = debuffType and debuffType:lower()
+    name = name and self:SanitazeString(name)
+    debuffType = debuffType and self:SanitazeString(debuffType)
 
     for _, aura in ipairs(db) do
-        if aura == name or aura == debuffType or tonumber(aura) == spellId then
+        if aura ~= nil and (aura == name or aura == debuffType or (spellId ~= nil and tonumber(aura) == spellId)) then
             return true
         end
     end

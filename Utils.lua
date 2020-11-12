@@ -2,6 +2,7 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
 local _G = _G
+
 local subFrameTypes = {"buffFrames", "debuffFrames", "dispelDebuffFrames"}
 
 local systemYellowCode = "|cFFffd100<text>|r"
@@ -30,30 +31,26 @@ function KHMRaidFrames:IterateRaidGroups()
     return function()
         groupIndex = groupIndex + 1
 
-        if groupIndex <= 8 then return groupFrame and _G["CompactRaidGroup"..groupIndex] end 
+        local groupFrame = _G["CompactRaidGroup"..groupIndex]
+        if groupIndex <= 8 and groupFrame then return groupFrame end 
     end
-end
-
-function KHMRaidFrames:IterateRaidGroupMembers(groupIndex)
-    local index = 0
-    local groupFrame = _G["CompactRaidGroup"..groupIndex]
-
-    return function()
-       index = index + 1
-       if index <= 5 then return groupFrame and _G[groupFrame:GetName().."Member"..index] end 
-    end    
 end
 
 function KHMRaidFrames:IterateRaidMembers()    
     local groupIndex = 0
+    local index = 0
 
     return function()
         while groupIndex <= 8 do
-            groupIndex = groupIndex + 1
+            index = index + 1
 
-            for frame in self:IterateRaidGroupMembers(groupIndex) do
-                if frame then return frame end
+            if index > 5 then
+                index = 1
+                groupIndex = groupIndex + 1
             end
+
+            local frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
+            if frame then return frame end
         end
     end
 end
@@ -78,10 +75,14 @@ function KHMRaidFrames:IterateSubFrameTypes()
     end
 end
 
-function KHMRaidFrames:GetFrameProperties(frame)
-    local matches = frame:GetName():gmatch("%u+%l+%d*")
-    local _, groupType = matches(), matches()
-    return groupType:lower()
+function KHMRaidFrames:SanitazeString(str)
+    key = str:match("[^--]+")
+    key = key:lower()
+    key = key:gsub("^%s*(.-)%s*$", "%1") 
+    key = key:gsub("\"", "")
+    key = key:gsub(",", "")
+
+    return key
 end
 
 function KHMRaidFrames:SanitizeStrings(str)
@@ -89,12 +90,8 @@ function KHMRaidFrames:SanitizeStrings(str)
     local index = 1
 
     for value in str:gmatch("[^\n]+") do
-        key = value:match("[^--]+")
-        key = key:lower()
-        key = key:gsub("^%s*(.-)%s*$", "%1") 
-        key = key:gsub("\"", "")
-        key = key:gsub(",", "")
-        t[index] = value
+        local key = self:SanitazeString(value)
+        t[index] = key
 
         index = index + 1
     end

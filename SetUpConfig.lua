@@ -1,7 +1,7 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
-
+-- useCompactPartyFrames, showPartyPets, raidOptionDisplayPets, https://wow.gamepedia.com/Console_variables
 local positions = {
     ["TOPLEFT"] = L["TOPLEFT"],
     ["LEFT"] = L["LEFT"],
@@ -53,65 +53,10 @@ function KHMRaidFrames:SetupOptions()
     return options
 end
 
-function KHMRaidFrames:SetupOptionsByType(frameType)
-    local db = self.db.profile[frameType]
+function KHMRaidFrames:SetupOptionsByType(groupType)
+    local db = self.db.profile[groupType]
     local options = {}
 
-    options.frames = {
-        type = "group",
-        order = 2,
-        name = L["Frames"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupFrameOptions("frames", db, frameType),     
-    }
-    options.buffFrames = {
-        type = "group",
-        order = 3,
-        name = L["Buffs"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupOptionsByFrameTypeProxy("buffFrames", db, frameType),        
-    }
-    options.debuffFrames = {
-        type = "group",
-        order = 4,
-        name = L["Debuffs"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupOptionsByFrameTypeProxy("debuffFrames", db, frameType),        
-    }
-    options.dispelDebuffFrames = {
-        type = "group",
-        order = 5,
-        name = L["Dispell Debuffs"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupOptionsByFrameTypeProxy("dispelDebuffFrames", db, frameType),  
-    }
-
-    return options
-end        
-
-function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, partyType)
-    local options = {}
-
-    options.properties = {
-        type = "group",
-        order = 1,
-        name = L["Properties"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupOptionsByFrameType(frameType, db, partyType),     
-    }
-    options.glows = {
-        type = "group",
-        order = 2,
-        name = L["Glow"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupGlowOptions(frameType, db, partyType),        
-    }
     options.virtualFrames = {
         name = L["Show\\Hide Test Frames"],
         desc = "",
@@ -120,14 +65,187 @@ function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, partyType)
         type = "execute",
         order = 6,
         func = function(info,val)
-            self:ShowVirtual(partyType)
+            self:ShowVirtual(groupType)
         end,
     }
+    
+    options.frames = {
+        type = "group",
+        order = 2,
+        name = L["General"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupFrameOptions("frames", db, groupType),     
+    }
+    options.buffFrames = {
+        type = "group",
+        order = 3,
+        name = L["Buffs"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupOptionsByFrameTypeProxy("buffFrames", db, groupType),        
+    }
+    options.debuffFrames = {
+        type = "group",
+        order = 4,
+        name = L["Debuffs"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupOptionsByFrameTypeProxy("debuffFrames", db, groupType),        
+    }
+    options.dispelDebuffFrames = {
+        type = "group",
+        order = 5,
+        name = L["Dispell Debuffs"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupOptionsByFrameTypeProxy("dispelDebuffFrames", db, groupType),  
+    }
+    options.raidIcon = {
+        type = "group",
+        order = 6,
+        name = L["Raid Target Icon"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupRaidIconOptions("raidIcon", db, groupType),  
+    }
+    return options
+end        
+
+function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, groupType)
+    local options = {}
+
+    options.properties = {
+        type = "group",
+        order = 1,
+        name = L["Properties"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupOptionsByFrameType(frameType, db, groupType),     
+    }
+
+    local glows = self:SetupGlowOptionsProxy(frameType, db, groupType)
+    options.glow = glows.glow
+    options.frameGlow = glows.frameGlow
 
     return options    
 end
 
-function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
+function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
+    db = db[frameType]
+
+    local options = {            
+        [frameType.."enabled"] = {
+            name = L["Enabled"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "toggle",
+            order = 1,
+            set = function(info,val)
+                db.enabled = val
+                self:SafeRefresh()
+            end,
+            get = function(info) 
+                return db.enabled 
+            end
+        },                   
+        ["size"..frameType] = {
+            name = L["Size"],
+            desc = "",
+            descStyle = "inline",
+            width = "double",
+            type = "range",
+            min = 1,
+            max = 100,
+            step = 1,
+            order = 2,
+            disabled = function(info)
+                return not db.enabled
+            end,                       
+            set = function(info,val)
+                db.size = val
+                self:SafeRefresh()
+            end,
+            get = function(info) return db.size end
+        },
+        ["xOffset"..frameType] = {
+            name = L["X Offset"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "range",
+            min = -100,
+            max = 100,
+            step = 1,
+            order = 3,          
+            disabled = function(info)
+                return not db.enabled
+            end,              
+            set = function(info,val)
+                db.xOffset = val
+                self:SafeRefresh()
+            end,
+            get = function(info) return db.xOffset end
+        },
+        ["yOffset"..frameType] = {
+            name = L["Y Offset"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "range",
+            min = -100,
+            max = 100,
+            step = 1,
+            order = 4,
+            disabled = function(info)
+                return not db.enabled
+            end,                        
+            set = function(info,val)
+                db.yOffset = val
+                self:SafeRefresh()
+            end,
+            get = function(info) return db.yOffset end
+        },                                              
+        [frameType.."AnchorPoint"] = {
+            name = L["Anchor Point"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "select",
+            values = positions,
+            order = 5,
+            disabled = function(info)
+                return not db.enabled
+            end,                         
+            set = function(info,val)
+                db.anchorPoint = val
+                self:SafeRefresh()
+            end,
+            get = function(info) return db.anchorPoint end
+        },
+        [frameType.."Skip"] = {
+            type = "header",
+            name = "",
+            order = 6,
+        },                                       
+        [frameType.."Reset"] = {
+            name = L["Reset to Default"],
+            desc = "",
+            descStyle = "inline",
+            width = "full",
+            type = "execute",
+            confirm = true,
+            order = 7,
+            func = function(info,val)
+                self:RestoreDefaults(groupType, frameType)
+            end,
+        },                               
+    }
+    return options    
+end
+
+function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
     local halfWidth = "normal"
 
     db = db[frameType]
@@ -185,14 +303,14 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, partyType)
             confirm = true,
             order = 5,
             func = function(info,val)
-                self:RestoreDefaults(partyType, frameType)
+                self:RestoreDefaults(groupType, frameType)
             end,
         },                               
     }
     return options    
 end
 
-function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
+function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
     db = db[frameType]
     local num, frameName
 
@@ -331,30 +449,12 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
         },                              
         [frameType.."Skip2"] = {
             type = "header",
-            name = L["Tracking"],
+            name = L["Block List"],
             order = 4,
-        },
-        ["tracking"..frameType] = {
-            name = L["Tracking"],
-            desc = L["Use for tracking particular "]..frameName..L[", will ignore everything else if not empty"],
-            usage = self:TrackingHelpText(),
-            multiline = 5,            
-            width = "full",
-            type = "input",
-            order = 5,                 
-            set = function(info,val)
-                db.tracking = self:SanitizeStrings(val)
-                db.trackingStr = val
-
-                self:SafeRefresh()
-            end,
-            get = function(info)
-                return db.trackingStr
-            end            
         },
         ["exclude"..frameType] = {
             name = L["Exclude"],
-            desc = L["Use for exclude particular "]..frameName,
+            desc = L["Use to block auras"],
             usage = self:TrackingHelpText(),
             width = "full",
             type = "input",
@@ -379,7 +479,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, partyType)
             order = 7,
             confirm = true,
             func = function(info,val)
-                self:RestoreDefaults(partyType, frameType)
+                self:RestoreDefaults(groupType, frameType)
             end,
         },                       
     }
