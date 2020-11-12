@@ -10,12 +10,13 @@ Locales\Locales.xml
 
 KHMRaidFrames.lua
 GlowFrames.lua
-DefaultConfig.lua
+GlowFramesConfig.lua
+Defaults.lua
 SetUpConfig.lua
 VirtualFrames.lua
 UnitAuras.lua
 Utils.lua
-Options.lua
+SetUpAddon.lua
 BlizzardCode.lua
 
 

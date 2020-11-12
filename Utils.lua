@@ -116,3 +116,34 @@ function KHMRaidFrames:TrackingHelpText()
 
     return s
 end
+
+function KHMRaidFrames:GroupTypeDB()
+    local groupType
+
+    if IsInRaid() then
+        groupType = "raid"
+    else
+        groupType = "party"
+    end
+
+    return self.db.profile[groupType]
+end 
+
+function KHMRaidFrames:CheckNil(table, key, value)
+    if key ~= nil then
+        table[key] = value
+    end
+end
+-- function KHMRaidFrames:SubFramesIndexMT()
+--     local t = {}
+
+--     t.__newindex  = function(_table, key, value)
+--         if key == nil then
+--             return
+--         else
+--             rawset(_table, key, value)
+--         end
+--     end
+
+--     return t
+-- end

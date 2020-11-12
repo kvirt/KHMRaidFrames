@@ -60,7 +60,41 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
 
     debuffFrame:Show()
 
-    self:FilterGlowAuras(debuffFrame, name, debuffType, spellId, "debuffFrames")    
+    self:FilterDebuffFrameGlowAuras(debuffFrame, name, debuffType, spellId)    
+end
+
+function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = ...
+    buffFrame.icon:SetTexture(icon)
+    if ( count > 1 ) then
+        local countText = count
+        if ( count >= 100 ) then
+            countText = BUFF_STACKS_OVERFLOW
+        end
+        buffFrame.count:Show()
+        buffFrame.count:SetText(countText)
+    else
+        buffFrame.count:Hide()
+    end
+    buffFrame:SetID(index)
+    local enabled = expirationTime and expirationTime ~= 0
+    if enabled then
+        local startTime = expirationTime - duration
+        CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true)
+    else
+        CooldownFrame_Clear(buffFrame.cooldown)
+    end
+    buffFrame:Show()
+
+    self:FilterBuffFrameGlowAuras(buffFrame, name, debuffType, spellId)    
+end
+
+function KHMRaidFrames:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
+    dispellDebuffFrame:Show()
+    dispellDebuffFrame.icon:SetTexture("Interface\\RaidFrame\\Raid-Icon-Debuff"..debuffType)
+    dispellDebuffFrame:SetID(index)
+
+    self:FilterDispelDebuffFrameGlowAuras(dispellDebuffFrame, debuffType)
 end
 
 function KHMRaidFrames:CompactUnitFrame_Util_IsBossAura(...)
@@ -131,6 +165,12 @@ end
 local dispellableDebuffTypes = { Magic = true, Curse = true, Disease = true, Poison = true}
 
 function KHMRaidFrames:UpdateAuras(frame)
+    local frameName = frame:GetName()
+    for _, v in pairs(self.aurasCache) do
+        v[frameName] = {}
+        -- setmetatable(v[frameName], self:SubFramesIndexMT())
+    end
+
     local maxBuffs = #frame.buffFrames
     local maxDebuffs = #frame.debuffFrames
     local maxDispelDebuffs = #frame.dispelDebuffFrames
@@ -199,7 +239,7 @@ function KHMRaidFrames:UpdateAuras(frame)
                 if not doneWithBuffs then
                     numUsedBuffs = numUsedBuffs + 1
                     local buffFrame = frame.buffFrames[numUsedBuffs]
-                    CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
+                    self:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
                     if numUsedBuffs == maxBuffs then
                         doneWithBuffs = true
                     end
@@ -247,7 +287,7 @@ function KHMRaidFrames:UpdateAuras(frame)
                     frame["hasDispel"..debuffType] = true
                     numUsedDispelDebuffs = numUsedDispelDebuffs + 1
                     local dispellDebuffFrame = frame.dispelDebuffFrames[numUsedDispelDebuffs]
-                    CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
+                    self:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
                     if numUsedDispelDebuffs == maxDispelDebuffs then
                         doneWithDispelDebuffs = true
                     end
@@ -286,4 +326,10 @@ function KHMRaidFrames:UpdateAuras(frame)
     CompactUnitFrame_HideAllBuffs(frame, numUsedBuffs + 1)
     CompactUnitFrame_HideAllDebuffs(frame, numUsedDebuffs + 1)
     CompactUnitFrame_HideAllDispelDebuffs(frame, numUsedDispelDebuffs + 1)
+
+    self:StopBuffFramesGlow(frame, numUsedBuffs + 1)
+    self:StopDebuffFramesGlow(frame, numUsedDebuffs + 1)
+    self:StopDispelDebuffFramesGlow(frame, numUsedDispelDebuffs + 1)
+
+    self:CheckFrameGlow(frame)
 end
