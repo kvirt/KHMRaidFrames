@@ -42,14 +42,16 @@ function KHMRaidFrames:Defaults()
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
-                    enabled = false
+                    enabled = false,
+                    useDefaultsColors = true,
                 },
                 frameGlow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
-                    enabled = false                                          
+                    enabled = false,
+                    useDefaultsColors = true,                                                           
                 },                  
             },
             debuffFrames = {
@@ -68,15 +70,17 @@ function KHMRaidFrames:Defaults()
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
-                    enabled = false                                          
+                    enabled = false,
+                    useDefaultsColors = true,
                 },
                 frameGlow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
-                    enabled = false                                          
-                },                               
+                    enabled = false,
+                    useDefaultsColors = true,                                                           
+                },                                
             },
             buffFrames = {
                 num = 3,
@@ -94,15 +98,17 @@ function KHMRaidFrames:Defaults()
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
-                    enabled = false                                          
+                    enabled = false,
+                    useDefaultsColors = true,
                 },
                 frameGlow = {
                     type = "pixel",
                     options = self:GetGlowOptions(),
                     tracking = {},
                     trackingStr = "",    
-                    enabled = false                                          
-                },                              
+                    enabled = false,
+                    useDefaultsColors = true,                                                           
+                },                               
             },
             raidIcon = {
                 enabled = true,
@@ -118,7 +124,7 @@ function KHMRaidFrames:Defaults()
     return defaults_settings
 end
 
-function KHMRaidFrames:RestoreDefaults(partyType, frameType)
+function KHMRaidFrames:RestoreDefaults(groupType, frameType)
     if InCombatLockdown() then
         print("Can not refresh settings while in combat")      
         return

@@ -1,7 +1,7 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
--- useCompactPartyFrames, showPartyPets, raidOptionDisplayPets, https://wow.gamepedia.com/Console_variables
+-- useCompactPartyFrames, showPartyPets, raidOptionDisplayPets, raidFramesDisplayPowerBars, raidOptionDisplayMainTankAndAssist, raidOptionKeepGroupsTogether, https://wow.gamepedia.com/Console_variables
 local positions = {
     ["TOPLEFT"] = L["TOPLEFT"],
     ["LEFT"] = L["LEFT"],

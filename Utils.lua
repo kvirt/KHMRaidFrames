@@ -3,15 +3,15 @@ local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
 local _G = _G
 
-local subFrameTypes = {"buffFrames", "debuffFrames", "dispelDebuffFrames"}
+local subFrameTypes = {"debuffFrames", "buffFrames", "dispelDebuffFrames"}
 
 local systemYellowCode = "|cFFffd100<text>|r"
 local yellowCode = "|cFFFFF569<text>|r"
-local redCode = "|cFFC41F3B<text>|r"
-local greenCode = "|cFFA9D271<text>|r"
-local purpleCode = "|cFFA330C9<text>|r"
-local blueCode = "|cFF0070DEMagic|r"
-local brownCode = "|cFFC79C6E<text>|r"
+local redCode = "|cFFC80000<text>|r"
+local greenCode = "|cFF009600<text>|r"
+local purpleCode = "|cFF9600FF<text>|r"
+local blueCode = "|cFF3296FF<text>|r"
+local brownCode = "|cFF966400<text>|r"
 local greyCode = "|cFFb8b6b0<text>|r"
 
 
@@ -108,11 +108,12 @@ function KHMRaidFrames:TrackingHelpText()
         "Magic".."\n"..
         "\n"..
         L["Wildcards"]..":\n"..
-        gsub(greenCode, "<text>", "Poison").."\n"..
-        gsub(purpleCode, "<text>", "Curse").."\n"..
-        gsub(brownCode, "<text>", "Disease").."\n"..
-        gsub(blueCode, "<text>", "Magic").."\n"..
-        gsub("155777"..greyCode, "<text>", L["-- Comments"])
+        greenCode:gsub("<text>", "Poison").."\n"..
+        purpleCode:gsub("<text>", "Curse").."\n"..
+        brownCode:gsub("<text>", "Disease").."\n"..
+        blueCode:gsub("<text>", "Magic").."\n"..
+        redCode:gsub("<text>", "Physical").."\n"..        
+        "155777"..greyCode:gsub("<text>", L["-- Comments"])
 
     return s
 end
@@ -134,6 +135,7 @@ function KHMRaidFrames:CheckNil(table, key, value)
         table[key] = value
     end
 end
+
 -- function KHMRaidFrames:SubFramesIndexMT()
 --     local t = {}
 

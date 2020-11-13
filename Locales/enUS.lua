@@ -52,3 +52,4 @@ L["Raid Target Icon"] = true
 L["Auras"] = true
 L["Aura Glow"] = true
 L["Frame Glow"] = true
+L["Use Default Colors"] = true

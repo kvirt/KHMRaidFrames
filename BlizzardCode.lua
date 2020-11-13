@@ -60,7 +60,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
 
     debuffFrame:Show()
 
-    self:FilterDebuffFrameGlowAuras(debuffFrame, name, debuffType, spellId)    
+    self:FilterGlowAuras(debuffFrame, name, debuffType, spellId, "debuffFrames")    
 end
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
@@ -86,7 +86,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
     end
     buffFrame:Show()
 
-    self:FilterBuffFrameGlowAuras(buffFrame, name, debuffType, spellId)    
+    self:FilterGlowAuras(buffFrame, name, debuffType, spellId, "buffFrames")    
 end
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
@@ -94,7 +94,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, 
     dispellDebuffFrame.icon:SetTexture("Interface\\RaidFrame\\Raid-Icon-Debuff"..debuffType)
     dispellDebuffFrame:SetID(index)
 
-    self:FilterDispelDebuffFrameGlowAuras(dispellDebuffFrame, debuffType)
+    self:FilterGlowAuras(dispellDebuffFrame, nil, debuffType, nil, "dispelDebuffFrames")
 end
 
 function KHMRaidFrames:CompactUnitFrame_Util_IsBossAura(...)
@@ -327,9 +327,5 @@ function KHMRaidFrames:UpdateAuras(frame)
     CompactUnitFrame_HideAllDebuffs(frame, numUsedDebuffs + 1)
     CompactUnitFrame_HideAllDispelDebuffs(frame, numUsedDispelDebuffs + 1)
 
-    self:StopBuffFramesGlow(frame, numUsedBuffs + 1)
-    self:StopDebuffFramesGlow(frame, numUsedDebuffs + 1)
-    self:StopDispelDebuffFramesGlow(frame, numUsedDispelDebuffs + 1)
-
-    self:CheckFrameGlow(frame)
+    self:FinishGlows(frame, {debuffFrames = numUsedDebuffs + 1, buffFrames = numUsedBuffs + 1, dispelDebuffFrames = numUsedDispelDebuffs + 1})
 end
