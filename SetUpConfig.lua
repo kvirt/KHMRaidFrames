@@ -1,7 +1,7 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
--- useCompactPartyFrames, showPartyPets, raidOptionDisplayPets, raidFramesDisplayPowerBars, raidOptionDisplayMainTankAndAssist, raidOptionKeepGroupsTogether, https://wow.gamepedia.com/Console_variables
+
 local positions = {
     ["TOPLEFT"] = L["TOPLEFT"],
     ["LEFT"] = L["LEFT"],
@@ -36,7 +36,7 @@ function KHMRaidFrames:SetupOptions()
     options.args.raid = {
         type = "group",
         order = 2,
-        name = L["Raid Frames"],
+        name = L["Raid"],
         desc = "",
         childGroups = "tab",  
         args = self:SetupOptionsByType("raid"),
@@ -44,7 +44,7 @@ function KHMRaidFrames:SetupOptions()
     options.args.party = {
         type = "group",
         order = 3,
-        name = L["Party Frames"],
+        name = L["Party"],
         desc = "",
         childGroups = "tab",          
         args = self:SetupOptionsByType("party"),                  
@@ -118,7 +118,7 @@ function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, groupType)
     options.properties = {
         type = "group",
         order = 1,
-        name = L["Properties"],
+        name = L["General"],
         desc = "",
         childGroups = "tab",  
         args = self:SetupOptionsByFrameType(frameType, db, groupType),     
@@ -454,7 +454,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
         },
         ["exclude"..frameType] = {
             name = L["Exclude"],
-            desc = L["Use to block auras"],
+            desc = L["Exclude auras"],
             usage = self:TrackingHelpText(),
             width = "full",
             type = "input",

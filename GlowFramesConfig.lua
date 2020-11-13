@@ -87,14 +87,13 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
                     self:StopOptionsFramesGlows(frameType, groupType, db)
                 end
 
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.enabled end
         },
         ["useDefaultsColors"..frameName] = {
             name = L["Use Default Colors"],
-            desc = "",
-            descStyle = "inline",
+            desc = self:DebuffColorsText(),
             width = "normal",
             type = "toggle",
             order = 2,
@@ -103,7 +102,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                       
             set = function(info,val)
                 db.useDefaultsColors = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.useDefaultsColors end
         },              
@@ -129,7 +128,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
                 self:StopOptionsAuraGlows(frameType, groupType, db)
                 self:StopOptionsFramesGlows(frameType, groupType, db)
 
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.type end
         },
@@ -146,7 +145,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                     
             set = function(info, r, g, b, a)
                 db.options[db.type].options.color = {r, g, b, a}
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info)
                 local color = db.options[db.type].options.color
@@ -168,7 +167,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                    
             set = function(info,val)
                 db.options[db.type].options.frequency = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.frequency end
         },
@@ -196,7 +195,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                  
             set = function(info,val)
                 db.options[db.type].options.N = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.N end
         },
@@ -219,7 +218,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                     
             set = function(info,val)
                 db.options[db.type].options.xOffset = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.xOffset end
         },
@@ -242,7 +241,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                     
             set = function(info,val)
                 db.options[db.type].options.yOffset = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.yOffset end
         },
@@ -265,7 +264,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                       
             set = function(info,val)
                 db.options[db.type].options.th = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.th end
         },      
@@ -285,7 +284,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,                       
             set = function(info,val)
                 db.options[db.type].options.border = val
-                self:RefreshConfig()
+                self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.border end
         },
@@ -300,7 +299,7 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
         },                                        
         ["tracking"..frameName] = {
             name = L["Tracking"],
-            desc = L["Use to block auras"],
+            desc = L["Track auras"],
             width = "full",
             type = "input",
             usage = self:TrackingHelpText(),

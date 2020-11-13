@@ -7,6 +7,7 @@ local subFrameTypes = {"debuffFrames", "buffFrames", "dispelDebuffFrames"}
 
 local systemYellowCode = "|cFFffd100<text>|r"
 local yellowCode = "|cFFFFF569<text>|r"
+local witeCode = "|cFFFFFFFF<text>|r"
 local redCode = "|cFFC80000<text>|r"
 local greenCode = "|cFF009600<text>|r"
 local purpleCode = "|cFF9600FF<text>|r"
@@ -18,10 +19,21 @@ local greyCode = "|cFFb8b6b0<text>|r"
 function KHMRaidFrames:SafeRefresh()
     if InCombatLockdown() then
         self:Print("Can not refresh settings while in combat")        
-        self:HideAll() 
+        self:HideAll()
+        self.deffered = true 
         return
     else
         self:RefreshConfig()
+    end
+end
+
+function KHMRaidFrames:IterateGroupsNotToghether()
+    local index = 0
+
+    return function()
+       index = index + 1
+
+       if index <= 40 then return _G["CompactRaidFrame"..index] end 
     end
 end
 
@@ -36,7 +48,11 @@ function KHMRaidFrames:IterateRaidGroups()
     end
 end
 
-function KHMRaidFrames:IterateRaidMembers()    
+function KHMRaidFrames:IterateRaidMembers()
+    if not self.keepGroupsTogether then
+        return self:IterateGroupsNotToghether()
+    end
+
     local groupIndex = 0
     local index = 0
 
@@ -56,6 +72,10 @@ function KHMRaidFrames:IterateRaidMembers()
 end
 
 function KHMRaidFrames:IterateGroupMembers()
+    if not self.keepGroupsTogether then
+        return self:IterateGroupsNotToghether()
+    end
+
     local index = 0
     local groupFrame = _G["CompactPartyFrame"]
 
@@ -99,6 +119,17 @@ function KHMRaidFrames:SanitizeStrings(str)
     return t
 end
 
+function KHMRaidFrames:DebuffColorsText()
+    local s = "\n"..
+        greenCode:gsub("<text>", "Poison").."\n"..
+        purpleCode:gsub("<text>", "Curse").."\n"..
+        brownCode:gsub("<text>", "Disease").."\n"..
+        blueCode:gsub("<text>", "Magic").."\n"..
+        witeCode:gsub("<text>", "Physical").."\n"
+
+    return s
+end
+
 function KHMRaidFrames:TrackingHelpText()
 
     local s = "\n".."\n".."\n"..
@@ -107,12 +138,7 @@ function KHMRaidFrames:TrackingHelpText()
         "155777".."\n"..
         "Magic".."\n"..
         "\n"..
-        L["Wildcards"]..":\n"..
-        greenCode:gsub("<text>", "Poison").."\n"..
-        purpleCode:gsub("<text>", "Curse").."\n"..
-        brownCode:gsub("<text>", "Disease").."\n"..
-        blueCode:gsub("<text>", "Magic").."\n"..
-        redCode:gsub("<text>", "Physical").."\n"..        
+        L["Wildcards"]..":\n"..self:DebuffColorsText()..        
         "155777"..greyCode:gsub("<text>", L["-- Comments"])
 
     return s
@@ -135,17 +161,3 @@ function KHMRaidFrames:CheckNil(table, key, value)
         table[key] = value
     end
 end
-
--- function KHMRaidFrames:SubFramesIndexMT()
---     local t = {}
-
---     t.__newindex  = function(_table, key, value)
---         if key == nil then
---             return
---         else
---             rawset(_table, key, value)
---         end
---     end
-
---     return t
--- end

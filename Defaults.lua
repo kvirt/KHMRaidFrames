@@ -5,20 +5,16 @@ if not InCombatLockdown() then
 end
 
 local _G = _G
-local options = DefaultCompactUnitFrameSetupOptions
-local powerBarHeight = 8
-local powerBarUsedHeight = options.displayPowerBar and powerBarHeight or 0
 local CUF_AURA_BOTTOM_OFFSET = 2
 local NATIVE_UNIT_FRAME_HEIGHT = 36
-local NATIVE_UNIT_FRAME_WIDTH = 72
+local NATIVE_UNIT_FRAME_WIDTH = 72   
+local powerBarHeight = 8
 
-function KHMRaidFrames:GetFrameScale()
-    local componentScale = min(options.height / NATIVE_UNIT_FRAME_HEIGHT, options.width / NATIVE_UNIT_FRAME_WIDTH)
-    return componentScale
-end
 
 function KHMRaidFrames:Defaults()
-    local buffSize = 11 * self:GetFrameScale()
+    local powerBarUsedHeight, componentScale = self.displayPowerBar and powerBarHeight or 0, min(self.frameHeight / NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / NATIVE_UNIT_FRAME_WIDTH)
+
+    local buffSize = 11 * componentScale
     local defaults_settings = {profile = {party = {}, raid = {}}}
 
     local commons = {
@@ -130,10 +126,10 @@ function KHMRaidFrames:RestoreDefaults(groupType, frameType)
         return
     end
 
-    local defaults_settings = self:Defaults()["profile"][partyType][frameType]
+    local defaults_settings = self:Defaults()["profile"][groupType][frameType]
 
     for k, v in pairs(defaults_settings) do
-        self.db.profile[partyType][frameType][k] = v
+        self.db.profile[groupType][frameType][k] = v
     end
 
     self:SafeRefresh()

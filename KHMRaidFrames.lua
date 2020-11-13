@@ -1,5 +1,5 @@
 local addonName, addonTable = ...
-addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "AceHook-3.0", "AceConsole-3.0")
+addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "AceHook-3.0", "AceEvent-3.0", "AceConsole-3.0")
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
 local _G = _G

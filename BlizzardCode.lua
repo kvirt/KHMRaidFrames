@@ -168,12 +168,11 @@ function KHMRaidFrames:UpdateAuras(frame)
     local frameName = frame:GetName()
     for _, v in pairs(self.aurasCache) do
         v[frameName] = {}
-        -- setmetatable(v[frameName], self:SubFramesIndexMT())
     end
 
-    local maxBuffs = #frame.buffFrames
-    local maxDebuffs = #frame.debuffFrames
-    local maxDispelDebuffs = #frame.dispelDebuffFrames
+    local maxBuffs = frame.buffFrames_Num or 3
+    local maxDebuffs = frame.debuffFrames_Num or 3
+    local maxDispelDebuffs = frame.dispelDebuffFrames_Num or 3
 
     local doneWithBuffs = not frame.buffFrames or not frame.optionTable.displayBuffs or maxBuffs == 0
     local doneWithDebuffs = not frame.debuffFrames or not frame.optionTable.displayDebuffs or maxDebuffs == 0
@@ -245,7 +244,6 @@ function KHMRaidFrames:UpdateAuras(frame)
                     end
                 end
             end
-
             index = index + 1
             return doneWithBuffs and doneWithDebuffs
         end)

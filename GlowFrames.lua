@@ -5,7 +5,7 @@ local defuffsColors = {
     curse = {0.6, 0.0, 1.0, 1},
     disease = {0.6, 0.4, 0.0, 1},
     poison = {0.0, 0.6, 0.0, 1},
-    physical = {0.8, 0, 0, 1}
+    physical = {1, 1, 1, 1}
 }
 
 

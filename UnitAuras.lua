@@ -39,6 +39,8 @@ function KHMRaidFrames:AddSubFramesInternal(frame, groupType)
                 self.extraFrames[frameName..i] = true
             end
         end
+        
+        frame[subFrameType.."_Num"] = db.num
     end
 end
 
