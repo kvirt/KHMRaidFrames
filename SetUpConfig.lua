@@ -49,6 +49,31 @@ function KHMRaidFrames:SetupOptions()
         childGroups = "tab",          
         args = self:SetupOptionsByType("party"),                  
     }
+    options.args.glows = {
+        type = "group",
+        order = 3,
+        name = L["Glows"],
+        desc = "",
+        childGroups = "tab",          
+        args = {
+            ["aura glow"] = {
+                type = "group",
+                order = 2,
+                name = L["Aura Glow"],
+                desc = "",
+                childGroups = "tab",  
+                args = self:GlowSubTypes("auraGlow"),     
+            },
+            ["frame glow"] = {
+                type = "group",
+                order = 3,
+                name = L["Frame Glow"],
+                desc = "",
+                childGroups = "tab",  
+                args = self:GlowSubTypes("frameGlow"),        
+            }                      
+        },                 
+    }
 
     return options
 end
@@ -68,7 +93,6 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
             self:ShowVirtual(groupType)
         end,
     }
-    
     options.frames = {
         type = "group",
         order = 2,
@@ -83,7 +107,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = L["Buffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameTypeProxy("buffFrames", db, groupType),        
+        args = self:SetupOptionsByFrameType("buffFrames", db, groupType),        
     }
     options.debuffFrames = {
         type = "group",
@@ -91,7 +115,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = L["Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameTypeProxy("debuffFrames", db, groupType),        
+        args = self:SetupOptionsByFrameType("debuffFrames", db, groupType),        
     }
     options.dispelDebuffFrames = {
         type = "group",
@@ -99,7 +123,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = L["Dispell Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameTypeProxy("dispelDebuffFrames", db, groupType),  
+        args = self:SetupOptionsByFrameType("dispelDebuffFrames", db, groupType),  
     }
     options.raidIcon = {
         type = "group",
@@ -111,25 +135,6 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
     }
     return options
 end        
-
-function KHMRaidFrames:SetupOptionsByFrameTypeProxy(frameType, db, groupType)
-    local options = {}
-
-    options.properties = {
-        type = "group",
-        order = 1,
-        name = L["General"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupOptionsByFrameType(frameType, db, groupType),     
-    }
-
-    local glows = self:SetupGlowOptionsProxy(frameType, db, groupType)
-    options.glow = glows.glow
-    options.frameGlow = glows.frameGlow
-
-    return options    
-end
 
 function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
     db = db[frameType]

@@ -45,15 +45,11 @@ function KHMRaidFrames:AddSubFramesInternal(frame, groupType)
 end
 
 function KHMRaidFrames:AddSubFrames()
-    for frame in self:IterateRaidMembers() do
-        if frame then
-            self:AddSubFramesInternal(frame, "raid")
-        end
-    end
+    local isInRaid = IsInRaid() and "raid" or "party"
 
-    for frame in self:IterateGroupMembers() do
+    for frame in self:IterateCompactFrames(isInRaid) do
         if frame then
-            self:AddSubFramesInternal(frame, "party")
+            self:AddSubFramesInternal(frame, isInRaid)
         end
     end
 end

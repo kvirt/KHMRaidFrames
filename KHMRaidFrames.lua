@@ -14,74 +14,25 @@ local UnitPopupButtons = {
     ["RAID_TARGET_8"] = UnitPopupButtons["RAID_TARGET_8"],             
 }
 
-function KHMRaidFrames:RefreshConfig()
-    if not InCombatLockdown() then
-        self:AddSubFrames()
-    end  
-
-    local doneWithVirtual = false
-
-    for frame in self:IterateRaidMembers() do
-        self:SetUpFrame(frame, "raid")
-        self:SetUpRaidIcon(frame, "raid")
-        self:SetUpSubFrames(frame, "raid")
-
-        if self.virtual.shown and not doneWithVirtual then
-            self:SetUpVirtualSubFrames(frame, "raid")
-            doneWithVirtual = true
-        end
-
-        if not InCombatLockdown() then
-            CompactUnitFrame_UpdateAll(frame)
-        end          
-    end
-
-    for frame in self:IterateGroupMembers() do
-        self:SetUpFrame(frame, "party")
-        self:SetUpRaidIcon(frame, "party")
-        self:SetUpSubFrames(frame, "party")
-
-        if self.virtual.shown and not doneWithVirtual then
-            self:SetUpVirtualSubFrames(frame, "party")
-            doneWithVirtual = true
-        end
-
-        if not InCombatLockdown() then
-            CompactUnitFrame_UpdateAll(frame)
-        end         
-    end    
-
-    for group in self:IterateRaidGroups() do
-        self:SetUpGroup(group, "raid")
-    end
-
-    self:SetUpGroup(_G["CompactPartyFrame"], "party")
-end
 
 function KHMRaidFrames:UpdateLayout()
     if not InCombatLockdown() then
         self:AddSubFrames()
     end  
 
-    if IsInRaid() then
-        for frame in self:IterateRaidMembers() do
-            self:SetUpFrame(frame, "raid")
-            self:SetUpRaidIcon(frame, "raid")            
-            self:SetUpSubFrames(frame, "raid")
-        end
-        
-        for group in self:IterateRaidGroups() do
-            self:SetUpGroup(group, "raid")
-        end        
-    else
-        for frame in self:IterateGroupMembers() do
-            self:SetUpFrame(frame, "party")
-            self:SetUpRaidIcon(frame, "party")            
-            self:SetUpSubFrames(frame, "party") 
-        end
+    local isInRaid = IsInRaid() and "raid" or "party"
 
-        self:SetUpGroup(_G["CompactPartyFrame"], "party")  
+    for frame in self:IterateCompactFrames(isInRaid) do
+        if frame then
+            self:SetUpFrame(frame, isInRaid)
+            self:SetUpRaidIcon(frame, isInRaid)            
+            self:SetUpSubFrames(frame, isInRaid)
+        end       
     end
+
+    for group in self:IterateCompactGroups(isInRaid) do
+        self:SetUpGroup(group, isInRaid)
+    end      
 end
 
 function KHMRaidFrames:SetUpSubFrames(frame, groupType)
@@ -199,13 +150,68 @@ function KHMRaidFrames:SetUpFrame(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpGroup(frame, groupType)
+    if InCombatLockdown() then return end
     if not frame then return end
 
     local db = self.db.profile[groupType]
 
+    local totalHeight, totalWidth 
+
     if db.frames.hideGroupTitles then
         frame.title:Hide()
+
+        totalHeight, totalWidth = self:ResizeGroups(frame, 0)          
     else
+        totalHeight, totalWidth = self:ResizeGroups(frame, -frame.title:GetHeight()) 
+
         frame.title:Show()
     end
+    
+    if frame.borderFrame:IsShown() then
+        totalWidth = totalWidth + 12
+        totalHeight = totalHeight + 4
+    end
+
+    frame:SetSize(totalWidth, totalHeight)
 end                    
+
+function KHMRaidFrames:ResizeGroups(frame, yOffset)
+    local totalHeight = frame.title:GetHeight()
+    local totalWidth = 0
+
+    if self.horizontalGroups then
+        frame.title:ClearAllPoints()
+        frame.title:SetPoint("TOPLEFT")
+
+        local frame1 = _G[frame:GetName().."Member1"];
+        frame1:ClearAllPoints()
+        frame1:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, yOffset)
+        
+        for i=2, 5 do
+            local unitFrame = _G[frame:GetName().."Member"..i]
+            unitFrame:ClearAllPoints()
+            unitFrame:SetPoint("LEFT", _G[frame:GetName().."Member"..(i-1)], "RIGHT", 0, 0)
+        end
+
+        totalHeight = totalHeight + _G[frame:GetName().."Member1"]:GetHeight()
+        totalWidth = totalWidth + _G[frame:GetName().."Member1"]:GetWidth() * 5
+    else
+        frame.title:ClearAllPoints()
+        frame.title:SetPoint("TOP")
+
+        local frame1 = _G[frame:GetName().."Member1"];
+        frame1:ClearAllPoints()
+        frame1:SetPoint("TOP", frame, "TOP", 0, yOffset)
+        
+        for i=2, 5 do
+            local unitFrame = _G[frame:GetName().."Member"..i]
+            unitFrame:ClearAllPoints()
+            unitFrame:SetPoint("TOP", _G[frame:GetName().."Member"..(i-1)], "BOTTOM", 0, 0)
+        end
+
+        totalHeight = totalHeight + _G[frame:GetName().."Member1"]:GetHeight() * 5
+        totalWidth = totalWidth + _G[frame:GetName().."Member1"]:GetWidth()
+    end
+
+    return totalHeight, totalWidth           
+end

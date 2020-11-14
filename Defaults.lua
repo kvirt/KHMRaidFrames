@@ -15,7 +15,7 @@ function KHMRaidFrames:Defaults()
     local powerBarUsedHeight, componentScale = self.displayPowerBar and powerBarHeight or 0, min(self.frameHeight / NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / NATIVE_UNIT_FRAME_WIDTH)
 
     local buffSize = 11 * componentScale
-    local defaults_settings = {profile = {party = {}, raid = {}}}
+    local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
 
     local commons = {
             frames = {
@@ -32,23 +32,7 @@ function KHMRaidFrames:Defaults()
                 xOffset = -3,
                 yOffset = -2,
                 exclude = {},
-                excludeStr = "",          
-                glow = {
-                    type = "pixel",
-                    options = self:GetGlowOptions(),
-                    tracking = {},
-                    trackingStr = "",    
-                    enabled = false,
-                    useDefaultsColors = true,
-                },
-                frameGlow = {
-                    type = "pixel",
-                    options = self:GetGlowOptions(),
-                    tracking = {},
-                    trackingStr = "",    
-                    enabled = false,
-                    useDefaultsColors = true,                                                           
-                },                  
+                excludeStr = "",                            
             },
             debuffFrames = {
                 num = 3,
@@ -60,23 +44,7 @@ function KHMRaidFrames:Defaults()
                 xOffset = 3,
                 yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
                 exclude = {},
-                excludeStr = "",                
-                glow = {
-                    type = "pixel",
-                    options = self:GetGlowOptions(),
-                    tracking = {},
-                    trackingStr = "",    
-                    enabled = false,
-                    useDefaultsColors = true,
-                },
-                frameGlow = {
-                    type = "pixel",
-                    options = self:GetGlowOptions(),
-                    tracking = {},
-                    trackingStr = "",    
-                    enabled = false,
-                    useDefaultsColors = true,                                                           
-                },                                
+                excludeStr = "",                                               
             },
             buffFrames = {
                 num = 3,
@@ -88,23 +56,7 @@ function KHMRaidFrames:Defaults()
                 xOffset = -3,
                 yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
                 exclude = {},
-                excludeStr = "",                 
-                glow = {
-                    type = "pixel",
-                    options = self:GetGlowOptions(),
-                    tracking = {},
-                    trackingStr = "",    
-                    enabled = false,
-                    useDefaultsColors = true,
-                },
-                frameGlow = {
-                    type = "pixel",
-                    options = self:GetGlowOptions(),
-                    tracking = {},
-                    trackingStr = "",    
-                    enabled = false,
-                    useDefaultsColors = true,                                                           
-                },                               
+                excludeStr = "",                                               
             },
             raidIcon = {
                 enabled = true,
@@ -116,6 +68,45 @@ function KHMRaidFrames:Defaults()
     }
     defaults_settings.profile.party = commons
     defaults_settings.profile.raid = commons
+
+    defaults_settings.profile.glows = {
+        auraGlow = {
+            buffFrames = {
+                type = "pixel",
+                options = self:GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",    
+                enabled = false,
+                useDefaultsColors = true,                
+            },
+            debuffFrames = {
+                type = "pixel",
+                options = self:GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",    
+                enabled = false,
+                useDefaultsColors = true,                
+            },
+        },
+        frameGlow = {
+            buffFrames = {
+                type = "pixel",
+                options = self:GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",    
+                enabled = false,
+                useDefaultsColors = true,                
+            },
+            debuffFrames = {
+                type = "pixel",
+                options = self:GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",    
+                enabled = false,
+                useDefaultsColors = true,                
+            },                                                         
+        },
+    }
 
     return defaults_settings
 end

@@ -40,13 +40,12 @@ function KHMRaidFrames:StopGlow(frame, db)
 end
 
 function KHMRaidFrames:FilterGlowAuras(frame, name, debuffType, spellId, frameType)
-    local db = self:GroupTypeDB()[frameType]
+    local db = self.db.profile.glows.auraGlow[frameType]
 
     local found = false
     local frameName = frame:GetParent():GetName()
 
-    if db.glow.enabled or db.frameGlow.enabled then
-        db = db.glow
+    if self.db.profile.glows.auraGlow[frameType].enabled or self.db.profile.glows.frameGlow[frameType].enabled then
         name = name and name:lower()
         debuffType = debuffType and debuffType:lower() or "physical"
 
@@ -78,10 +77,8 @@ function KHMRaidFrames:FilterGlowAuras(frame, name, debuffType, spellId, frameTy
 end
 
 function KHMRaidFrames:FinishGlows(frame, indexes)
-    local db = self:GroupTypeDB()
-
-    for subFrame in self:IterateSubFrameTypes() do
-        local _db = db[subFrame].glow
+    for subFrame in self:IterateSubFrameTypes("dispelDebuffFrames") do
+        local db = self.db.profile.glows.auraGlow[subFrame]
 
         if db.enabled then
             for i=indexes[subFrame], #frame[subFrame] do
@@ -94,21 +91,20 @@ function KHMRaidFrames:FinishGlows(frame, indexes)
 end
 
 function KHMRaidFrames:SetFrameGlow(frame)
-    local db = self:GroupTypeDB()
     local frameName = frame:GetName()
 
-    for subFrame in self:IterateSubFrameTypes() do
-        local _db = db[subFrame].frameGlow
+    for subFrame in self:IterateSubFrameTypes("dispelDebuffFrames") do
+        local db = self.db.profile.glows.frameGlow[subFrame]
 
-        if _db.enabled then
-            for _, aura in ipairs(_db.tracking) do
+        if db.enabled then
+            for _, aura in ipairs(db.tracking) do
                 if self.aurasCache[subFrame][frameName][aura] then
-                    local color = _db.useDefaultsColors and defuffsColors[self.aurasCache[subFrame][frameName][aura]]
-                    return self:StartGlow(frame, _db, color)
+                    local color = db.useDefaultsColors and defuffsColors[self.aurasCache[subFrame][frameName][aura]]
+                    return self:StartGlow(frame, db, color)
                 end
             end
 
-            self:StopGlow(frame, _db)
+            self:StopGlow(frame, db)
         end
     end
 end

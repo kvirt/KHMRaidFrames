@@ -42,33 +42,31 @@ function KHMRaidFrames:GetGlowOptions(key)
     if key and options[key] then return options[key] else return options end
 end
 
-function KHMRaidFrames:SetupGlowOptionsProxy(frameType, db, groupType)
-    db = db[frameType]
+function KHMRaidFrames:GlowSubTypes(glowType)
+    options = {}
 
-    local options = {}
-
-    options.glow = {
+    options.buffFrames = {
+        type = "group",
+        order = 1,
+        name = L["Buffs"],
+        desc = "",
+        childGroups = "tab",  
+        args = self:SetupGlowOptions("buffFrames", glowType),        
+    }
+    options.debuffFrames = {
         type = "group",
         order = 2,
-        name = L["Aura Glow"],
+        name = L["Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupGlowOptions("glow", db, groupType, frameType),     
-    }
-    options.frameGlow = {
-        type = "group",
-        order = 3,
-        name = L["Frame Glow"],
-        desc = "",
-        childGroups = "tab",  
-        args = self:SetupGlowOptions("frameGlow", db, groupType, frameType),        
+        args = self:SetupGlowOptions("debuffFrames", glowType),        
     }
 
     return options
 end
 
-function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
-    db = db[glowType]
+function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
+    local db = self.db.profile.glows[glowType][frameType]
 
     local frameName = glowType..frameType
 
@@ -83,8 +81,8 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             set = function(info,val)
                 db.enabled = val
                 if not val then
-                    self:StopOptionsAuraGlows(frameType, groupType, db)
-                    self:StopOptionsFramesGlows(frameType, groupType, db)
+                    self:StopOptionsAuraGlows(frameType, db)
+                    self:StopOptionsFramesGlows(frameType, db)
                 end
 
                 self:SafeRefresh()
@@ -125,8 +123,8 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             end,      
             set = function(info,val)
                 db.type = val
-                self:StopOptionsAuraGlows(frameType, groupType, db)
-                self:StopOptionsFramesGlows(frameType, groupType, db)
+                self:StopOptionsAuraGlows(frameType, db)
+                self:StopOptionsFramesGlows(frameType, db)
 
                 self:SafeRefresh()
             end,
@@ -305,6 +303,9 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             usage = self:TrackingHelpText(),
             multiline = 5, 
             order = 10,
+            hidden = function(info)
+                return frameType == "dispelDebuffFrames"
+            end,
             disabled = function(info)
                 return not db.enabled
             end,                 
@@ -332,59 +333,49 @@ function KHMRaidFrames:SetupGlowOptions(glowType, db, groupType, frameType)
             confirm = true,
             order = 12,
             func = function(info,val)
-                self:RestoreGlowDefaults(groupType, frameType, glowType)
-                self:StopOptionsAuraGlows(frameType, groupType, db)
-                self:StopOptionsFramesGlows(frameType, groupType, db)                
+                self:RestoreGlowDefaults(frameType, glowType)
+                self:StopOptionsAuraGlows(frameType, db)
+                self:StopOptionsFramesGlows(frameType, db)                
             end,
         },                                 
     }
     return options
 end
 
-function KHMRaidFrames:RestoreGlowDefaults(groupType, frameType, glowType)
+function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
     if InCombatLockdown() then
         print("Can not refresh settings while in combat")      
         return
     end
 
-    local defaults_settings = self:Defaults()["profile"][groupType][frameType][glowType]
+    local defaults_settings = self:Defaults()["profile"][glowType][frameType]
 
     for k, v in pairs(defaults_settings) do
-        self.db.profile[groupType][frameType][glowType][k] = v
+        self.db.profile[glowType][frameType][k] = v
     end
 
     self:SafeRefresh()
 end
 
-function KHMRaidFrames:StopOptionsAuraGlows(frameType, groupType, db)
-    local db = self.db.profile[groupType][frameType].glow
+function KHMRaidFrames:StopOptionsAuraGlows(frameType, db)
+    local db = self.db.profile.glows.auraGlow[frameType]
 
-    if groupType == "raid" then
-        for frame in self:IterateRaidMembers() do
-            for i=1, #frame[frameType] do
-                self:StopOptionsGlow(frame[frameType][i], db)
-            end        
-        end
-    else
-        for frame in self:IterateGroupMembers() do
-            for i=1, #frame[frameType] do
-                self:StopOptionsGlow(frame[frameType][i], db)
-            end          
-        end
+    local isInRaid = IsInRaid() and "raid" or "party"
+
+    for frame in self:IterateCompactFrames(isInRaid) do
+        for i=1, #frame[frameType] do
+            self:StopOptionsGlow(frame[frameType][i], db)
+        end        
     end
 end
 
-function KHMRaidFrames:StopOptionsFramesGlows(frameType, groupType, db)
-    local db = self.db.profile[groupType][frameType].frameGlow
+function KHMRaidFrames:StopOptionsFramesGlows(frameType, db)
+    local db = self.db.profile.glows.frameGlow[frameType]
 
-    if groupType == "raid" then
-        for frame in self:IterateRaidMembers() do
-            self:StopOptionsGlow(frame, db)
-        end
-    else
-        for frame in self:IterateGroupMembers() do
-            self:StopOptionsGlow(frame, db)         
-        end
+    local isInRaid = IsInRaid() and "raid" or "party"
+
+    for frame in self:IterateCompactFrames(isInRaid) do
+        self:StopOptionsGlow(frame, db)
     end
 end
 

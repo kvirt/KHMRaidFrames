@@ -135,6 +135,34 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SafeRefresh()   
 end
 
+function KHMRaidFrames:RefreshConfig()
+    if not InCombatLockdown() then
+        self:AddSubFrames()
+    end  
+
+    local doneWithVirtual = false
+    local isInRaid = IsInRaid() and 'raid' or 'party'
+
+    for frame in self:IterateCompactFrames(isInRaid) do
+        self:SetUpFrame(frame, isInRaid)
+        self:SetUpRaidIcon(frame, isInRaid)
+        self:SetUpSubFrames(frame, isInRaid)
+
+        if self.virtual.shown and not doneWithVirtual then
+            self:SetUpVirtualSubFrames(frame, isInRaid)
+            doneWithVirtual = true
+        end
+
+        if not InCombatLockdown() then
+            CompactUnitFrame_UpdateAll(frame)
+        end          
+    end
+
+    for group in self:IterateCompactGroups(isInRaid) do
+        self:SetUpGroup(group, isInRaid)
+    end 
+end
+
 function KHMRaidFrames:GetRaidProfileSettings(profile)
     if InCombatLockdown() then return end
 
@@ -148,14 +176,12 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.frameHeight = settings.frameHeight
     self.displayPowerBar = settings.displayPowerBar
     self.displayPets = settings.displayPets
-    self.useCompactPartyFrames = settings.shown
     self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
     if self.db then
         self:SafeRefresh()
     end
 end
-
 
 function KHMRaidFrames:ProfileReload()
     self.config:NotifyChange("KHMRaidFrames")

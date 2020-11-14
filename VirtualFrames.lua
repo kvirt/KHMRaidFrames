@@ -35,18 +35,10 @@ function KHMRaidFrames:ShowVirtual(groupType)
         return
     end
 
-    if IsInRaid() then
-        for frame in self:IterateRaidMembers() do
-            self.virtual.shown = true
-            self:SetUpVirtualSubFrames(frame, groupType)
-            break
-        end
-    else
-        for frame in self:IterateGroupMembers() do
-            self.virtual.shown = true            
-            self:SetUpVirtualSubFrames(frame, groupType)
-            break
-        end  
+    for frame in self:IterateCompactFrames(groupType) do
+        self.virtual.shown = true
+        self:SetUpVirtualSubFrames(frame, groupType)
+        break
     end
 end
 
@@ -73,7 +65,7 @@ function KHMRaidFrames:SetUpVirtualSubFrames(frame, groupType)
         self:HideVirtual()
         return
     end
-
+    print(frame:GetName())
     local db = self.db.profile[groupType]
 
     for subFrameType in self:IterateSubFrameTypes() do
@@ -81,7 +73,7 @@ function KHMRaidFrames:SetUpVirtualSubFrames(frame, groupType)
 
         local typedframes = {}
         for i=1, self.maxFrames do
-            typedframes[i] =  self.virtual.frames[subFrameType..i]
+            typedframes[i] = self.virtual.frames[subFrameType..i]
         end
 
         self:SetUpVirtualFrameCount(typedframes, _db.num)

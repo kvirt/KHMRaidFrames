@@ -27,71 +27,83 @@ function KHMRaidFrames:SafeRefresh()
     end
 end
 
-function KHMRaidFrames:IterateGroupsNotToghether()
+function KHMRaidFrames:IterateCompactFrames(isInRaid)
     local index = 0
-
-    return function()
-       index = index + 1
-
-       if index <= 40 then return _G["CompactRaidFrame"..index] end 
-    end
-end
-
-function KHMRaidFrames:IterateRaidGroups()
     local groupIndex = 0
+    local doneOld = (not self.displayPets and not self.displayMainTankAndAssist) and self.keepGroupsTogether
+    local doneNew = not self.keepGroupsTogether
+    local frame
 
     return function()
-        groupIndex = groupIndex + 1
-
-        local groupFrame = _G["CompactRaidGroup"..groupIndex]
-        if groupIndex <= 8 and groupFrame then return groupFrame end 
-    end
-end
-
-function KHMRaidFrames:IterateRaidMembers()
-    if not self.keepGroupsTogether then
-        return self:IterateGroupsNotToghether()
-    end
-
-    local groupIndex = 0
-    local index = 0
-
-    return function()
-        while groupIndex <= 8 do
+        while not doneNew do
             index = index + 1
 
             if index > 5 then
                 index = 1
                 groupIndex = groupIndex + 1
+
+                if groupIndex == 8 then
+                    doneNew = true
+                end
             end
 
-            local frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
+            if isInRaid == "raid" then
+                frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
+            else
+                if groupIndex == 2 then
+                    doneNew = true
+                    return 
+                end        
+
+                frame = _G["CompactPartyFrameMember"..index]
+            end
+            
             if frame then return frame end
+        end
+
+        while not doneOld do
+            index = index + 1
+
+            local oldStyleframe =_G["CompactRaidFrame"..index]
+
+            if index == 40 then 
+                doneOld = true
+                index = 0
+            end
+
+            if oldStyleframe then return oldStyleframe end
         end
     end
 end
 
-function KHMRaidFrames:IterateGroupMembers()
-    if not self.keepGroupsTogether then
-        return self:IterateGroupsNotToghether()
-    end
-
-    local index = 0
-    local groupFrame = _G["CompactPartyFrame"]
+function KHMRaidFrames:IterateCompactGroups(isInRaid)
+    local groupIndex = 0
 
     return function()
-       index = index + 1
-       if index <= 5 then return groupFrame and _G[groupFrame:GetName().."Member"..index] end 
+        while groupIndex <= 8 do
+            groupIndex = groupIndex + 1
+
+            if isInRaid == "raid" then
+                groupFrame = _G["CompactRaidGroup"..groupIndex]
+            else
+                groupFrame = _G["CompactPartyFrame"]
+                groupIndex = 9
+            end
+
+            if groupFrame then return groupFrame end
+        end
     end
 end
 
-function KHMRaidFrames:IterateSubFrameTypes()
+function KHMRaidFrames:IterateSubFrameTypes(exclude)
     local index = 0
     local len = #subFrameTypes
 
     return function()
-       index = index + 1
-       if index <= len then return subFrameTypes[index] end 
+        index = index + 1
+        if index <= len and subFrameTypes[index] ~= exclude then 
+            return subFrameTypes[index] 
+        end 
     end
 end
 
