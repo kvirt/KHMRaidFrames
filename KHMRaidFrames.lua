@@ -15,65 +15,12 @@ local UnitPopupButtons = {
 }
 
 
-function KHMRaidFrames:UpdateLayout()
-    if not InCombatLockdown() then
-        self:AddSubFrames()
-    end  
-
-    local isInRaid = IsInRaid() and "raid" or "party"
+function KHMRaidFrames:UpdateRaidMark()
+    local isInRaid = IsInRaid() and "raid" or "party"    
 
     for frame in self:IterateCompactFrames(isInRaid) do
-        if frame then
-            self:SetUpFrame(frame, isInRaid)
-            self:SetUpRaidIcon(frame, isInRaid)            
-            self:SetUpSubFrames(frame, isInRaid)
-        end       
-    end
-
-    for group in self:IterateCompactGroups(isInRaid) do
-        self:SetUpGroup(group, isInRaid)
-    end      
-end
-
-function KHMRaidFrames:SetUpSubFrames(frame, groupType)
-    local typedframes
-
-    local db = self.db.profile[groupType]
-
-    if frame and frame:IsShown() and frame.unit then
-        for frameType in self:IterateSubFrameTypes() do
-            typedframes = frame[frameType]
-
-            self:ShowHideHooks(typedframes, db[frameType])         
-            self:SetUpSubFramesPositionsAndSize(frame, typedframes, db[frameType])
-        end              
-    end                   
-end  
-
-function KHMRaidFrames:ShowHideHooks(typedframes, db)
-    local hooked, _
-
-    for frameNum=1, #typedframes do
-        if frameNum > db.num then
-            hooked, _ = self:IsHooked(typedframes[frameNum], "OnShow")
-
-            if not hooked then 
-                self:SecureHookScript(typedframes[frameNum], "OnShow", 
-                    function(typedframe)
-                        self:OnShow(typedframe, db, frameNum)
-                    end
-                )
-            end
-
-            self:OnShow(typedframes[frameNum], db, frameNum)
-        end
-    end
-end                            
-
-function KHMRaidFrames:OnShow(frame, db, frameNum)
-    if frameNum > db.num then
-        frame:Hide()
-    end
+        self:SetUpRaidIcon(frame, isInRaid) 
+    end 
 end
 
 function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
@@ -82,12 +29,18 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
 
     while frameNum <= #typedframes do
         typedframe = typedframes[frameNum]
-
         typedframe:ClearAllPoints()
-        anchor1, relativeFrame, anchor2 = self:GetFramePosition(frame, typedframes, db, frameNum)
 
         if frameNum == 1 then
-            xOffset, yOffset = db.xOffset, db.yOffset
+            anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
+        elseif frameNum % (db.numInRow) == 1 then
+            anchor1, relativeFrame, anchor2 = self.rowsPositions[db.rowsGrowDirection][1], typedframes[frameNum - db.numInRow], self.rowsPositions[db.rowsGrowDirection][2]
+        else
+            anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]           
+        end
+
+        if frameNum == 1 then
+            xOffset, yOffset = self:Offsets(anchor1)
         else
             xOffset, yOffset = 0, 0
         end
@@ -139,45 +92,10 @@ function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
     else
         frame.raidIcon:Hide()
     end  
-end
-
-function KHMRaidFrames:SetUpFrame(frame, groupType)
-    local db = self.db.profile[groupType]
-
-    if frame then
-        frame.healthBar:SetStatusBarTexture(db.frames.texture, "BORDER")
-    end
-end
-
-function KHMRaidFrames:SetUpGroup(frame, groupType)
-    if InCombatLockdown() then return end
-    if not frame then return end
-
-    local db = self.db.profile[groupType]
-
-    local totalHeight, totalWidth 
-
-    if db.frames.hideGroupTitles then
-        frame.title:Hide()
-
-        totalHeight, totalWidth = self:ResizeGroups(frame, 0)          
-    else
-        totalHeight, totalWidth = self:ResizeGroups(frame, -frame.title:GetHeight()) 
-
-        frame.title:Show()
-    end
-    
-    if frame.borderFrame:IsShown() then
-        totalWidth = totalWidth + 12
-        totalHeight = totalHeight + 4
-    end
-
-    frame:SetSize(totalWidth, totalHeight)
-end                    
+end                  
 
 function KHMRaidFrames:ResizeGroups(frame, yOffset)
-    local totalHeight = frame.title:GetHeight()
-    local totalWidth = 0
+    local totalHeight, totalWidth = 0, 0
 
     if self.horizontalGroups then
         frame.title:ClearAllPoints()

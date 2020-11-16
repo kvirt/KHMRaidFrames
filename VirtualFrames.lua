@@ -30,16 +30,52 @@ function KHMRaidFrames:GetVirtualFrames()
 end
 
 function KHMRaidFrames:ShowVirtual(groupType)
-    if self.virtual.shown then
-        self:HideVirtual()
+    local frame 
+
+    for _frame in self:IterateCompactFrames("raid") do
+        frame = _frame
+        break
+    end
+
+    if frame == nil then
+        for _frame in self:IterateCompactFrames("party") do
+            frame = _frame
+            break
+        end
+    end
+
+    if frame == nil then
         return
     end
 
-    for frame in self:IterateCompactFrames(groupType) do
-        self.virtual.shown = true
-        self:SetUpVirtualSubFrames(frame, groupType)
-        break
+    self.virtual.shown = true 
+    self.virtual.frame = frame
+
+    for subFrameType in self:IterateSubFrameTypes() do
+        self:SetUpVirtual(subFrameType, groupType)
     end
+end
+
+function KHMRaidFrames:SetUpVirtual(subFrameType, groupType)
+    if self.virtual.shown == false then return end
+
+    local db = self.db.profile[groupType][subFrameType]
+
+    local typedframes = {}
+
+    for i=1, self.maxFrames do
+        typedframes[i] = self.virtual.frames[subFrameType..i]
+    end
+
+    for frameNum=1, #typedframes do
+        if frameNum > db.num then
+            typedframes[frameNum]:Hide()
+        elseif frameNum <= db.num then
+            typedframes[frameNum]:Show()
+        end
+    end 
+
+    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db)
 end
 
 function KHMRaidFrames:HideVirtual()
@@ -47,36 +83,5 @@ function KHMRaidFrames:HideVirtual()
         frame:Hide()
     end
 
-    self.virtual.shown = false
-end
-
-function KHMRaidFrames:SetUpVirtualFrameCount(typedframes, num)
-    for frameNum=1, #typedframes do
-        if frameNum > num then
-            typedframes[frameNum]:Hide()
-        elseif frameNum <= num then
-            typedframes[frameNum]:Show()
-        end
-    end     
-end
-
-function KHMRaidFrames:SetUpVirtualSubFrames(frame, groupType)
-    if not frame or not self.virtual.shown then
-        self:HideVirtual()
-        return
-    end
-    print(frame:GetName())
-    local db = self.db.profile[groupType]
-
-    for subFrameType in self:IterateSubFrameTypes() do
-        local _db = db[subFrameType]
-
-        local typedframes = {}
-        for i=1, self.maxFrames do
-            typedframes[i] = self.virtual.frames[subFrameType..i]
-        end
-
-        self:SetUpVirtualFrameCount(typedframes, _db.num)
-        self:SetUpSubFramesPositionsAndSize(frame, typedframes, _db)
-    end
+    self.virtual.shown = false        
 end

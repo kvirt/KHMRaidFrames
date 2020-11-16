@@ -1,7 +1,7 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
-local _G = _G
+local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
 
 
 function KHMRaidFrames:OnInitialize()
@@ -14,28 +14,20 @@ function KHMRaidFrames:Setup()
     self.isOpen = false
 
     self.maxFrames = 10 
-    self.extraFrames = {}
-    self.glowingFrames = {
-        party = {
-            frames = {},
-        },
-        raid = {
-            frames = {},
-        },
-    }
     self.virtual = {
         shown = false,
         frames = {},
     } 
     self.aurasCache = {}
-
+    self.processedFrames = {}
+    
     for subFrame in self:IterateSubFrameTypes() do
-        self.glowingFrames.party[subFrame] = {}
-        self.glowingFrames.raid[subFrame] = {}
         self.aurasCache[subFrame] = {}
     end
 
     self:GetVirtualFrames()
+
+    self.textures, self.sortedTextures = self:GetTextures()
 
     local defaults_settings = self:Defaults()
     self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)
@@ -65,7 +57,9 @@ function KHMRaidFrames:Setup()
     self:RegisterChatCommand("лрь", function() 
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-    end)      
+    end)
+
+    self:RegisterChatCommand("кд", function() ReloadUI() end)         
 end
 
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
@@ -82,26 +76,31 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     deferrFrame:SetScript(
         "OnEvent", 
         function(frame, event)
-            self:UpdateLayout()
+            local groupType = IsInRaid() and "raid" or "party"
 
-            if event == "PLAYER_REGEN_ENABLED" and self.deffered then
-                self:SafeRefresh()
+            if event == "PLAYER_REGEN_ENABLED" then
+                self:SafeRefresh(groupType)
 
-                InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-                InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+                if self.deffered then                
+                    InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+                    InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
 
-                self.deffered = false
+                    self.deffered = false
+                end
             elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
                 self:HideAll()
-                self.deffered = true         
+                self.deffered = true
+            elseif event == "RAID_TARGET_UPDATE" then
+                self:UpdateRaidMark(groupType)
             end
         end
     ) 
 
     self:SecureHook(
         "CompactRaidFrameContainer_LayoutFrames", 
-        function(container)
-            self:UpdateLayout() 
+        function()
+            local groupType = IsInRaid() and "raid" or "party"
+            self:CUFDefaults(groupType)
         end
     )
 
@@ -121,12 +120,13 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook(
         "SetCVar",         
         function(cvar, value)
-            if InCombatLockdown() then return end
+            local groupType = IsInRaid() and "raid" or "party"
+
             if cvar == "useCompactPartyFrames" then
                 self.useCompactPartyFrames = value
                 
                 if self.db then
-                    self:SafeRefresh()
+                    self:SafeRefresh(groupType)
                 end
             end        
         end
@@ -135,33 +135,21 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SafeRefresh()   
 end
 
-function KHMRaidFrames:RefreshConfig()
-    if not InCombatLockdown() then
-        self:AddSubFrames()
-    end  
+function KHMRaidFrames:RefreshConfig(groupType)
+    local isInCombatLockDown = InCombatLockdown()
 
-    local doneWithVirtual = false
-    local isInRaid = IsInRaid() and 'raid' or 'party'
-
-    for frame in self:IterateCompactFrames(isInRaid) do
-        self:SetUpFrame(frame, isInRaid)
-        self:SetUpRaidIcon(frame, isInRaid)
-        self:SetUpSubFrames(frame, isInRaid)
-
-        if self.virtual.shown and not doneWithVirtual then
-            self:SetUpVirtualSubFrames(frame, isInRaid)
-            doneWithVirtual = true
-        end
-
-        if not InCombatLockdown() then
-            CompactUnitFrame_UpdateAll(frame)
-        end          
+    for frameType in self:IterateSubFrameTypes() do
+        self:SetUpVirtual(frameType, groupType)
     end
 
-    for group in self:IterateCompactGroups(isInRaid) do
-        self:SetUpGroup(group, isInRaid)
-    end 
-end
+    for group in self:IterateCompactGroups(groupType) do
+        self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)
+    end
+
+    for frame in self:IterateCompactFrames(groupType) do
+        self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
+    end
+end    
 
 function KHMRaidFrames:GetRaidProfileSettings(profile)
     if InCombatLockdown() then return end
@@ -190,7 +178,8 @@ end
 function KHMRaidFrames:OnOptionShow()
     if InCombatLockdown() then
         self:Print("Can not refresh settings while in combat")        
-        self:HideAll() 
+        self:HideAll()
+        self.deffered = true
         return
     end
 

@@ -10,22 +10,19 @@ local defuffsColors = {
 
 
 function KHMRaidFrames:StartGlow(frame, db, color)
-    if self.isOpen then
-        self:StopOptionsGlow(frame, db)
-    end
-
-    if frame.glowing then return end
+    if frame.glowing and not self.isOpen then return end
 
     local glowType = db.type
     local glowOptions = db.options[glowType]
     local options = glowOptions.options
+    local color = color or options.color
 
     if glowType == "button" then
-        glowOptions.start(frame, color or options.color, options.frequency)
+        glowOptions.start(frame, colorr, options.frequency)
     elseif glowType == "pixel" then
-        glowOptions.start(frame, color or options.color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border)
+        glowOptions.start(frame, color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border)
     elseif glowType == "auto" then
-        glowOptions.start(frame, color or options.color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset)
+        glowOptions.start(frame, color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset)
     end
 
     frame.glowing = true
@@ -93,13 +90,13 @@ end
 function KHMRaidFrames:SetFrameGlow(frame)
     local frameName = frame:GetName()
 
-    for subFrame in self:IterateSubFrameTypes("dispelDebuffFrames") do
-        local db = self.db.profile.glows.frameGlow[subFrame]
+    for frameType in self:IterateSubFrameTypes("dispelDebuffFrames") do
+        local db = self.db.profile.glows.frameGlow[frameType]
 
         if db.enabled then
             for _, aura in ipairs(db.tracking) do
-                if self.aurasCache[subFrame][frameName][aura] then
-                    local color = db.useDefaultsColors and defuffsColors[self.aurasCache[subFrame][frameName][aura]]
+                if self.aurasCache[frameType][frameName][aura] then
+                    local color = db.useDefaultsColors and defuffsColors[self.aurasCache[frameType][frameName][aura]]
                     return self:StartGlow(frame, db, color)
                 end
             end

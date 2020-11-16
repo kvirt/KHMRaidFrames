@@ -89,15 +89,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
     self:FilterGlowAuras(buffFrame, name, debuffType, spellId, "buffFrames")    
 end
 
-function KHMRaidFrames:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
-    dispellDebuffFrame:Show()
-    dispellDebuffFrame.icon:SetTexture("Interface\\RaidFrame\\Raid-Icon-Debuff"..debuffType)
-    dispellDebuffFrame:SetID(index)
-
-    self:FilterGlowAuras(dispellDebuffFrame, nil, debuffType, nil, "dispelDebuffFrames")
-end
-
-function KHMRaidFrames:CompactUnitFrame_Util_IsBossAura(...)
+local function CompactUnitFrame_Util_IsBossAura(...)
     return select(12, ...)
 end
 
@@ -158,7 +150,7 @@ function KHMRaidFrames:SetDebuffsHelper(debuffFrames, frameNum, maxDebuffs, filt
     return frameNum, maxDebuffs
 end
 
-function KHMRaidFrames:NumElements(arr)
+local function NumElements(arr)
     return arr and #arr or 0
 end
 
@@ -166,13 +158,16 @@ local dispellableDebuffTypes = { Magic = true, Curse = true, Disease = true, Poi
 
 function KHMRaidFrames:UpdateAuras(frame)
     local frameName = frame:GetName()
+
     for _, v in pairs(self.aurasCache) do
         v[frameName] = {}
     end
 
-    local maxBuffs = frame.buffFrames_Num or 3
-    local maxDebuffs = frame.debuffFrames_Num or 3
-    local maxDispelDebuffs = frame.dispelDebuffFrames_Num or 3
+    local db = self:GroupTypeDB()
+
+    local maxBuffs = min(db.buffFrames.num, #frame.buffFrames) or 3
+    local maxDebuffs = min(db.debuffFrames.num, #frame.debuffFrames) or 3
+    local maxDispelDebuffs = min(db.dispelDebuffFrames.num, #frame.dispelDebuffFrames) or 3
 
     local doneWithBuffs = not frame.buffFrames or not frame.optionTable.displayBuffs or maxBuffs == 0
     local doneWithDebuffs = not frame.debuffFrames or not frame.optionTable.displayDebuffs or maxDebuffs == 0
@@ -191,7 +186,7 @@ function KHMRaidFrames:UpdateAuras(frame)
 
     if not doneWithDebuffs then
         AuraUtil.ForEachAura(frame.displayedUnit, "HARMFUL", batchCount, function(...)
-            if self:CompactUnitFrame_Util_IsBossAura(...) then
+            if CompactUnitFrame_Util_IsBossAura(...) then
                 if not bossDebuffs then
                     bossDebuffs = {}
                 end
@@ -222,7 +217,7 @@ function KHMRaidFrames:UpdateAuras(frame)
         index = 1
         batchCount = math.max(maxBuffs, maxDebuffs)
         AuraUtil.ForEachAura(frame.displayedUnit, "HELPFUL", batchCount, function(...)
-            if self:CompactUnitFrame_Util_IsBossAura(...) then
+            if CompactUnitFrame_Util_IsBossAura(...) then
                 -- Boss Auras are considered Debuffs for our purposes.
                 if not doneWithDebuffs then
                     if not bossBuffs then
@@ -249,7 +244,7 @@ function KHMRaidFrames:UpdateAuras(frame)
         end)
     end
 
-    numUsedDebuffs = math.min(maxDebuffs, numUsedDebuffs + self:NumElements(priorityDebuffs))
+    numUsedDebuffs = math.min(maxDebuffs, numUsedDebuffs + NumElements(priorityDebuffs))
     if numUsedDebuffs == maxDebuffs then
         doneWithDebuffs = true
     end
@@ -268,7 +263,7 @@ function KHMRaidFrames:UpdateAuras(frame)
         index = 1
         AuraUtil.ForEachAura(frame.displayedUnit, "HARMFUL|RAID", batchCount, function(...)
             if not doneWithDebuffs and displayOnlyDispellableDebuffs then
-                if self:CompactUnitFrame_Util_ShouldDisplayDebuff(...) and not self:CompactUnitFrame_Util_IsBossAura(...) and not CompactUnitFrame_Util_IsPriorityDebuff(...) then
+                if self:CompactUnitFrame_Util_ShouldDisplayDebuff(...) and not CompactUnitFrame_Util_IsBossAura(...) and not CompactUnitFrame_Util_IsPriorityDebuff(...) then
                     if not nonBossDebuffs then
                         nonBossDebuffs = {}
                     end
@@ -285,7 +280,7 @@ function KHMRaidFrames:UpdateAuras(frame)
                     frame["hasDispel"..debuffType] = true
                     numUsedDispelDebuffs = numUsedDispelDebuffs + 1
                     local dispellDebuffFrame = frame.dispelDebuffFrames[numUsedDispelDebuffs]
-                    self:CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
+                    CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
                     if numUsedDispelDebuffs == maxDispelDebuffs then
                         doneWithDispelDebuffs = true
                     end

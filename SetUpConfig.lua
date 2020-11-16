@@ -1,6 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
-local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
 local positions = {
     ["TOPLEFT"] = L["TOPLEFT"],
@@ -80,8 +79,10 @@ end
 
 function KHMRaidFrames:SetupOptionsByType(groupType)
     local db = self.db.profile[groupType]
-    local options = {}
 
+    self.groupType = groupType
+    local options = {} 
+    
     options.virtualFrames = {
         name = L["Show\\Hide Test Frames"],
         desc = "",
@@ -90,7 +91,11 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         type = "execute",
         order = 6,
         func = function(info,val)
-            self:ShowVirtual(groupType)
+            if self.virtual.shown == true then            
+                self:HideVirtual()
+            else                
+                self:ShowVirtual(groupType)      
+            end
         end,
     }
     options.frames = {
@@ -149,7 +154,7 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             order = 1,
             set = function(info,val)
                 db.enabled = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) 
                 return db.enabled 
@@ -170,7 +175,7 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             end,                       
             set = function(info,val)
                 db.size = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.size end
         },
@@ -189,7 +194,7 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             end,              
             set = function(info,val)
                 db.xOffset = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.xOffset end
         },
@@ -208,7 +213,7 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             end,                        
             set = function(info,val)
                 db.yOffset = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.yOffset end
         },                                              
@@ -225,7 +230,7 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             end,                         
             set = function(info,val)
                 db.anchorPoint = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.anchorPoint end
         },
@@ -265,7 +270,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             order = 2,
             set = function(info,val)
                 db.hideGroupTitles = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) 
                 return db.hideGroupTitles 
@@ -277,22 +282,22 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             descStyle = "inline",
             width = "double",
             type = "select",
-            values = function(info, val)
-                local textures = SharedMedia:HashTable("statusbar")
-                local t = {}
-                for k, v in pairs(textures) do
-                    t[v] = k
-                end
-                table.sort(t, function(a, b) return a:upper() < b:upper() end)
-                self.textures = t                    
-                return t
-            end, 
+            values = function(info, val) return self.sortedTextures end, 
             order = 3,        
             set = function(info,val)
-                db.texture = val
-                self:SafeRefresh()
+                db.texture = self.sortedTextures[val]
+                self:SafeRefresh(groupType)
             end,
-            get = function(info) return db.texture end
+            get = function(info)
+                for i, texture in ipairs(self.sortedTextures) do
+                    if db.texture == texture then return i end
+                end
+
+                db.texture = "Blizzard Raid Bar"
+                self:SafeRefresh(groupType)
+                
+                return db.texture
+            end
         },
         [frameType.."Skip"] = {
             type = "header",
@@ -342,7 +347,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 1,          
             set = function(info,val)
                 db.num = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.num end
         },       
@@ -358,7 +363,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 1,           
             set = function(info,val)
                 db.size = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.size end
         },
@@ -374,7 +379,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 2,          
             set = function(info,val)
                 db.numInRow = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.numInRow end
         },                
@@ -390,7 +395,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 2,          
             set = function(info,val)
                 db.xOffset = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.xOffset end
         },
@@ -406,24 +411,10 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 2,          
             set = function(info,val)
                 db.yOffset = val
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.yOffset end
-        },       
-        [frameType.."rowsGrowDirection"] = {
-            name = L["Rows Grow Direction"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "select",
-            values = grow_positions,
-            order = 3,
-            set = function(info,val)
-                db.rowsGrowDirection = val
-                self:SafeRefresh()
-            end,
-            get = function(info) return db.rowsGrowDirection end
-        },                                        
+        },                                           
         [frameType.."AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
@@ -434,7 +425,8 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 3,           
             set = function(info,val)
                 db.anchorPoint = val
-                self:SafeRefresh()
+                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]              
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.anchorPoint end
         },
@@ -448,7 +440,8 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             order = 3,
             set = function(info,val)
                 db.growDirection = val
-                self:SafeRefresh()
+                db.rowsGrowDirection = self.rowsGrows[db.anchorPoint][val]
+                self:SafeRefresh(groupType)
             end,
             get = function(info) return db.growDirection end
         },                              
@@ -469,7 +462,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
 
-                self:SafeRefresh()
+                self:SafeRefresh(groupType)
             end,
             get = function(info)
                 return db.excludeStr

@@ -1,5 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
+local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
 local _G = _G
 
@@ -16,14 +17,16 @@ local brownCode = "|cFF966400<text>|r"
 local greyCode = "|cFFb8b6b0<text>|r"
 
 
-function KHMRaidFrames:SafeRefresh()
+function KHMRaidFrames:SafeRefresh(groupType)
+    groupType = groupType or (IsInRaid() and "raid" or "party")
+
     if InCombatLockdown() then
         self:Print("Can not refresh settings while in combat")        
         self:HideAll()
         self.deffered = true 
         return
     else
-        self:RefreshConfig()
+        self:RefreshConfig(groupType)
     end
 end
 
@@ -42,7 +45,8 @@ function KHMRaidFrames:IterateCompactFrames(isInRaid)
                 index = 1
                 groupIndex = groupIndex + 1
 
-                if groupIndex == 8 then
+                if groupIndex == 9 then
+                    index = 0
                     doneNew = true
                 end
             end
@@ -51,13 +55,14 @@ function KHMRaidFrames:IterateCompactFrames(isInRaid)
                 frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
             else
                 if groupIndex == 2 then
+                    index = 0
                     doneNew = true
-                    return 
+                    break 
                 end        
 
                 frame = _G["CompactPartyFrameMember"..index]
             end
-            
+
             if frame then return frame end
         end
 
@@ -172,4 +177,20 @@ function KHMRaidFrames:CheckNil(table, key, value)
     if key ~= nil then
         table[key] = value
     end
+end
+
+function KHMRaidFrames:GetTextures()
+    local textures = SharedMedia:HashTable("statusbar")
+
+    local s = {}
+    for k, v in pairs(textures) do
+        table.insert(s, k)
+    end
+
+
+    table.sort(s, function(a, b)
+        return a:sub(1, 1):lower() < b:sub(1, 1):lower() 
+    end) 
+
+    return textures, s
 end

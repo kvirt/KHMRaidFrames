@@ -2,7 +2,7 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local LCG = LibStub("LibCustomGlow-1.0")
 
-function KHMRaidFrames:GetGlowOptions(key)
+function KHMRaidFrames.GetGlowOptions(key)
     local options = {
         pixel = {
             options = {
@@ -100,6 +100,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                       
             set = function(info,val)
                 db.useDefaultsColors = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.useDefaultsColors end
@@ -123,9 +124,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,      
             set = function(info,val)
                 db.type = val
-                self:StopOptionsAuraGlows(frameType, db)
-                self:StopOptionsFramesGlows(frameType, db)
-
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.type end
@@ -143,6 +142,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                     
             set = function(info, r, g, b, a)
                 db.options[db.type].options.color = {r, g, b, a}
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info)
@@ -165,6 +165,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                    
             set = function(info,val)
                 db.options[db.type].options.frequency = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.frequency end
@@ -188,11 +189,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 return not db.enabled
             end,            
             hidden = function(info)
-                local options = self:GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(db.type)
                 if options.options["N"] ~= nil then return false else return true end
             end,                  
             set = function(info,val)
                 db.options[db.type].options.N = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.N end
@@ -211,11 +213,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 return not db.enabled
             end,            
             hidden = function(info)
-                local options = self:GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(db.type)
                 if options.options["xOffset"] ~= nil then return false else return true end
             end,                     
             set = function(info,val)
                 db.options[db.type].options.xOffset = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.xOffset end
@@ -234,11 +237,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 return not db.enabled
             end,            
             hidden = function(info)
-                local options = self:GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(db.type)
                 if options.options["yOffset"] ~= nil then return false else return true end
             end,                     
             set = function(info,val)
                 db.options[db.type].options.yOffset = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.yOffset end
@@ -257,11 +261,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 return not db.enabled
             end,            
             hidden = function(info)
-                local options = self:GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(db.type)
                 if options.options["th"] ~= nil then return false else return true end
             end,                       
             set = function(info,val)
                 db.options[db.type].options.th = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.th end
@@ -277,11 +282,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 return not db.enabled
             end,            
             hidden = function(info)
-                local options = self:GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(db.type)
                 if options.options["border"] ~= nil then return false else return true end
             end,                       
             set = function(info,val)
                 db.options[db.type].options.border = val
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info) return db.options[db.type].options.border end
@@ -291,7 +297,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             name = "",
             order = 9,
             hidden = function(info)
-                local options = self:GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(db.type)
                 if options.options["N"] ~= nil then return false else return true end
             end,             
         },                                        
@@ -313,6 +319,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 db.tracking = self:SanitizeStrings(val)
                 db.trackingStr = val
 
+                self:RestartOptionsGlows()
                 self:SafeRefresh()
             end,
             get = function(info)
@@ -357,16 +364,20 @@ function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
     self:SafeRefresh()
 end
 
-function KHMRaidFrames:StopOptionsAuraGlows(frameType, db)
+function KHMRaidFrames:StopOptionsAuraGlows(frameType)
     local db = self.db.profile.glows.auraGlow[frameType]
 
-    local isInRaid = IsInRaid() and "raid" or "party"
-
-    for frame in self:IterateCompactFrames(isInRaid) do
+    for frame in self:IterateCompactFrames("raid") do
         for i=1, #frame[frameType] do
             self:StopOptionsGlow(frame[frameType][i], db)
         end        
     end
+
+    for frame in self:IterateCompactFrames("party") do
+        for i=1, #frame[frameType] do
+            self:StopOptionsGlow(frame[frameType][i], db)
+        end        
+    end    
 end
 
 function KHMRaidFrames:StopOptionsFramesGlows(frameType, db)
@@ -380,11 +391,25 @@ function KHMRaidFrames:StopOptionsFramesGlows(frameType, db)
 end
 
 function KHMRaidFrames:StopOptionsGlow(frame, db)
-    if not frame.glowing or not self.isOpen then return end
+    if not frame.glowing and not self.isOpen then return end
 
     for _, glowType in pairs{"pixel", "auto", "button"} do
         db.options[glowType].stop(frame)
     end
 
     frame.glowing = false
+end
+
+function KHMRaidFrames:RestartOptionsGlows()
+    for frame in self:IterateCompactFrames("raid") do
+        if frame.glowing then
+            self:UpdateAuras(frame)
+        end    
+    end
+
+    for frame in self:IterateCompactFrames("party") do
+        if frame.glowing then
+            self:UpdateAuras(frame)
+        end    
+    end
 end

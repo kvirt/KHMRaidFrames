@@ -4,15 +4,13 @@ if not InCombatLockdown() then
     CompactRaidFrameContainer_TryUpdate(CompactRaidFrameContainer)
 end
 
-local _G = _G
-local CUF_AURA_BOTTOM_OFFSET = 2
+local _G, tinsert = _G, tinsert
 local NATIVE_UNIT_FRAME_HEIGHT = 36
 local NATIVE_UNIT_FRAME_WIDTH = 72   
-local powerBarHeight = 8
 
 
 function KHMRaidFrames:Defaults()
-    local powerBarUsedHeight, componentScale = self.displayPowerBar and powerBarHeight or 0, min(self.frameHeight / NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / NATIVE_UNIT_FRAME_WIDTH)
+    local componentScale = min(self.frameHeight / NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / NATIVE_UNIT_FRAME_WIDTH)
 
     local buffSize = 11 * componentScale
     local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
@@ -20,7 +18,7 @@ function KHMRaidFrames:Defaults()
     local commons = {
             frames = {
                 hideGroupTitles = false,
-                texture = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",                
+                texture = "Blizzard Raid Bar",                
             },        
             dispelDebuffFrames = {
                 num = 3,
@@ -29,8 +27,8 @@ function KHMRaidFrames:Defaults()
                 anchorPoint = "TOPRIGHT",
                 growDirection = "LEFT",
                 size = 12,
-                xOffset = -3,
-                yOffset = -2,
+                xOffset = 0,
+                yOffset = 0,
                 exclude = {},
                 excludeStr = "",                            
             },
@@ -41,8 +39,8 @@ function KHMRaidFrames:Defaults()
                 anchorPoint = "BOTTOMLEFT",
                 growDirection = "RIGHT",
                 size = buffSize,
-                xOffset = 3,
-                yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
+                xOffset = 0,
+                yOffset = 0,
                 exclude = {},
                 excludeStr = "",                                               
             },
@@ -53,8 +51,8 @@ function KHMRaidFrames:Defaults()
                 anchorPoint = "BOTTOMRIGHT",
                 growDirection = "LEFT",
                 size = buffSize,
-                xOffset = -3,
-                yOffset = CUF_AURA_BOTTOM_OFFSET + powerBarUsedHeight,
+                xOffset = 0,
+                yOffset = 0,
                 exclude = {},
                 excludeStr = "",                                               
             },
@@ -73,7 +71,7 @@ function KHMRaidFrames:Defaults()
         auraGlow = {
             buffFrames = {
                 type = "pixel",
-                options = self:GetGlowOptions(),
+                options = self.GetGlowOptions(),
                 tracking = {},
                 trackingStr = "",    
                 enabled = false,
@@ -81,7 +79,7 @@ function KHMRaidFrames:Defaults()
             },
             debuffFrames = {
                 type = "pixel",
-                options = self:GetGlowOptions(),
+                options = self.GetGlowOptions(),
                 tracking = {},
                 trackingStr = "",    
                 enabled = false,
@@ -91,7 +89,7 @@ function KHMRaidFrames:Defaults()
         frameGlow = {
             buffFrames = {
                 type = "pixel",
-                options = self:GetGlowOptions(),
+                options = self.GetGlowOptions(),
                 tracking = {},
                 trackingStr = "",    
                 enabled = false,
@@ -99,7 +97,7 @@ function KHMRaidFrames:Defaults()
             },
             debuffFrames = {
                 type = "pixel",
-                options = self:GetGlowOptions(),
+                options = self.GetGlowOptions(),
                 tracking = {},
                 trackingStr = "",    
                 enabled = false,
@@ -123,5 +121,80 @@ function KHMRaidFrames:RestoreDefaults(groupType, frameType)
         self.db.profile[groupType][frameType][k] = v
     end
 
-    self:SafeRefresh()
+    self:SafeRefresh(groupType)
+end
+
+function KHMRaidFrames:CUFDefaults(groupType)
+    local deferred
+    local isInCombatLockDown = InCombatLockdown()
+
+    for group in self:IterateCompactGroups(groupType) do
+        if self.processedFrames[group] == nil then
+            deferred = self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)
+
+            if deferred == false then 
+                self.processedFrames[group] = true
+            end
+        end
+    end
+
+    for frame in self:IterateCompactFrames(groupType) do
+        if self.processedFrames[frame] == nil then
+            deferred = self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
+
+            if deferred == false then 
+                self.processedFrames[frame] = true
+            end
+        end
+    end
+end
+
+function KHMRaidFrames:DefaultGroupSetUp(frame, groupType, isInCombatLockDown)
+    local db = self.db.profile[groupType]
+    local deferred = false
+
+    if not isInCombatLockDown then
+        local totalHeight, totalWidth = 0, 0
+
+        if db.frames.hideGroupTitles then
+            frame.title:Hide()    
+            totalHeight, totalWidth = self:ResizeGroups(frame, 0)
+        else
+            frame.title:Show()               
+            totalHeight, totalWidth = self:ResizeGroups(frame, -frame.title:GetHeight())
+            totalHeight = totalHeight + frame.title:GetHeight() 
+        end
+        
+        if frame.borderFrame:IsShown() then
+            totalWidth = totalWidth + 12
+            totalHeight = totalHeight + 4
+        end
+
+        frame:SetSize(totalWidth, totalHeight)
+    else
+        deferred = true
+    end  
+
+    return deferred
+end
+
+function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
+    local db = self.db.profile[groupType]
+    local deferred = false
+
+    if not isInCombatLockDown then
+        self:AddSubFrames(frame, groupType)
+    else
+        deferred = true   
+    end 
+
+    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames)
+
+    self:SetUpRaidIcon(frame, groupType)
+
+    frame.healthBar:SetStatusBarTexture(self.textures[db.frames.texture], "BORDER")
+
+    return deferred
 end

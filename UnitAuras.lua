@@ -1,21 +1,108 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
-local _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE
+local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
-local mirrorPositions = {
+local _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE
+local CUF_AURA_BOTTOM_OFFSET = 2
+local powerBarHeight = 8
+
+KHMRaidFrames.mirrorPositions = {
     ["LEFT"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
     ["BOTTOM"] = {"TOPLEFT", "BOTTOMLEFT"},
     ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
     ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
 }
 
-local rowsPositions = {
+KHMRaidFrames.rowsPositions = {
     ["LEFT"] = {"TOPRIGHT", "TOPLEFT"},
     ["BOTTOM"] = {"TOPRIGHT", "BOTTOMRIGHT"},
     ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
     ["TOP"] = {"BOTTOMRIGHT", "TOPRIGHT"},         
 }
 
-function KHMRaidFrames:AddSubFramesInternal(frame, groupType)
+KHMRaidFrames.rowsGrows = {
+    ["TOPLEFT"] = {
+        ["LEFT"] = "BOTTOM",
+        ["BOTTOM"] = "RIGHT",
+        ["RIGHT"] = "BOTTOM",
+        ["TOP"] = "RIGHT",
+    },
+    ["LEFT"] = {
+        ["LEFT"] = "BOTTOM",
+        ["BOTTOM"] = "RIGHT",
+        ["RIGHT"] = "BOTTOM",
+        ["TOP"] = "RIGHT",
+    },
+    ["BOTTOMLEFT"] = {
+        ["LEFT"] = "TOP",
+        ["BOTTOM"] = "RIGHT",
+        ["RIGHT"] = "TOP",
+        ["TOP"] = "RIGHT",
+    },
+    ["BOTTOM"] = {
+        ["LEFT"] = "TOP",
+        ["BOTTOM"] = "RIGHT",
+        ["RIGHT"] = "TOP",
+        ["TOP"] = "RIGHT",
+    },
+    ["BOTTOMRIGHT"] = {
+        ["LEFT"] = "TOP",
+        ["BOTTOM"] = "LEFT",
+        ["RIGHT"] = "TOP",
+        ["TOP"] = "LEFT",
+    },
+    ["RIGHT"] = {
+        ["LEFT"] = "TOP",
+        ["BOTTOM"] = "LEFT",
+        ["RIGHT"] = "TOP",
+        ["TOP"] = "LEFT",
+    },
+    ["TOPRIGHT"] = {
+        ["LEFT"] = "BOTTOM",
+        ["BOTTOM"] = "LEFT",
+        ["RIGHT"] = "BOTTOM",
+        ["TOP"] = "LEFT",
+    },
+    ["TOP"] = {
+        ["LEFT"] = "BOTTOM",
+        ["BOTTOM"] = "LEFT",
+        ["RIGHT"] = "BOTTOM",
+        ["TOP"] = "LEFT",
+    },
+    ["CENTER"] = {
+        ["LEFT"] = "TOP",
+        ["BOTTOM"] = "RIGHT",
+        ["RIGHT"] = "TOP",
+        ["TOP"] =  "RIGHT",
+    }          
+}
+
+
+function KHMRaidFrames:Offsets(anchor)
+    local powerBarUsedHeight = (self.displayPowerBar and powerBarHeight or 0) + CUF_AURA_BOTTOM_OFFSET 
+    local xOffset, yOffset = 0, 0
+
+    if anchor == "LEFT" then
+        xOffset, yOffset = 3, 0
+    elseif anchor == "RIGHT" then
+        xOffset, yOffset = -3, 0
+    elseif anchor == "TOP" then
+        xOffset, yOffset = 0, -3
+    elseif anchor == "BOTTOM" then
+        xOffset, yOffset = 0, powerBarUsedHeight
+    elseif anchor == "BOTTOMLEFT" then
+        xOffset, yOffset = 3, powerBarUsedHeight
+    elseif anchor == "BOTTOMRIGHT" then
+        xOffset, yOffset = -3, powerBarUsedHeight
+    elseif anchor == "TOPLEFT" then
+        xOffset, yOffset = 3, -3
+    elseif anchor == "TOPRIGHT" then
+        xOffset, yOffset = -3, -3                                    
+    end
+
+    return xOffset, yOffset
+end
+
+function KHMRaidFrames:AddSubFrames(frame, groupType)
     for subFrameType in self:IterateSubFrameTypes() do
         local frameName, template
         local db = self.db.profile[groupType][subFrameType]
@@ -31,41 +118,12 @@ function KHMRaidFrames:AddSubFramesInternal(frame, groupType)
             frameName = frame:GetName().."DispelDebuff"
         end  
 
-        for i=4, db.num do
-            if not self.extraFrames[frameName..i] then 
-                local typedFrame = CreateFrame("Button", frameName..i, frame, template)
-                typedFrame:ClearAllPoints()
-                typedFrame:Hide()
-                self.extraFrames[frameName..i] = true
-            end
-        end
-        
-        frame[subFrameType.."_Num"] = db.num
-    end
-end
-
-function KHMRaidFrames:AddSubFrames()
-    local isInRaid = IsInRaid() and "raid" or "party"
-
-    for frame in self:IterateCompactFrames(isInRaid) do
-        if frame then
-            self:AddSubFramesInternal(frame, isInRaid)
+        for i=#frame[subFrameType] + 1, db.num do
+            local typedFrame = CreateFrame("Button", frameName..i, frame, template)
+            typedFrame:ClearAllPoints()
+            typedFrame:Hide()
         end
     end
-end
-
-function KHMRaidFrames:GetFramePosition(frame, typedframes, db, frameNum)
-    local anchor1, relativeFrame, anchor2
-
-    if frameNum == 1 then
-        anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
-    elseif frameNum % (db.numInRow) == 1 then
-        anchor1, relativeFrame, anchor2 = rowsPositions[db.rowsGrowDirection][1], typedframes[frameNum - db.numInRow], rowsPositions[db.rowsGrowDirection][2]
-    else
-        anchor1, relativeFrame, anchor2 = mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], mirrorPositions[db.growDirection][2]           
-    end
-
-    return anchor1, relativeFrame, anchor2
 end
 
 function KHMRaidFrames:FilterAuras(name, debuffType, spellId, frameType)
