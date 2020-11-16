@@ -173,12 +173,6 @@ function KHMRaidFrames:GroupTypeDB()
     return self.db.profile[groupType]
 end 
 
-function KHMRaidFrames:CheckNil(table, key, value)
-    if key ~= nil then
-        table[key] = value
-    end
-end
-
 function KHMRaidFrames:GetTextures()
     local textures = SharedMedia:HashTable("statusbar")
 

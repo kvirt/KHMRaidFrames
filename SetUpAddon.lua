@@ -2,6 +2,20 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
 local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
+local reloadConfirmation = "KHMRaidFrames_PROFILE_RELOAD"
+StaticPopupDialogs[reloadConfirmation] = {
+    text = "Reload needed to apply profile",
+    button1 = YES,
+    button2 = NO,
+    OnAccept = function(self)
+        ReloadUI()
+    end, 
+    OnCancel = function(self)
+       KHMRaidFrames:Print("The user interface is not reloaded. To fix it, enter \"\/reload\" in chat.")
+        end,
+    timeout = 0,
+    hideOnEscape = 1,
+}
 
 
 function KHMRaidFrames:OnInitialize()
@@ -20,10 +34,7 @@ function KHMRaidFrames:Setup()
     } 
     self.aurasCache = {}
     self.processedFrames = {}
-    
-    for subFrame in self:IterateSubFrameTypes() do
-        self.aurasCache[subFrame] = {}
-    end
+    self.glowingFrames = {}
 
     self:GetVirtualFrames()
 
@@ -65,9 +76,18 @@ end
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
-    self.db.RegisterCallback(self, "OnProfileChanged", "SafeRefresh")
-    self.db.RegisterCallback(self, "OnProfileCopied", "ProfileReload")
-    self.db.RegisterCallback(self, "OnProfileReset", "ProfileReload") 
+    self.db.RegisterCallback(
+        self, "OnProfileChanged", 
+        function(...) StaticPopup_Show(reloadConfirmation)                    
+    end)
+    self.db.RegisterCallback(
+        self, "OnProfileCopied", 
+        function(...) StaticPopup_Show(reloadConfirmation)                             
+    end)
+    self.db.RegisterCallback(
+        self, "OnProfileReset", 
+        function(...) StaticPopup_Show(reloadConfirmation)               
+    end)
 
     local deferrFrame = CreateFrame("Frame")
     deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -132,7 +152,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         end
     )
 
-    self:SafeRefresh()   
+    self:SafeRefresh()
 end
 
 function KHMRaidFrames:RefreshConfig(groupType)
@@ -169,10 +189,6 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     if self.db then
         self:SafeRefresh()
     end
-end
-
-function KHMRaidFrames:ProfileReload()
-    self.config:NotifyChange("KHMRaidFrames")
 end
 
 function KHMRaidFrames:OnOptionShow()

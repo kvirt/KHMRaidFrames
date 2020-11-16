@@ -1,10 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
-if not InCombatLockdown() then
-    CompactRaidFrameContainer_TryUpdate(CompactRaidFrameContainer)
-end
-
-local _G, tinsert = _G, tinsert
+local _G, tinsert, CompactRaidFrameContainer = _G, tinsert, CompactRaidFrameContainer
 local NATIVE_UNIT_FRAME_HEIGHT = 36
 local NATIVE_UNIT_FRAME_WIDTH = 72   
 
@@ -151,6 +147,7 @@ end
 
 function KHMRaidFrames:DefaultGroupSetUp(frame, groupType, isInCombatLockDown)
     local db = self.db.profile[groupType]
+
     local deferred = false
 
     if not isInCombatLockDown then

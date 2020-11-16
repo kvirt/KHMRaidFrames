@@ -2,6 +2,15 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local LCG = LibStub("LibCustomGlow-1.0")
 
+local defuffsColors = {
+    magic = {0.2, 0.6, 1.0, 1},
+    curse = {0.6, 0.0, 1.0, 1},
+    disease = {0.6, 0.4, 0.0, 1},
+    poison = {0.0, 0.6, 0.0, 1},
+    physical = {1, 1, 1, 1}
+}
+
+
 function KHMRaidFrames.GetGlowOptions(key)
     local options = {
         pixel = {
@@ -80,12 +89,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 1,          
             set = function(info,val)
                 db.enabled = val
-                if not val then
-                    self:StopOptionsAuraGlows(frameType, db)
-                    self:StopOptionsFramesGlows(frameType, db)
-                end
-
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)                                  
             end,
             get = function(info) return db.enabled end
         },
@@ -100,8 +104,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                       
             set = function(info,val)
                 db.useDefaultsColors = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.useDefaultsColors end
         },              
@@ -124,8 +127,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,      
             set = function(info,val)
                 db.type = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.type end
         },
@@ -142,8 +144,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                     
             set = function(info, r, g, b, a)
                 db.options[db.type].options.color = {r, g, b, a}
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info)
                 local color = db.options[db.type].options.color
@@ -165,8 +166,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                    
             set = function(info,val)
                 db.options[db.type].options.frequency = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.options[db.type].options.frequency end
         },
@@ -194,8 +194,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                  
             set = function(info,val)
                 db.options[db.type].options.N = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.options[db.type].options.N end
         },
@@ -218,8 +217,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                     
             set = function(info,val)
                 db.options[db.type].options.xOffset = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.options[db.type].options.xOffset end
         },
@@ -242,8 +240,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                     
             set = function(info,val)
                 db.options[db.type].options.yOffset = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.options[db.type].options.yOffset end
         },
@@ -266,8 +263,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                       
             set = function(info,val)
                 db.options[db.type].options.th = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.options[db.type].options.th end
         },      
@@ -287,8 +283,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,                       
             set = function(info,val)
                 db.options[db.type].options.border = val
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info) return db.options[db.type].options.border end
         },
@@ -319,8 +314,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 db.tracking = self:SanitizeStrings(val)
                 db.trackingStr = val
 
-                self:RestartOptionsGlows()
-                self:SafeRefresh()
+                self:RestartOptionsGlows(frameType, glowType)   
             end,
             get = function(info)
                 return db.trackingStr
@@ -341,8 +335,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 12,
             func = function(info,val)
                 self:RestoreGlowDefaults(frameType, glowType)
-                self:StopOptionsAuraGlows(frameType, db)
-                self:StopOptionsFramesGlows(frameType, db)                
+                self:RestartOptionsGlows(frameType, glowType)               
             end,
         },                                 
     }
@@ -364,52 +357,86 @@ function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
     self:SafeRefresh()
 end
 
-function KHMRaidFrames:StopOptionsAuraGlows(frameType)
-    local db = self.db.profile.glows.auraGlow[frameType]
+function KHMRaidFrames:RestartOptionsGlows(frameType, glowType)
+    local db = self.db.profile.glows[glowType][frameType]
+    
+    if glowType == "auraGlow" then
+        self:RestoreAuraFramesGlow(db, frameType)
+    else
+        self:RestoreFramesGlow(db, frameType)
+    end
+end
 
+function KHMRaidFrames:RestoreAuraFramesGlow(db, frameType)
     for frame in self:IterateCompactFrames("raid") do
         for i=1, #frame[frameType] do
-            self:StopOptionsGlow(frame[frameType][i], db)
-        end        
+            local typedFrame = frame[frameType][i]    
+            if typedFrame.__glowing then
+                for _, _glowType in pairs{"pixel", "auto", "button"} do
+                    db.options[_glowType].stop(typedFrame)
+                end
+
+                typedFrame.__glowing = nil
+
+                local color = db.useDefaultsColors and defuffsColors[typedFrame[frameType.."Glowing"]]
+                self:StartGlow(typedFrame, db, color)
+            end          
+        end
+
+        self:UpdateAuras(frame)          
     end
 
     for frame in self:IterateCompactFrames("party") do
         for i=1, #frame[frameType] do
-            self:StopOptionsGlow(frame[frameType][i], db)
-        end        
-    end    
-end
+            local typedFrame = frame[frameType][i]    
+            if typedFrame.__glowing then
+                for _, _glowType in pairs{"pixel", "auto", "button"} do
+                    db.options[_glowType].stop(typedFrame)
+                end
 
-function KHMRaidFrames:StopOptionsFramesGlows(frameType, db)
-    local db = self.db.profile.glows.frameGlow[frameType]
+                typedFrame.__glowing = nil
 
-    local isInRaid = IsInRaid() and "raid" or "party"
+                local color = db.useDefaultsColors and defuffsColors[typedFrame[frameType.."Glowing"]]
+                self:StartGlow(typedFrame, db, color)
+            end
+        end
 
-    for frame in self:IterateCompactFrames(isInRaid) do
-        self:StopOptionsGlow(frame, db)
+        self:UpdateAuras(frame)        
     end
-end
+end 
 
-function KHMRaidFrames:StopOptionsGlow(frame, db)
-    if not frame.glowing and not self.isOpen then return end
-
-    for _, glowType in pairs{"pixel", "auto", "button"} do
-        db.options[glowType].stop(frame)
-    end
-
-    frame.glowing = false
-end
-
-function KHMRaidFrames:RestartOptionsGlows()
+function KHMRaidFrames:RestoreFramesGlow(db, frameType)
     for frame in self:IterateCompactFrames("raid") do
-        if frame.glowing then
-            self:UpdateAuras(frame)
-        end    
+        if frame.__glowing then
+            for _, _glowType in pairs{"pixel", "auto", "button"} do
+                db.options[_glowType].stop(frame)
+            end
+
+            frame.__glowing = nil
+
+            if frame[frameType.."Glowing"] then
+                local color = db.useDefaultsColors and defuffsColors[frame[frameType.."Glowing"]]
+                self:StartGlow(frame, db, color)
+            end
+
+            self:UpdateAuras(frame)               
+        end
     end
 
     for frame in self:IterateCompactFrames("party") do
-        if frame.glowing then
-            self:UpdateAuras(frame)
-        end    
+        if frame.__glowing then
+            for _, _glowType in pairs{"pixel", "auto", "button"} do
+                db.options[_glowType].stop(frame)
+            end
+
+            frame.__glowing = nil
+
+            if frame[frameType.."Glowing"] then
+                local color = db.useDefaultsColors and defuffsColors[frame[frameType.."Glowing"]]
+                self:StartGlow(frame, db, color)
+            end
+
+            self:UpdateAuras(frame)            
+        end
     end
-end
+end    
