@@ -41,6 +41,8 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
 
         if frameNum == 1 then
             xOffset, yOffset = self:Offsets(anchor1)
+            xOffset = xOffset + db.xOffset
+            yOffset = yOffset + db.yOffset
         else
             xOffset, yOffset = 0, 0
         end
