@@ -83,7 +83,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
                 (aura == name or aura == debuffType or aura == spellId)
             ) then
                 local color = db.auraGlow.buffFrames.useDefaultsColors and defuffsColors[debuffType]                
-                self:StartGlow(debuffFrame, db.auraGlow.debuffFrames, color)
+                self:StartGlow(debuffFrame, db.auraGlow.debuffFrames, color, "debuffFrames", "auraGlow")
                 debuffFrame.debuffFramesGlowing = debuffType
                 break
             end
@@ -91,20 +91,13 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     end        
 
     if not debuffFrame.debuffFramesGlowing then
-        self:StopGlow(debuffFrame, db.auraGlow.debuffFrames)
+        self:StopGlow(debuffFrame, db.auraGlow.debuffFrames, "debuffFrames", "auraGlow")
     end
 
-    if db.frameGlow.debuffFrames.enabled then
-        for _, aura in ipairs(db.frameGlow.debuffFrames.tracking) do
-            if (
-                aura ~= nil and 
-                (aura == name or aura == debuffType or aura == spellId)
-            ) then                
-                debuffFrame:GetParent().debuffFramesGlowing = debuffType
-                break
-            end
-        end
-    end
+    local parent = debuffFrame:GetParent() 
+    parent.debuffFramesGlowing[debuffType] = debuffType
+    parent.debuffFramesGlowing[name] = debuffType
+    parent.debuffFramesGlowing[spellId] = debuffType
 end
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
@@ -144,7 +137,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
                 (aura == name or aura == debuffType or aura == spellId)
             ) then
                 local color = db.auraGlow.buffFrames.useDefaultsColors and defuffsColors[debuffType]                
-                self:StartGlow(buffFrame, db.auraGlow.buffFrames, color)
+                self:StartGlow(buffFrame, db.auraGlow.buffFrames, color, "buffFrames", "auraGlow")
                 buffFrame.buffFramesGlowing = debuffType
                 break
             end
@@ -152,20 +145,13 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
     end
 
     if not buffFrame.buffFramesGlowing then
-        self:StopGlow(buffFrame, db.auraGlow.buffFrames)
+        self:StopGlow(buffFrame, db.auraGlow.buffFrames, "buffFrames", "auraGlow")
     end
 
-    if db.frameGlow.buffFrames.enabled then
-        for _, aura in ipairs(db.frameGlow.buffFrames.tracking) do
-            if (
-                aura ~= nil and 
-                (aura == name or aura == debuffType or aura == spellId)
-            ) then                
-                buffFrame:GetParent().buffFramesGlowing = debuffType
-                break
-            end
-        end
-    end
+    local parent = buffFrame:GetParent()  
+    parent.buffFramesGlowing[debuffType] = debuffType
+    parent.buffFramesGlowing[name] = debuffType
+    parent.buffFramesGlowing[spellId] = debuffType
 end
 
 local function CompactUnitFrame_Util_IsBossAura(...)
@@ -207,7 +193,7 @@ function KHMRaidFrames:CompactUnitFrame_HideAllBuffs(frame, startingIndex, db)
     if frame.buffFrames then
         for i=startingIndex or 1, #frame.buffFrames do
             frame.buffFrames[i]:Hide()
-            self:StopGlow(frame.buffFrames[i], db.buffFrames)
+            self:StopGlow(frame.buffFrames[i], db.buffFrames, "buffFrames", "auraGlow")
         end
     end
 end
@@ -216,7 +202,7 @@ function KHMRaidFrames:CompactUnitFrame_HideAllDebuffs(frame, startingIndex, db)
     if frame.debuffFrames then
         for i=startingIndex or 1, #frame.debuffFrames do
             frame.debuffFrames[i]:Hide()
-            self:StopGlow(frame.debuffFrames[i], db.debuffFrames)
+            self:StopGlow(frame.debuffFrames[i], db.debuffFrames, "debuffFrames", "auraGlow")
         end
     end
 end
@@ -254,10 +240,8 @@ end
 local dispellableDebuffTypes = { Magic = true, Curse = true, Disease = true, Poison = true}
 
 function KHMRaidFrames:UpdateAuras(frame)
-    local debuffFramesGlowing, buffFramesGlowing = frame.debuffFramesGlowing, frame.buffFramesGlowing
-
-    frame.buffFramesGlowing = nil
-    frame.debuffFramesGlowing = nil
+    frame.buffFramesGlowing = {}
+    frame.debuffFramesGlowing = {}
 
     local db = self:GroupTypeDB()
 
@@ -419,14 +403,149 @@ function KHMRaidFrames:UpdateAuras(frame)
 
     db = self.db.profile.glows.frameGlow
 
-    if frame.debuffFramesGlowing then
-        local color = db.debuffFrames.useDefaultsColors and defuffsColors[frame.debuffFramesGlowing]
-        self:StartGlow(frame, db.debuffFrames, color)        
-    elseif frame.buffFramesGlowing then
-        local color = db.buffFrames.useDefaultsColors and defuffsColors[frame.buffFramesGlowing]
-        self:StartGlow(frame, db.buffFrames, color)
-    else
-        self:StopGlow(frame, db.buffFrames)
-        self:StopGlow(frame, db.debuffFrames)
+    if db.buffFrames.enabled then
+        for _, tracking in ipairs(db.buffFrames.tracking) do
+            if frame.buffFramesGlowing[tracking] then
+                local color = db.buffFrames.useDefaultsColors and defuffsColors[frame.buffFramesGlowing[tracking]]
+                self:StartGlow(frame, db.buffFrames, color, "buffFrames", "frameGlow")
+                self:StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
+                return
+            end
+        end
     end
+
+    if db.debuffFrames.enabled then
+        for _, tracking in ipairs(db.debuffFrames.tracking) do
+            if frame.debuffFramesGlowing[tracking] then
+                local color = db.debuffFrames.useDefaultsColors and defuffsColors[frame.debuffFramesGlowing[tracking]]
+                self:StartGlow(frame, db.debuffFrames, color, "debuffFrames", "frameGlow")
+                self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
+                return
+            end
+        end
+    end
+
+    self:StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
+    self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
+
+    --     for aura, debuffType in pairs(frame.useDefaultsColors) do
+    --         if aura ~= nil and aura == parent.debuffFramesGlowing then break end
+
+    --         if (
+    --             aura ~= nil and 
+    --             (aura == name or aura == debuffType or aura == spellId)
+    --         ) then                     
+    --             parent.debuffFramesGlowing = debuffType
+    --             break
+    --         end
+    --     end
+    -- end
+
+    -- if frame.debuffFramesGlowing then
+    --     local color = db.debuffFrames.useDefaultsColors and defuffsColors[frame.debuffFramesGlowing]
+    --     self:StartGlow(frame, db.debuffFrames, color, "debuffFrames")
+
+    --     if db.debuffFrames.type ~= db.buffFrames.type then
+    --         self:StopGlow(frame, db.buffFrames, "buffFrames")
+    --     end
+    -- elseif frame.buffFramesGlowing then
+    --     local color = db.buffFrames.useDefaultsColors and defuffsColors[frame.buffFramesGlowing]
+    --     self:StartGlow(frame, db.buffFrames, color, "buffFrames")
+
+    --     if db.debuffFrames.type ~= db.buffFrames.type then
+    --         self:StopGlow(frame, db.debuffFrames, "debuffFrames")
+    --     end        
+    -- else
+    --     self:StopGlow(frame, db.debuffFrames, "debuffFrames")
+    --     self:StopGlow(frame, db.buffFrames, "buffFrames")
+    -- end        
+    -- if rame.debuffFramesGlowing then
+    --     self:StopGlow(frame, db.debuffFrames)
+    --     self:StopGlow(frame, db.buffFrames)
+
+    --     local color = db.debuffFrames.useDefaultsColors and defuffsColors[n_d]
+    --     self:StartGlow(frame, db.debuffFrames, color)
+    --     return
+    -- elseif (n_d and o_d) and n_d == o_d then
+    --     return
+    -- elseif not n_d then
+    --     self:StopGlow(frame, db.debuffFrames)  
+    -- end
+
+    -- topPrio = 9999
+
+    -- for k, v in pairs(frame.buffFramesGlowing or {}) do
+    --     if tonumber(k) < topPrio then topPrio = k end
+    -- end
+
+    -- local n_b = frame.buffFramesGlowing[topPrio]
+    -- local o_b = buffFramesGlowing
+
+    -- frame.buffFramesGlowing = n_b
+
+    -- if n_b and (n_b ~= o_b) then
+    --     self:StopGlow(frame, db.debuffFrames)
+    --     self:StopGlow(frame, db.buffFrames)
+
+    --     local color = db.buffFrames.useDefaultsColors and defuffsColors[n_b]
+    --     self:StartGlow(frame, db.buffFrames, color)
+    --     return
+    -- elseif (n_b and o_b) and n_b == o_b then
+    --     return
+    -- elseif not n_b then
+    --     self:StopGlow(frame, db.buffFrames)  
+    -- end
+
+
+
+
+
+
+
+
+
+
+
+                   
+    -- local d_old, d_new = debuffFramesGlowing, frame.debuffFramesGlowing
+
+    -- if (d_old and d_new) and (d_old[1] ~= d_new[1]) then
+    --     if d_new[2] ~= d_old[2] then
+    --         self:StopGlow(frame, db.debuffFrames)
+    --         self:StopGlow(frame, db.buffFrames)
+
+    --         local color = db.debuffFrames.useDefaultsColors and defuffsColors[d_new[1]]
+    --         self:StartGlow(frame, db.debuffFrames, color)
+    --         return
+    --     end
+    -- elseif d_old and not d_new then
+    --     self:StopGlow(frame, db.debuffFrames)
+    -- elseif not d_old and d_new then
+    --     local color = db.debuffFrames.useDefaultsColors and defuffsColors[d_new[1]]
+    --     self:StartGlow(frame, db.debuffFrames, color)
+    --     return
+    -- elseif (d_old and d_new) and (d_old[1] == d_new[1]) then
+    --     return
+    -- end
+
+    -- local b_old, b_new = buffFramesGlowing, frame.buffFramesGlowing
+
+    -- if (b_old and b_new) and (b_old[1] ~= b_new[1]) then
+    --     if b_new[2] ~= b_old[2] then
+    --         self:StopGlow(frame, db.buffFrames)
+    --         self:StopGlow(frame, db.debuffFrames) 
+                           
+    --         local color = db.buffFrames.useDefaultsColors and defuffsColors[b_new[1]]
+    --         self:StartGlow(frame, db.buffFrames, color)
+    --     end
+
+    -- elseif b_old and not b_new then
+    --     self:StopGlow(frame, db.buffFrames)
+    -- elseif not b_old and b_new then
+    --     local color = db.buffFrames.useDefaultsColors and defuffsColors[b_new[1]]
+    --     self:StartGlow(frame, db.buffFrames, color)
+    -- elseif (b_old and b_new) and (b_old[1] == b_new[1]) then
+    --     local color = db.buffFrames.useDefaultsColors and defuffsColors[b_new[1]]
+    --     self:StartGlow(frame, db.buffFrames, color) 
+    -- end
 end

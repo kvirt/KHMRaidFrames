@@ -34,7 +34,16 @@ function KHMRaidFrames:Setup()
     } 
     self.aurasCache = {}
     self.processedFrames = {}
-    self.glowingFrames = {}
+    self.glowingFrames = {
+        auraGlow = {
+            buffFrames = {},
+            debuffFrames = {},
+        },
+        frameGlow = {
+            buffFrames = {},
+            debuffFrames = {},            
+        },
+    }
 
     self:GetVirtualFrames()
 

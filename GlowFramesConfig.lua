@@ -360,83 +360,14 @@ end
 function KHMRaidFrames:RestartOptionsGlows(frameType, glowType)
     local db = self.db.profile.glows[glowType][frameType]
     
-    if glowType == "auraGlow" then
-        self:RestoreAuraFramesGlow(db, frameType)
-    else
-        self:RestoreFramesGlow(db, frameType)
-    end
+    for frame, color in pairs(self.glowingFrames[glowType][frameType]) do
+        for _, _glowType in ipairs{"pixel", "auto", "button"} do
+            self.GetGlowOptions(_glowType).stop(frame, frameType or "")
+
+            self.glowingFrames[glowType][frameType][frame] = nil            
+        end
+
+        local color = db.useDefaultsColors and color or db.options[db.type].color
+        self:StartGlow(frame, db, color, frameType, glowType)           
+    end  
 end
-
-function KHMRaidFrames:RestoreAuraFramesGlow(db, frameType)
-    for frame in self:IterateCompactFrames("raid") do
-        for i=1, #frame[frameType] do
-            local typedFrame = frame[frameType][i]    
-            if typedFrame.__glowing then
-                for _, _glowType in pairs{"pixel", "auto", "button"} do
-                    db.options[_glowType].stop(typedFrame)
-                end
-
-                typedFrame.__glowing = nil
-
-                local color = db.useDefaultsColors and defuffsColors[typedFrame[frameType.."Glowing"]]
-                self:StartGlow(typedFrame, db, color)
-            end          
-        end
-
-        self:UpdateAuras(frame)          
-    end
-
-    for frame in self:IterateCompactFrames("party") do
-        for i=1, #frame[frameType] do
-            local typedFrame = frame[frameType][i]    
-            if typedFrame.__glowing then
-                for _, _glowType in pairs{"pixel", "auto", "button"} do
-                    db.options[_glowType].stop(typedFrame)
-                end
-
-                typedFrame.__glowing = nil
-
-                local color = db.useDefaultsColors and defuffsColors[typedFrame[frameType.."Glowing"]]
-                self:StartGlow(typedFrame, db, color)
-            end
-        end
-
-        self:UpdateAuras(frame)        
-    end
-end 
-
-function KHMRaidFrames:RestoreFramesGlow(db, frameType)
-    for frame in self:IterateCompactFrames("raid") do
-        if frame.__glowing then
-            for _, _glowType in pairs{"pixel", "auto", "button"} do
-                db.options[_glowType].stop(frame)
-            end
-
-            frame.__glowing = nil
-
-            if frame[frameType.."Glowing"] then
-                local color = db.useDefaultsColors and defuffsColors[frame[frameType.."Glowing"]]
-                self:StartGlow(frame, db, color)
-            end
-
-            self:UpdateAuras(frame)               
-        end
-    end
-
-    for frame in self:IterateCompactFrames("party") do
-        if frame.__glowing then
-            for _, _glowType in pairs{"pixel", "auto", "button"} do
-                db.options[_glowType].stop(frame)
-            end
-
-            frame.__glowing = nil
-
-            if frame[frameType.."Glowing"] then
-                local color = db.useDefaultsColors and defuffsColors[frame[frameType.."Glowing"]]
-                self:StartGlow(frame, db, color)
-            end
-
-            self:UpdateAuras(frame)            
-        end
-    end
-end    
