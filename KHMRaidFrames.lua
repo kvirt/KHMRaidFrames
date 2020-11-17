@@ -16,11 +16,13 @@ local UnitPopupButtons = {
 
 
 function KHMRaidFrames:UpdateRaidMark()
-    local isInRaid = IsInRaid() and "raid" or "party"    
+    for frame in self:IterateCompactFrames("raid") do
+        self:SetUpRaidIcon(frame, "raid") 
+    end
 
-    for frame in self:IterateCompactFrames(isInRaid) do
-        self:SetUpRaidIcon(frame, isInRaid) 
-    end 
+    for frame in self:IterateCompactFrames("party") do
+        self:SetUpRaidIcon(frame, "party") 
+    end      
 end
 
 function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
