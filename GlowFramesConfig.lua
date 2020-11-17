@@ -348,10 +348,10 @@ function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
         return
     end
 
-    local defaults_settings = self:Defaults()["profile"][glowType][frameType]
+    local defaults_settings = self:Defaults()["profile"].glows[glowType][frameType]
 
     for k, v in pairs(defaults_settings) do
-        self.db.profile[glowType][frameType][k] = v
+        self.db.profile.glows[glowType][frameType][k] = v
     end
 
     self:SafeRefresh()
