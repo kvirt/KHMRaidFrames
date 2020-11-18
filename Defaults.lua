@@ -148,31 +148,12 @@ end
 function KHMRaidFrames:DefaultGroupSetUp(frame, groupType, isInCombatLockDown)
     local db = self.db.profile[groupType]
 
-    local deferred = false
-
-    if not isInCombatLockDown then
-        local totalHeight, totalWidth = 0, 0
-
-        if db.frames.hideGroupTitles then
-            frame.title:Hide()    
-            totalHeight, totalWidth = self:ResizeGroups(frame, 0)
-        else
-            frame.title:Show()               
-            totalHeight, totalWidth = self:ResizeGroups(frame, -frame.title:GetHeight())
-            totalHeight = totalHeight + frame.title:GetHeight() 
-        end
-        
-        if frame.borderFrame:IsShown() then
-            totalWidth = totalWidth + 12
-            totalHeight = totalHeight + 4
-        end
-
-        frame:SetSize(totalWidth, totalHeight)
+    if db.frames.hideGroupTitles then
+        frame.title:Hide()    
     else
-        deferred = true
-    end  
-
-    return deferred
+        frame.title:Show()
+    end             
+        
 end
 
 function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)

@@ -138,6 +138,8 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         function(frame)
             if not UnitIsPlayer(frame.displayedUnit) or not frame:GetName() then
                 return
+            elseif frame:GetName() and frame:GetName():find("^NamePlate%d") then
+                return            
             else
                 self:UpdateAuras(frame)
             end
@@ -185,6 +187,8 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
 
     local settings = GetRaidProfileFlattenedOptions(profile or GetActiveRaidProfile())
 
+    if not settings then return end
+
     self.horizontalGroups = settings.horizontalGroups
     self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
     self.keepGroupsTogether = settings.keepGroupsTogether
@@ -201,8 +205,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
 end
 
 function KHMRaidFrames:OnOptionShow()
-    if InCombatLockdown() then
-        self:Print("Can not refresh settings while in combat")        
+    if InCombatLockdown() then        
         self:HideAll()
         self.deffered = true
         return
