@@ -119,7 +119,7 @@ function KHMRaidFrames:AddSubFrames(frame, groupType)
         end  
 
         for i=#frame[subFrameType] + 1, db.num do
-            local typedFrame = CreateFrame("Button", frameName..i, frame, template)
+            local typedFrame = _G[frameName..i] or CreateFrame("Button", frameName..i, frame, template)
             typedFrame:ClearAllPoints()
             typedFrame:Hide()
         end
