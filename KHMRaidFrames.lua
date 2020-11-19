@@ -79,6 +79,12 @@ function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
 
     local index = GetRaidTargetIndex(frame.unit)
 
+    if index == "NONE" then
+        index = 0
+    else
+        index = tonumber(index)
+    end    
+
     if index and index >= 1 and index <= 8 then
         local options = UnitPopupButtons["RAID_TARGET_"..index]
         local texture, tCoordLeft, tCoordRight, tCoordTop, tCoordBottom = options.icon, options.tCoordLeft, options.tCoordRight, options.tCoordTop, options.tCoordBottom

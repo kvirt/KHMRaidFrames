@@ -100,7 +100,8 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
     local deferrFrame = CreateFrame("Frame")
     deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-    deferrFrame:RegisterEvent("PLAYER_REGEN_DISABLED")    
+    deferrFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    deferrFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
     deferrFrame:RegisterEvent("RAID_TARGET_UPDATE")  -- raid target icon    
     deferrFrame:SetScript(
         "OnEvent", 
@@ -119,7 +120,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
             elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
                 self:HideAll()
                 self.deffered = true
-            elseif event == "RAID_TARGET_UPDATE" then
+            elseif event == "RAID_TARGET_UPDATE" or event == "PLAYER_ROLES_ASSIGNED" then
                 self:UpdateRaidMark(groupType)
             end
         end
@@ -163,6 +164,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         end
     )
 
+    self:AddPlayerFrame()
     self:SafeRefresh()
 end
 

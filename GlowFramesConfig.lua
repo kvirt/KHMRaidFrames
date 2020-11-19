@@ -91,7 +91,10 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 db.enabled = val
                 self:RestartOptionsGlows(frameType, glowType)                                  
             end,
-            get = function(info) return db.enabled end
+            get = function(info)
+                self:HideVirtual() 
+                return db.enabled 
+            end
         },
         ["useDefaultsColors"..frameName] = {
             name = L["Use Default Colors"],
