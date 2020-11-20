@@ -164,7 +164,6 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         end
     )
 
-    self:AddPlayerFrame()
     self:SafeRefresh()
 end
 
