@@ -358,11 +358,26 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             get = function(info) 
                 return db.clickThrough 
             end
-        },        
+        },
+        [frameType.."Show Big Debuffs"] = {
+            name = L["Show Big Debuffs"],
+            desc = "",
+            descStyle = "inline",
+            width = "double",
+            type = "toggle",
+            order = 5,        
+            set = function(info,val)
+                db.showBigDebuffs = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) 
+                return db.showBigDebuffs 
+            end
+        },                   
         [frameType.."Skip"] = {
             type = "header",
             name = "",
-            order = 5,
+            order = 6,
         },                         
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
@@ -371,7 +386,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "full",
             type = "execute",
             confirm = true,
-            order = 6,
+            order = 7,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,

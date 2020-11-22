@@ -59,3 +59,4 @@ L["Disease"] = true
 L["Curse"] = true
 L["Physical"] = true
 L["Click Through Auras"] = true
+L["Show Big Debuffs"] = true

@@ -199,21 +199,18 @@ function KHMRaidFrames:GetTextures()
 end
 
 function KHMRaidFrames:TrackAuras(name, debuffType, spellId, db)
-    for _, aura in pairs(db) do
+    for _, aura in ipairs(db) do
+        local excluded = false
         if (aura == name or aura == debuffType or aura == spellId) then
-            return true
+            for _, exclude in ipairs(self.db.profile.glows.glowBlockList.tracking) do
+                if (exclude == name or exclude == debuffType or exclude == spellId) then
+                    excluded = true
+                    break
+                end
+            end
+            if not excluded then return true end
         end
     end
 
-    return false
-end
-
-function KHMRaidFrames:ExcludeAuras(name, spellId)
-    for _, aura in pairs(self.db.profile.glows.glowBlockList.tracking) do
-        if (aura == name or aura == spellId) then
-            return true
-        end
-    end
-    
-    return false
+    return nil
 end
