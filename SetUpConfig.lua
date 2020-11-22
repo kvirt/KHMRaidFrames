@@ -448,7 +448,7 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             descStyle = "inline",
             width = "normal",
             type = "range",
-            min = 0,
+            min = 1,
             max = num,
             step = 1,
             order = 2,          

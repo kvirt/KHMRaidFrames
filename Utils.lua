@@ -200,17 +200,18 @@ end
 
 function KHMRaidFrames:TrackAuras(name, debuffType, spellId, db)
     for _, aura in ipairs(db) do
-        local excluded = false
         if (aura == name or aura == debuffType or aura == spellId) then
-            for _, exclude in ipairs(self.db.profile.glows.glowBlockList.tracking) do
-                if (exclude == name or exclude == debuffType or exclude == spellId) then
-                    excluded = true
-                    break
-                end
-            end
-            if not excluded then return true end
+            if not self:ExcludeAuras(name, debuffType, spellId) then return true end
         end
     end
 
     return nil
+end
+
+function KHMRaidFrames:ExcludeAuras(name, debuffType, spellId)
+    for _, exclude in ipairs(self.db.profile.glows.glowBlockList.tracking) do
+        if (exclude == name or exclude == debuffType or exclude == spellId) then
+            return true
+        end
+    end
 end
