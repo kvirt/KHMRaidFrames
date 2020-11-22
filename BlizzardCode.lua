@@ -1,13 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
-local defuffsColors = {
-    magic = {0.2, 0.6, 1.0, 1},
-    curse = {0.6, 0.0, 1.0, 1},
-    disease = {0.6, 0.4, 0.0, 1},
-    poison = {0.0, 0.6, 0.0, 1},
-    physical = {1, 1, 1, 1}
-}
-
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)
     debuffFrame.debuffFramesGlowing = nil  
@@ -77,18 +69,22 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     local db = self.db.profile.glows
 
     if db.auraGlow.debuffFrames.enabled then
-        for _, aura in ipairs(db.auraGlow.debuffFrames.tracking) do
-            if (
-                aura ~= nil and 
-                (aura == name or aura == debuffType or aura == spellId)
-            ) then
-                local color = db.auraGlow.buffFrames.useDefaultsColors and defuffsColors[debuffType]                
-                self:StartGlow(debuffFrame, db.auraGlow.debuffFrames, color, "debuffFrames", "auraGlow")
-                debuffFrame.debuffFramesGlowing = debuffType
-                break
-            end
-        end
-    end        
+        if (
+            (
+                db.auraGlow.debuffFrames.tracking[name] or 
+                db.auraGlow.debuffFrames.tracking[debuffType] or 
+                db.auraGlow.debuffFrames.tracking[spellId]
+            ) and
+            not (
+                self.db.profile.glows.glowBlockList.tracking[name] or
+                self.db.profile.glows.glowBlockList.tracking[spellId]
+            )
+        ) then
+            local color = db.auraGlow.debuffFrames.useDefaultsColors and db.auraGlow.defaultColors[debuffType]                
+            self:StartGlow(debuffFrame, db.auraGlow.debuffFrames, color, "buffFrames", "auraGlow")
+            debuffFrame.debuffFramesGlowing = debuffType
+        end     
+    end       
 
     if not debuffFrame.debuffFramesGlowing then
         self:StopGlow(debuffFrame, db.auraGlow.debuffFrames, "debuffFrames", "auraGlow")
@@ -130,18 +126,23 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
     spellId = tostring(spellId)
 
     local db = self.db.profile.glows
+    
     if db.auraGlow.buffFrames.enabled then
-        for _, aura in ipairs(db.auraGlow.buffFrames.tracking) do
-            if (
-                aura ~= nil and 
-                (aura == name or aura == debuffType or aura == spellId)
-            ) then
-                local color = db.auraGlow.buffFrames.useDefaultsColors and defuffsColors[debuffType]                
-                self:StartGlow(buffFrame, db.auraGlow.buffFrames, color, "buffFrames", "auraGlow")
-                buffFrame.buffFramesGlowing = debuffType
-                break
-            end
-        end        
+        if (
+            (
+                db.auraGlow.buffFrames.tracking[name] or 
+                db.auraGlow.buffFrames.tracking[debuffType] or 
+                db.auraGlow.buffFrames.tracking[spellId]
+            ) and
+            not (
+                self.db.profile.glows.glowBlockList.tracking[name] or
+                self.db.profile.glows.glowBlockList.tracking[spellId]
+            )
+        ) then
+            local color = db.auraGlow.buffFrames.useDefaultsColors and db.auraGlow.defaultColors[debuffType]                
+            self:StartGlow(buffFrame, db.auraGlow.buffFrames, color, "buffFrames", "auraGlow")
+            buffFrame.buffFramesGlowing = debuffType
+        end     
     end
 
     if not buffFrame.buffFramesGlowing then
@@ -406,7 +407,7 @@ function KHMRaidFrames:UpdateAuras(frame)
     if db.buffFrames.enabled then
         for _, tracking in ipairs(db.buffFrames.tracking) do
             if frame.buffFramesGlowing[tracking] then
-                local color = db.buffFrames.useDefaultsColors and defuffsColors[frame.buffFramesGlowing[tracking]]
+                local color = db.buffFrames.useDefaultsColors and db.defaultColors[frame.buffFramesGlowing[tracking]]
                 self:StartGlow(frame, db.buffFrames, color, "buffFrames", "frameGlow")
                 self:StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
                 return
@@ -417,7 +418,7 @@ function KHMRaidFrames:UpdateAuras(frame)
     if db.debuffFrames.enabled then
         for _, tracking in ipairs(db.debuffFrames.tracking) do
             if frame.debuffFramesGlowing[tracking] then
-                local color = db.debuffFrames.useDefaultsColors and defuffsColors[frame.debuffFramesGlowing[tracking]]
+                local color = db.debuffFrames.useDefaultsColors and db.defaultColors[frame.debuffFramesGlowing[tracking]]
                 self:StartGlow(frame, db.debuffFrames, color, "debuffFrames", "frameGlow")
                 self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
                 return

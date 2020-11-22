@@ -4,6 +4,13 @@ local _G, tinsert, CompactRaidFrameContainer = _G, tinsert, CompactRaidFrameCont
 local NATIVE_UNIT_FRAME_HEIGHT = 36
 local NATIVE_UNIT_FRAME_WIDTH = 72   
 
+KHMRaidFrames.defuffsColors = {
+    magic = {0.2, 0.6, 1.0, 1},
+    curse = {0.6, 0.0, 1.0, 1},
+    disease = {0.6, 0.4, 0.0, 1},
+    poison = {0.0, 0.6, 0.0, 1},
+    physical = {1, 1, 1, 1}
+}
 
 function KHMRaidFrames:Defaults()
     local componentScale = min(self.frameHeight / NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / NATIVE_UNIT_FRAME_WIDTH)
@@ -14,7 +21,8 @@ function KHMRaidFrames:Defaults()
     local commons = {
             frames = {
                 hideGroupTitles = false,
-                texture = "Blizzard Raid Bar",                
+                texture = "Blizzard Raid Bar",
+                clickTrough = false,            
             },        
             dispelDebuffFrames = {
                 num = 3,
@@ -81,6 +89,7 @@ function KHMRaidFrames:Defaults()
                 enabled = false,
                 useDefaultsColors = true,                
             },
+            defaultColors = self.defuffsColors,
         },
         frameGlow = {
             buffFrames = {
@@ -98,8 +107,13 @@ function KHMRaidFrames:Defaults()
                 trackingStr = "",    
                 enabled = false,
                 useDefaultsColors = true,                
-            },                                                         
+            },
+            defaultColors = self.defuffsColors,                                                       
         },
+        glowBlockList = {
+            tracking = {},
+            trackingStr = "",              
+        },       
     }
 
     return defaults_settings
@@ -166,9 +180,9 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
         deferred = true   
     end 
 
-    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames)
-    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames)
-    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType)
 
     self:SetUpRaidIcon(frame, groupType)
 

@@ -2,14 +2,6 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local LCG = LibStub("LibCustomGlow-1.0")
 
-local defuffsColors = {
-    magic = {0.2, 0.6, 1.0, 1},
-    curse = {0.6, 0.0, 1.0, 1},
-    disease = {0.6, 0.4, 0.0, 1},
-    poison = {0.0, 0.6, 0.0, 1},
-    physical = {1, 1, 1, 1}
-}
-
 
 function KHMRaidFrames.GetGlowOptions(key)
     local options = {
@@ -70,6 +62,114 @@ function KHMRaidFrames:GlowSubTypes(glowType)
         childGroups = "tab",  
         args = self:SetupGlowOptions("debuffFrames", glowType),        
     }
+    options.defaultColors = {
+        type = "group",
+        order = 3,
+        name = L["Default Colors"],
+        desc = "",
+        childGroups = "tab",  
+        args = {
+            ["color magic"] = {
+                name = L["Magic"],
+                desc = "",
+                descStyle = "inline",
+                width = "full",
+                type = "color",
+                order = 1,
+                hasAlpha = true,                   
+                set = function(info, r, g, b, a)
+                    self.db.profile.glows[glowType].defaultColors.magic = {r, g, b, a} 
+                end,
+                get = function(info)
+                    local color = self.db.profile.glows[glowType].defaultColors.magic
+                    return color[1], color[2], color[3], color[4]
+                end
+            }, 
+            ["color curse"] = {
+                name = L["Curse"],
+                desc = "",
+                descStyle = "inline",
+                width = "full",
+                type = "color",
+                order = 2,
+                hasAlpha = true,                   
+                set = function(info, r, g, b, a)
+                    self.db.profile.glows[glowType].defaultColors.curse = {r, g, b, a}
+                end,
+                get = function(info)
+                    local color = self.db.profile.glows[glowType].defaultColors.curse
+                    return color[1], color[2], color[3], color[4]
+                end
+            },  
+            ["color disease"] = {
+                name = L["Disease"],
+                desc = "",
+                descStyle = "inline",
+                width = "full",
+                type = "color",
+                order = 3,
+                hasAlpha = true,                   
+                set = function(info, r, g, b, a)
+                    self.db.profile.glows[glowType].defaultColors.disease = {r, g, b, a} 
+                end,
+                get = function(info)
+                    local color = self.db.profile.glows[glowType].defaultColors.disease
+                    return color[1], color[2], color[3], color[4]
+                end
+            },  
+            ["color poison"] = {
+                name = L["Poison"],
+                desc = "",
+                descStyle = "inline",
+                width = "full",
+                type = "color",
+                order = 4,
+                hasAlpha = true,                   
+                set = function(info, r, g, b, a)
+                    self.db.profile.glows[glowType].defaultColors.poison = {r, g, b, a}
+                end,
+                get = function(info)
+                    local color = self.db.profile.glows[glowType].defaultColors.poison
+                    return color[1], color[2], color[3], color[4]
+                end
+            },  
+            ["color physical"] = {
+                name = L["Physical"],
+                desc = "",
+                descStyle = "inline",
+                width = "full",
+                type = "color",
+                order = 5,
+                hasAlpha = true,                   
+                set = function(info, r, g, b, a)
+                    self.db.profile.glows[glowType].defaultColors.physical = {r, g, b, a} 
+                end,
+                get = function(info)
+                    local color = self.db.profile.glows[glowType].defaultColors.physical
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
+            ["Color Skip"] = {
+                type = "header",
+                name = "",
+                order = 6,
+            },                                       
+            ["Color Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                descStyle = "inline",
+                width = "full",
+                type = "execute",
+                confirm = true,
+                order = 7,
+                func = function(info,val)
+                    self:RestoreDefaultColors(glowType)
+                    self:RestartOptionsGlows("buffFrames", glowType)
+                    self:RestartOptionsGlows("debuffFrames", glowType)              
+                end,
+            },                                                                            
+        },      
+    }    
 
     return options
 end
@@ -355,6 +455,16 @@ function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
 
     for k, v in pairs(defaults_settings) do
         self.db.profile.glows[glowType][frameType][k] = v
+    end
+
+    self:SafeRefresh()
+end
+
+function KHMRaidFrames:RestoreDefaultColors(glowType)
+    local db = self.db.profile.glows[glowType].defaultColors
+
+    for k, v in pairs(db) do
+        self.db.profile.glows[glowType].defaultColors[k] = KHMRaidFrames.defuffsColors[k]
     end
 
     self:SafeRefresh()

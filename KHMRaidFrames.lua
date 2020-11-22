@@ -25,7 +25,7 @@ function KHMRaidFrames:UpdateRaidMark()
     end      
 end
 
-function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
+function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
@@ -57,7 +57,13 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db)
             yOffset
         )
 
-        typedframe:SetSize(db.size, db.size)      
+        typedframe:SetSize(db.size, db.size)
+
+        if self.db.profile[groupType].frames.clickThrough then
+            typedframe:EnableMouse(false)
+        else
+            typedframe:EnableMouse(true)
+        end
 
         frameNum = frameNum + 1
     end     

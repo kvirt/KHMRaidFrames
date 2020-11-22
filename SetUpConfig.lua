@@ -70,7 +70,52 @@ function KHMRaidFrames:SetupOptions()
                 desc = "",
                 childGroups = "tab",  
                 args = self:GlowSubTypes("frameGlow"),        
-            }                      
+            },
+            ["glow block list"] = {
+                type = "group",
+                order = 3,
+                name = L["Block List"],
+                desc = "",
+                childGroups = "tab",  
+                args = {
+                    ["glowBlockList"] = {
+                        name = L["Block List"],
+                        desc = L["Exclude auras from Glows"],
+                        usage = self:ExcludeHelpText(),
+                        width = "full",
+                        type = "input",
+                        multiline = 10, 
+                        order = 1,                   
+                        set = function(info,val)
+                            self.db.profile.glows.glowBlockList.tracking = self:SanitizeStrings(val)
+                            self.db.profile.glows.glowBlockList.excludeStr = val
+
+                            self:SafeRefresh(groupType)
+                        end,
+                        get = function(info)
+                            return self.db.profile.glows.glowBlockList.excludeStr
+                        end              
+                    },
+                    ["glow block list Skip"] = {
+                        type = "header",
+                        name = "",
+                        order = 2,
+                    },                                       
+                    ["glow block list Reset"] = {
+                        name = L["Reset to Default"],
+                        desc = "",
+                        descStyle = "inline",
+                        width = "full",
+                        type = "execute",
+                        confirm = true,
+                        order = 3,
+                        func = function(info,val)
+                            self.db.profile.glows.glowBlockList.excludeStr = ""
+                            self.db.profile.glows.glowBlockList.tracking = {}
+                        end,
+                    },                                       
+                },        
+            }                                   
         },                 
     }
 
@@ -299,10 +344,25 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
                 return db.texture
             end
         },
+        [frameType.."Click Through"] = {
+            name = L["Click Through Auras"],
+            desc = "",
+            descStyle = "inline",
+            width = "double",
+            type = "toggle",
+            order = 4,        
+            set = function(info,val)
+                db.clickThrough = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) 
+                return db.clickThrough 
+            end
+        },        
         [frameType.."Skip"] = {
             type = "header",
             name = "",
-            order = 4,
+            order = 5,
         },                         
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
@@ -311,7 +371,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "full",
             type = "execute",
             confirm = true,
-            order = 5,
+            order = 6,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,

@@ -161,6 +161,15 @@ function KHMRaidFrames:TrackingHelpText()
     return s
 end
 
+function KHMRaidFrames:ExcludeHelpText()
+
+    local s = "\n".."\n".."\n"..
+        L["Rejuvenation"].."\n"..
+        "155777".."\n"
+
+    return s
+end
+
 function KHMRaidFrames:GroupTypeDB()
     local groupType
 
@@ -187,4 +196,21 @@ function KHMRaidFrames:GetTextures()
     end) 
 
     return textures, s
+end
+
+function KHMRaidFrames.IndexMetaTable(tb)
+    local mt = {}
+
+    function mt.__index(table, key)
+        for i=1, #table do
+            local ret = rawget(table, i)
+            if ret == key then return true end
+        end
+
+        return nil
+    end
+
+    setmetatable(tb, mt)
+
+    return tb
 end
