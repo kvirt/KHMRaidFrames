@@ -75,7 +75,7 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType)
         end
     end 
 
-    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db)
+    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType)
 end
 
 function KHMRaidFrames:HideVirtual()

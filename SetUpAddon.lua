@@ -52,13 +52,6 @@ function KHMRaidFrames:Setup()
     local defaults_settings = self:Defaults()
     self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)
 
-    -- sorted hash tables
-    self.IndexMetaTable(self.db.profile.glows.glowBlockList.tracking)
-    self.IndexMetaTable(self.db.profile.glows.auraGlow.buffFrames.tracking)
-    self.IndexMetaTable(self.db.profile.glows.auraGlow.debuffFrames.tracking)
-    self.IndexMetaTable(self.db.profile.glows.frameGlow.buffFrames.tracking)
-    self.IndexMetaTable(self.db.profile.glows.frameGlow.debuffFrames.tracking)
-
     local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
     local LibDualSpec = LibStub("LibDualSpec-1.0")

@@ -198,19 +198,22 @@ function KHMRaidFrames:GetTextures()
     return textures, s
 end
 
-function KHMRaidFrames.IndexMetaTable(tb)
-    local mt = {}
-
-    function mt.__index(table, key)
-        for i=1, #table do
-            local ret = rawget(table, i)
-            if ret == key then return true end
+function KHMRaidFrames:TrackAuras(name, debuffType, spellId, db)
+    for _, aura in pairs(db) do
+        if (aura == name or aura == debuffType or aura == spellId) then
+            return true
         end
-
-        return nil
     end
 
-    setmetatable(tb, mt)
+    return false
+end
 
-    return tb
+function KHMRaidFrames:ExcludeAuras(name, spellId)
+    for _, aura in pairs(self.db.profile.glows.glowBlockList.tracking) do
+        if (aura == name or aura == spellId) then
+            return true
+        end
+    end
+    
+    return false
 end

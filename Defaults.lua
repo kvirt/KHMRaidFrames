@@ -22,7 +22,7 @@ function KHMRaidFrames:Defaults()
             frames = {
                 hideGroupTitles = false,
                 texture = "Blizzard Raid Bar",
-                clickTrough = false,            
+                clickThrough = false,            
             },        
             dispelDebuffFrames = {
                 num = 3,
