@@ -403,7 +403,7 @@ function KHMRaidFrames:UpdateAuras(frame)
         for aura, auras in pairs(frame.debuffFramesGlowing) do
             local name, debuffType, spellId = auras[1], auras[2], auras[3]
 
-            if self:TrackAuras(aura, nil, nil, self.db.profile.glows.frameGlow.debuffFrames.tracking) then
+            if self:TrackAuras(name, debuffType, spellId, self.db.profile.glows.frameGlow.debuffFrames.tracking) then
                 local color = db.debuffFrames.useDefaultsColors and db.defaultColors[debuffType]
                 self:StartGlow(frame, db.debuffFrames, color, "debuffFrames", "frameGlow")
                 self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
