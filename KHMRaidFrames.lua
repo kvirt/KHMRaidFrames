@@ -57,7 +57,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             yOffset
         )
 
-        typedframe:SetSize(db.size, db.size)
+        typedframe:SetSize(db.size * self.componentScale, db.size * self.componentScale)
 
         if self.db.profile[groupType].frames.clickThrough then
             typedframe:EnableMouse(false)
@@ -98,7 +98,7 @@ function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
         frame.raidIcon:ClearAllPoints()
 
         frame.raidIcon:SetPoint(db.raidIcon.anchorPoint, frame, db.raidIcon.anchorPoint, db.raidIcon.xOffset, db.raidIcon.yOffset)
-        frame.raidIcon:SetSize(db.raidIcon.size, db.raidIcon.size)
+        frame.raidIcon:SetSize(db.raidIcon.size * self.componentScale, db.raidIcon.size * self.componentScale)
 
         frame.raidIcon:SetTexture(texture)
 

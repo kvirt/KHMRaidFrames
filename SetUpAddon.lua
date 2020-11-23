@@ -200,6 +200,8 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.displayPets = settings.displayPets
     self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
+    self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
+
     if self.db then
         self:SafeRefresh()
     end

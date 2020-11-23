@@ -49,13 +49,13 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     local size
 
     if IsInRaid() then
-        size = self.db.profile.raid.debuffFrames.size
+        size = self.db.profile.raid.debuffFrames.size * self.componentScale
     else
-        size = self.db.profile.party.debuffFrames.size
+        size = self.db.profile.party.debuffFrames.size * self.componentScale
     end
 
     if isBossAura then
-        size = size + BOSS_DEBUFF_SIZE_INCREASE
+        size = (size + BOSS_DEBUFF_SIZE_INCREASE) * self.componentScale
     end
 
     debuffFrame:SetSize(size, size)

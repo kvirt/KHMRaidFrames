@@ -230,8 +230,8 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             descStyle = "inline",
             width = "normal",
             type = "range",
-            min = -100,
-            max = 100,
+            min = -200,
+            max = 200,
             step = 1,
             order = 3,          
             disabled = function(info)
@@ -249,8 +249,8 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             descStyle = "inline",
             width = "normal",
             type = "range",
-            min = -100,
-            max = 100,
+            min = -200,
+            max = 200,
             step = 1,
             order = 4,
             disabled = function(info)
@@ -464,8 +464,8 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             descStyle = "inline",
             width = "normal",
             type = "range",
-            min = -100,
-            max = 100,
+            min = -200,
+            max = 200,
             step = 1,
             order = 2,          
             set = function(info,val)
@@ -480,8 +480,8 @@ function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
             descStyle = "inline",
             width = "normal",
             type = "range",
-            min = -100,
-            max = 100,
+            min = -200,
+            max = 200,
             step = 1,
             order = 2,          
             set = function(info,val)

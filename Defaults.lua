@@ -1,8 +1,8 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
 local _G, tinsert, CompactRaidFrameContainer = _G, tinsert, CompactRaidFrameContainer
-local NATIVE_UNIT_FRAME_HEIGHT = 36
-local NATIVE_UNIT_FRAME_WIDTH = 72   
+KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
+KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH = 72   
 
 KHMRaidFrames.defuffsColors = {
     magic = {0.2, 0.6, 1.0, 1},
@@ -13,9 +13,6 @@ KHMRaidFrames.defuffsColors = {
 }
 
 function KHMRaidFrames:Defaults()
-    local componentScale = min(self.frameHeight / NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / NATIVE_UNIT_FRAME_WIDTH)
-
-    local buffSize = 11 * componentScale
     local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
 
     local commons = {
@@ -43,7 +40,7 @@ function KHMRaidFrames:Defaults()
                 rowsGrowDirection = "TOP",                
                 anchorPoint = "BOTTOMLEFT",
                 growDirection = "RIGHT",
-                size = buffSize,
+                size = 11,
                 xOffset = 0,
                 yOffset = 0,
                 exclude = {},
@@ -55,7 +52,7 @@ function KHMRaidFrames:Defaults()
                 rowsGrowDirection = "TOP",                  
                 anchorPoint = "BOTTOMRIGHT",
                 growDirection = "LEFT",
-                size = buffSize,
+                size = 11,
                 xOffset = 0,
                 yOffset = 0,
                 exclude = {},
@@ -63,7 +60,7 @@ function KHMRaidFrames:Defaults()
             },
             raidIcon = {
                 enabled = true,
-                size = 30,
+                size = 15,
                 xOffset = 0,
                 yOffset = 0,
                 anchorPoint = "TOP",
