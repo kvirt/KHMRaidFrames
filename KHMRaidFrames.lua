@@ -25,7 +25,7 @@ function KHMRaidFrames:UpdateRaidMark()
     end      
 end
 
-function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType)
+function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, resize)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
@@ -57,7 +57,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             yOffset
         )
 
-        typedframe:SetSize(db.size * self.componentScale, db.size * self.componentScale)
+        typedframe:SetSize(db.size * resize, db.size * resize)
 
         if self.db.profile[groupType].frames.clickThrough then
             typedframe:EnableMouse(false)

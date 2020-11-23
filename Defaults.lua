@@ -178,9 +178,9 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
         deferred = true   
     end 
 
-    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType)
-    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType)
-    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, self.componentScale)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, self.componentScale)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, 1)
 
     self:SetUpRaidIcon(frame, groupType)
 

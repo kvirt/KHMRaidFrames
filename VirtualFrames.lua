@@ -75,7 +75,8 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType)
         end
     end 
 
-    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType)
+    local resize = subFrameType ~= "dispelDebuffFrames" and self.componentScale or 1
+    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, resize)
 end
 
 function KHMRaidFrames:HideVirtual()
