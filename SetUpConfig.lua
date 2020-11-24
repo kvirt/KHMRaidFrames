@@ -178,7 +178,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
     options.raidIcon = {
         type = "group",
         order = 6,
-        name = L["Raid Target Icon"],
+        name = L["Raid Icon"],
         desc = "",
         childGroups = "tab",  
         args = self:SetupRaidIconOptions("raidIcon", db, groupType),  
@@ -191,7 +191,7 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
 
     local options = {            
         [frameType.."enabled"] = {
-            name = L["Enabled"],
+            name = L["Enable"],
             desc = "",
             descStyle = "inline",
             width = "normal",

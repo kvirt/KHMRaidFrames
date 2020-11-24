@@ -181,7 +181,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
 
     local options = {
         ["enabled"..frameName] = {
-            name = L["Enabled"],
+            name = L["Enable"],
             desc = "",
             descStyle = "inline",
             width = "double",
