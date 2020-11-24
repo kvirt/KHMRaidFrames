@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("KHMRaidFrames", "enUS", true)
 
+if not L then return end
+
 L["TOPLEFT"] = true
 L["LEFT"] = true
 L["BOTTOMLEFT"] = true
@@ -43,8 +45,8 @@ L["Rows Grow Direction"] = true
 L["Rejuvenation"] = true
 L["Wildcards"] = true
 L["-- Comments"] = true
-L["Tracking"] = true
-L["Exclude"] = true
+L["Track auras"] = true
+L["Exclude auras"] = true
 L["Block List"] = true
 L["Raid Target Icon"] = true
 L["Auras"] = true

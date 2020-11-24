@@ -34,7 +34,7 @@ function KHMRaidFrames:SetupOptions()
 
     options.args.raid = {
         type = "group",
-        order = 2,
+        order = 1,
         name = L["Raid"],
         desc = "",
         childGroups = "tab",  
@@ -42,7 +42,7 @@ function KHMRaidFrames:SetupOptions()
     }
     options.args.party = {
         type = "group",
-        order = 3,
+        order = 2,
         name = L["Party"],
         desc = "",
         childGroups = "tab",          
@@ -57,7 +57,7 @@ function KHMRaidFrames:SetupOptions()
         args = {
             ["aura glow"] = {
                 type = "group",
-                order = 2,
+                order = 1,
                 name = L["Aura Glow"],
                 desc = "",
                 childGroups = "tab",  
@@ -65,7 +65,7 @@ function KHMRaidFrames:SetupOptions()
             },
             ["frame glow"] = {
                 type = "group",
-                order = 3,
+                order = 2,
                 name = L["Frame Glow"],
                 desc = "",
                 childGroups = "tab",  

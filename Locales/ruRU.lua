@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("KHMRaidFrames", "ruRU", false)
 
+if not L then return end
+
 L["TOPLEFT"] = "Лево Верх"
 L["LEFT"] = "Лево"
 L["BOTTOMLEFT"] = "Лево Низ"
