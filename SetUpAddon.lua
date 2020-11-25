@@ -23,6 +23,8 @@ function KHMRaidFrames:OnInitialize()
 end
 
 function KHMRaidFrames:Setup()
+    self.componentScale = 1
+
     self:GetRaidProfileSettings()
 
     self.isOpen = false
