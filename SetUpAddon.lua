@@ -111,6 +111,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
             local groupType = IsInRaid() and "raid" or "party"
 
             if event == "PLAYER_REGEN_ENABLED" then
+                self:GetRaidProfileSettings()
                 self:SafeRefresh(groupType)
 
                 if self.deffered then                
@@ -172,9 +173,9 @@ end
 function KHMRaidFrames:RefreshConfig(groupType)
     local isInCombatLockDown = InCombatLockdown()
 
-    for frameType in self:IterateSubFrameTypes() do
-        self:SetUpVirtual(frameType, groupType)
-    end
+    self:SetUpVirtual("buffFrames", groupType, self.componentScale)
+    self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
+    self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
 
     for group in self:IterateCompactGroups(groupType) do
         self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)

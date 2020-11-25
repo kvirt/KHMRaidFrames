@@ -114,6 +114,9 @@ end
 
 function KHMRaidFrames:SanitazeString(str)
     key = str:match("[^--]+")
+
+    if not key then return end
+
     key = key:lower()
     key = key:gsub("^%s*(.-)%s*$", "%1") 
     key = key:gsub("\"", "")
@@ -128,9 +131,12 @@ function KHMRaidFrames:SanitizeStrings(str)
 
     for value in str:gmatch("[^\n]+") do
         local key = self:SanitazeString(value)
-        t[index] = key
 
-        index = index + 1
+        if key then 
+            t[index] = key
+
+            index = index + 1
+        end
     end
 
     return t

@@ -1,7 +1,7 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
-local _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tonumber, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE
+local _G, tostring, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tostring, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE
 local CUF_AURA_BOTTOM_OFFSET = 2
 local powerBarHeight = 8
 
@@ -145,9 +145,34 @@ function KHMRaidFrames:FilterAurasInternal(name, debuffType, spellId, db)
 
     name = name and self:SanitazeString(name)
     debuffType = debuffType and self:SanitazeString(debuffType)
+    spellId = tostring(spellId)
 
     for _, aura in ipairs(db) do
-        if aura ~= nil and (aura == name or aura == debuffType or (spellId ~= nil and tonumber(aura) == spellId)) then
+        if aura ~= nil and (aura == name or aura == debuffType or (spellId ~= nil and aura == spellId)) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function KHMRaidFrames:AdditionalAura(name, debuffType, spellId)
+    local db
+
+    if IsInRaid() then
+        db = self.db.profile.raid.frames.tracking
+    else
+        db = self.db.profile.party.frames.tracking
+    end
+
+    if #db == 0 then return false end
+
+    name = name and self:SanitazeString(name)
+    debuffType = debuffType and self:SanitazeString(debuffType)
+    spellId = tostring(spellId)
+
+    for _, aura in ipairs(db) do
+        if aura == name or aura == debuffType or (spellId ~= nil and aura == spellId) then
             return true
         end
     end

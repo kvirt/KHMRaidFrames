@@ -20,7 +20,8 @@ function KHMRaidFrames:Defaults()
                 hideGroupTitles = false,
                 texture = "Blizzard Raid Bar",
                 clickThrough = false,
-                showBigDebuffs = true,            
+                tracking = {},
+                trackingStr = "",                                
             },        
             dispelDebuffFrames = {
                 num = 3,
@@ -44,7 +45,9 @@ function KHMRaidFrames:Defaults()
                 xOffset = 0,
                 yOffset = 0,
                 exclude = {},
-                excludeStr = "",                                               
+                excludeStr = "",
+                bigDebuffSize = 11 + 9,
+                showBigDebuffs = true,                                            
             },
             buffFrames = {
                 num = 3,

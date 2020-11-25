@@ -62,3 +62,6 @@ L["Curse"] = true
 L["Physical"] = true
 L["Click Through Auras"] = true
 L["Show Big Debuffs"] = true
+L["Additional Auras Tracking"] = true
+L["Track Auras that are not shown by default by Blizzard"] = true
+L["Big Debuffs"] = true

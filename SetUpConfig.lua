@@ -157,7 +157,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = L["Buffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameType("buffFrames", db, groupType),        
+        args = self:SetupBuffFrames(db.buffFrames, groupType),        
     }
     options.debuffFrames = {
         type = "group",
@@ -165,7 +165,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = L["Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameType("debuffFrames", db, groupType),        
+        args = self:SetupDebuffFrames(db.debuffFrames, groupType),        
     }
     options.dispelDebuffFrames = {
         type = "group",
@@ -173,7 +173,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = L["Dispell Debuffs"],
         desc = "",
         childGroups = "tab",  
-        args = self:SetupOptionsByFrameType("dispelDebuffFrames", db, groupType),  
+        args = self:SetupDispelldebuffFrames(db.dispelDebuffFrames, groupType),  
     }
     options.raidIcon = {
         type = "group",
@@ -359,25 +359,28 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
                 return db.clickThrough 
             end
         },
-        [frameType.."Show Big Debuffs"] = {
-            name = L["Show Big Debuffs"],
-            desc = "",
-            descStyle = "inline",
-            width = "double",
-            type = "toggle",
-            order = 5,        
+        ["additionalTracking"] = {
+            name = L["Additional Auras Tracking"],
+            desc = L["Track Auras that are not shown by default by Blizzard"],
+            usage = self:TrackingHelpText(),
+            width = "full",
+            type = "input",
+            multiline = 10, 
+            order = 6,                   
             set = function(info,val)
-                db.showBigDebuffs = val
+                db.tracking = self:SanitizeStrings(val)
+                db.trackingStr = val
+
                 self:SafeRefresh(groupType)
             end,
-            get = function(info) 
-                return db.showBigDebuffs 
-            end
-        },                   
+            get = function(info)
+                return db.trackingStr
+            end              
+        },                           
         [frameType.."Skip"] = {
             type = "header",
             name = "",
-            order = 6,
+            order = 7,
         },                         
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
@@ -386,175 +389,11 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "full",
             type = "execute",
             confirm = true,
-            order = 7,
+            order = 8,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,
         },                               
     }
     return options    
-end
-
-function KHMRaidFrames:SetupOptionsByFrameType(frameType, db, groupType)
-    db = db[frameType]
-    local num, frameName
-
-    if frameType == "dispelDebuffFrames" then
-        frameName = L["Dispell Debuffs"]
-    elseif frameType == "debuffFrames" then
-        frameName = L["Debuffs"]
-    else
-        frameName = L["Buffs"]
-    end
-
-    if frameType ~= "dispelDebuffFrames" then num = self.maxFrames else num = 4 end
-
-    local options = {                
-        ["num"..frameType] = {
-            name = L["Num"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "range",
-            min = 0,
-            max = num,
-            step = 1,
-            order = 1,          
-            set = function(info,val)
-                db.num = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.num end
-        },       
-        ["size"..frameType] = {
-            name = L["Size"],
-            desc = "",
-            descStyle = "inline",
-            width = "double",
-            type = "range",
-            min = 1,
-            max = 100,
-            step = 1,
-            order = 1,           
-            set = function(info,val)
-                db.size = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.size end
-        },
-        ["numInRow"..frameType] = {
-            name = L["Num In Row"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "range",
-            min = 1,
-            max = num,
-            step = 1,
-            order = 2,          
-            set = function(info,val)
-                db.numInRow = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.numInRow end
-        },                
-        ["xOffset"..frameType] = {
-            name = L["X Offset"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "range",
-            min = -200,
-            max = 200,
-            step = 1,
-            order = 2,          
-            set = function(info,val)
-                db.xOffset = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.xOffset end
-        },
-        ["yOffset"..frameType] = {
-            name = L["Y Offset"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "range",
-            min = -200,
-            max = 200,
-            step = 1,
-            order = 2,          
-            set = function(info,val)
-                db.yOffset = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.yOffset end
-        },                                           
-        [frameType.."AnchorPoint"] = {
-            name = L["Anchor Point"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "select",
-            values = positions,
-            order = 3,           
-            set = function(info,val)
-                db.anchorPoint = val
-                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]              
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.anchorPoint end
-        },
-        [frameType.."GrowDirection"] = {
-            name = L["Grow Direction"],
-            desc = "",
-            descStyle = "inline",
-            width = "normal",
-            type = "select",
-            values = grow_positions,
-            order = 3,
-            set = function(info,val)
-                db.growDirection = val
-                db.rowsGrowDirection = self.rowsGrows[db.anchorPoint][val]
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info) return db.growDirection end
-        },                              
-        [frameType.."Skip2"] = {
-            type = "header",
-            name = L["Block List"],
-            order = 4,
-        },
-        ["exclude"..frameType] = {
-            name = L["Exclude"],
-            desc = L["Exclude auras"],
-            usage = self:TrackingHelpText(),
-            width = "full",
-            type = "input",
-            multiline = 5, 
-            order = 6,                   
-            set = function(info,val)
-                db.exclude = self:SanitizeStrings(val)
-                db.excludeStr = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return db.excludeStr
-            end              
-        },                      
-        [frameType.."Reset"] = {
-            name = L["Reset to Default"],
-            desc = "",
-            descStyle = "inline",
-            width = "full",
-            type = "execute",
-            order = 7,
-            confirm = true,
-            func = function(info,val)
-                self:RestoreDefaults(groupType, frameType)
-            end,
-        },                       
-    }
-    return options   
 end

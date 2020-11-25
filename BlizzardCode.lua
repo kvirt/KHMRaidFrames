@@ -150,6 +150,10 @@ function KHMRaidFrames:CompactUnitFrame_Util_ShouldDisplayDebuff(...)
         return false
     end
 
+    if self:AdditionalAura(name, debuffType, spellId) then
+        return true
+    end
+
     local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
     if ( hasCustom ) then
         return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") )   --Would only be "mine" in the case of something like forbearance.
@@ -163,6 +167,10 @@ function KHMRaidFrames:CompactUnitFrame_UtilShouldDisplayBuff(...)
 
     if not self:FilterAuras(name, debuffType, spellId, "buffFrames") then
         return false
+    end
+
+    if self:AdditionalAura(name, debuffType, spellId) then
+        return true
     end
 
     local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")

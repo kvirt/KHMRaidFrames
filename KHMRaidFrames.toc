@@ -12,6 +12,7 @@ KHMRaidFrames.lua
 GlowFrames.lua
 GlowFramesConfig.lua
 Defaults.lua
+SetUpAuras.lua
 SetUpConfig.lua
 VirtualFrames.lua
 UnitAuras.lua

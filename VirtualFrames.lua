@@ -51,12 +51,12 @@ function KHMRaidFrames:ShowVirtual(groupType)
     self.virtual.shown = true 
     self.virtual.frame = frame
 
-    for subFrameType in self:IterateSubFrameTypes() do
-        self:SetUpVirtual(subFrameType, groupType)
-    end
+    self:SetUpVirtual("buffFrames", groupType, self.componentScale)
+    self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
+    self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
 end
 
-function KHMRaidFrames:SetUpVirtual(subFrameType, groupType)
+function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
     if self.virtual.shown == false then return end
 
     local db = self.db.profile[groupType][subFrameType]
@@ -75,8 +75,11 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType)
         end
     end 
 
-    local resize = subFrameType ~= "dispelDebuffFrames" and self.componentScale or 1
     self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, resize)
+
+    if db.showBigDebuffs and bigSized then
+        typedframes[1]:SetSize(db.bigDebuffSize * resize, db.bigDebuffSize * resize)
+    end    
 end
 
 function KHMRaidFrames:HideVirtual()
