@@ -2,9 +2,9 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
 local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
-local reloadConfirmation = "KHMRaidFrames_PROFILE_RELOAD"
-StaticPopupDialogs[reloadConfirmation] = {
-    text = "Reload needed to apply profile",
+KHMRaidFrames.reloadConfirmation = "KHMRaidFrames_PROFILE_RELOAD"
+StaticPopupDialogs[KHMRaidFrames.reloadConfirmation] = {
+    text = "Reload needed to apply settings",
     button1 = YES,
     button2 = NO,
     OnAccept = function(self)
@@ -89,15 +89,15 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
     self.db.RegisterCallback(
         self, "OnProfileChanged", 
-        function(...) StaticPopup_Show(reloadConfirmation)                    
+        function(...) StaticPopup_Show(self.reloadConfirmation)                    
     end)
     self.db.RegisterCallback(
         self, "OnProfileCopied", 
-        function(...) StaticPopup_Show(reloadConfirmation)                             
+        function(...) StaticPopup_Show(self.reloadConfirmation)                             
     end)
     self.db.RegisterCallback(
         self, "OnProfileReset", 
-        function(...) StaticPopup_Show(reloadConfirmation)               
+        function(...) StaticPopup_Show(self.reloadConfirmation)               
     end)
 
     local deferrFrame = CreateFrame("Frame")
@@ -125,6 +125,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
                 self.deffered = true
             elseif event == "RAID_TARGET_UPDATE" or event == "PLAYER_ROLES_ASSIGNED" then
                 self:UpdateRaidMark(groupType)
+                self:HightLightOptions()
             end
         end
     ) 
@@ -137,16 +138,29 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         end
     )
 
+    if self.db.profile.raid.frames.enhancedAbsorbs or self.db.profile.party.frames.enhancedAbsorbs then 
+        self:SecureHook(
+            "CompactUnitFrame_UpdateHealPrediction", 
+            function(frame)
+                if not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
+
+                self:SetUpAbsorb(frame)
+            end
+        )
+    end
+
+     self:SecureHook(
+        self.dialog,
+        "FeedGroup", 
+        function() self:HightLightOptions() end
+    )
+
     self:SecureHook(
         "CompactUnitFrame_UpdateAuras", 
         function(frame)
-            if not UnitIsPlayer(frame.displayedUnit) or not frame:GetName() then
-                return
-            elseif frame:GetName() and frame:GetName():find("^NamePlate%d") then
-                return            
-            else
-                self:UpdateAuras(frame)
-            end
+            if not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
+
+            self:UpdateAuras(frame)
         end
     )
     
@@ -183,6 +197,7 @@ function KHMRaidFrames:RefreshConfig(groupType)
 
     for frame in self:IterateCompactFrames(groupType) do
         self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
+        self:SetUpAbsorb(frame)
     end
 end    
 
@@ -219,6 +234,7 @@ function KHMRaidFrames:OnOptionShow()
 
     self.isOpen = true
     self:ShowRaidFrame()
+    self:HightLightOptions()    
 end
 
 function KHMRaidFrames:OnOptionHide()

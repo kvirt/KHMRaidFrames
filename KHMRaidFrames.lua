@@ -149,3 +149,47 @@ function KHMRaidFrames:ResizeGroups(frame, yOffset)
 
     return totalHeight, totalWidth           
 end
+
+function KHMRaidFrames:SetUpAbsorb(frame)
+    if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end   
+     
+    local absorbBar = frame.totalAbsorb
+    if not absorbBar or absorbBar:IsForbidden()then return end
+    
+    local absorbOverlay = frame.totalAbsorbOverlay
+    if not absorbOverlay or absorbOverlay:IsForbidden() then return end
+    
+    local healthBar = frame.healthBar
+    if not healthBar or healthBar:IsForbidden() then return end
+    
+    local _, maxHealth = healthBar:GetMinMaxValues()
+    if maxHealth <= 0 then return end
+    
+    local totalAbsorb = UnitGetTotalAbsorbs(frame.displayedUnit) or 0
+    if totalAbsorb > maxHealth then
+        totalAbsorb = maxHealth
+    end
+    
+    local overAbsorbGlow = frame.overAbsorbGlow
+    if overAbsorbGlow and not overAbsorbGlow:IsForbidden() then overAbsorbGlow:Hide() end
+
+    if totalAbsorb > 0 then
+        absorbOverlay:ClearAllPoints()
+
+        if absorbBar:IsShown() then
+            absorbOverlay:SetPoint("TOPRIGHT", absorbBar, "TOPRIGHT", 0, 0)
+            absorbOverlay:SetPoint("BOTTOMRIGHT", absorbBar, "BOTTOMRIGHT", 0, 0)
+        else
+            absorbOverlay:SetPoint("TOPRIGHT", healthBar, "TOPRIGHT", 0, 0)
+            absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", 0, 0)             
+        end
+
+        local totalWidth, totalHeight = healthBar:GetSize()           
+        local barSize = totalAbsorb / maxHealth * totalWidth
+        
+        absorbOverlay:SetWidth(barSize)
+        absorbOverlay:SetTexCoord(0, barSize / absorbOverlay.tileSize, 0, totalHeight / absorbOverlay.tileSize)
+        absorbBar:SetAlpha(0.5)
+        absorbOverlay:Show()
+    end  
+end

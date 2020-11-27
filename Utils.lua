@@ -221,3 +221,28 @@ function KHMRaidFrames:ExcludeAuras(name, debuffType, spellId)
         end
     end
 end
+
+function KHMRaidFrames:HightLightOptions()
+    local groupType = IsInRaid() and "raid" or "party"
+    local frame
+
+    for i=1, 5 do
+        local groupFrame = "AceGUITabGroup"..i
+
+        for j=1, 5 do
+            frame = _G[groupFrame.."Tab"..j]
+            if frame and frame.value == groupType and self.isOpen then
+                local texture = frame.currentGroup or frame:CreateTexture("currentGroup", "BACKGROUND")
+                texture:SetTexture("Interface/OptionsFrame/UI-OptionsFrame-ActiveTab")
+                frame.currentGroup = texture
+                frame.currentGroup:SetPoint("BOTTOMLEFT")
+                frame.currentGroup:SetPoint("BOTTOMRIGHT")
+                frame.currentGroup:SetVertexColor(1, 0, 0, 1)
+                -- frame.currentGroup:SetTexCoord(0, 1, -0.1, 0.5)
+                frame.currentGroup:Show()
+            elseif frame and frame.currentGroup then
+                frame.currentGroup:Hide()
+            end
+        end
+    end
+end

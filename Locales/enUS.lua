@@ -65,3 +65,5 @@ L["Show Big Debuffs"] = true
 L["Additional Auras Tracking"] = true
 L["Track Auras that are not shown by default by Blizzard"] = true
 L["Big Debuffs"] = true
+L["Enhanced Absorbs"] = true
+L["UI will be reloaded to apply settings"] = true

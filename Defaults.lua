@@ -20,6 +20,7 @@ function KHMRaidFrames:Defaults()
                 hideGroupTitles = false,
                 texture = "Blizzard Raid Bar",
                 clickThrough = false,
+                enhancedAbsorbs = false,
                 tracking = {},
                 trackingStr = "",                                
             },        

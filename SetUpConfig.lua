@@ -27,7 +27,7 @@ function KHMRaidFrames:SetupOptions()
         descStyle = "inline",
         type = "group",
         childGroups = "tab",  
-        order = 1,    
+        order = 1,            
     }
 
     options.args = {}
@@ -359,6 +359,24 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
                 return db.clickThrough 
             end
         },
+        [frameType.."Enhanced Absorbs"] = {
+            name = L["Enhanced Absorbs"],
+            desc = "",
+            descStyle = "inline",
+            width = "double",
+            type = "toggle",
+            order = 5,
+            confirm = true,
+            confirmText = L["UI will be reloaded to apply settings"],      
+            set = function(info,val)
+                db.enhancedAbsorbs = val
+                self:SafeRefresh(groupType)
+                ReloadUI()
+            end,
+            get = function(info) 
+                return db.enhancedAbsorbs 
+            end
+        },        
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
             desc = L["Track Auras that are not shown by default by Blizzard"],

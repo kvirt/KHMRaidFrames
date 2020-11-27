@@ -49,17 +49,19 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     local size
 
     if IsInRaid() then
-        size = self.db.profile.raid.debuffFrames.size
+        size = self.db.profile.raid.debuffFrames
     else
-        size = self.db.profile.party.debuffFrames.size
+        size = self.db.profile.party.debuffFrames
     end
 
     if isBossAura then
-        size = size + BOSS_DEBUFF_SIZE_INCREASE
+        size = size.bigDebuffSize
+    else
+        size = size.size
     end
 
     size = size * self.componentScale
-    
+
     debuffFrame:SetSize(size, size)
 
     debuffFrame:Show()
@@ -150,9 +152,9 @@ function KHMRaidFrames:CompactUnitFrame_Util_ShouldDisplayDebuff(...)
         return false
     end
 
-    if self:AdditionalAura(name, debuffType, spellId) then
-        return true
-    end
+    -- if self:AdditionalAura(name, debuffType, spellId) then
+    --     return true
+    -- end
 
     local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
     if ( hasCustom ) then
@@ -169,9 +171,9 @@ function KHMRaidFrames:CompactUnitFrame_UtilShouldDisplayBuff(...)
         return false
     end
 
-    if self:AdditionalAura(name, debuffType, spellId) then
-        return true
-    end
+    -- if self:AdditionalAura(name, debuffType, spellId) then
+    --     return true
+    -- end
 
     local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
 
@@ -259,7 +261,7 @@ function KHMRaidFrames:UpdateAuras(frame)
 
     if not doneWithDebuffs then
         AuraUtil.ForEachAura(frame.displayedUnit, "HARMFUL", batchCount, function(...)
-            if db.frames.showBigDebuffs and CompactUnitFrame_Util_IsBossAura(...) then
+            if db.debuffFrames.showBigDebuffs and CompactUnitFrame_Util_IsBossAura(...) then
                 if not bossDebuffs then
                     bossDebuffs = {}
                 end
@@ -290,7 +292,7 @@ function KHMRaidFrames:UpdateAuras(frame)
         index = 1
         batchCount = math.max(maxBuffs, maxDebuffs)
         AuraUtil.ForEachAura(frame.displayedUnit, "HELPFUL", batchCount, function(...)
-            if db.frames.showBigDebuffs and CompactUnitFrame_Util_IsBossAura(...) then
+            if db.debuffFrames.showBigDebuffs and CompactUnitFrame_Util_IsBossAura(...) then
                 -- Boss Auras are considered Debuffs for our purposes.
                 if not doneWithDebuffs then
                     if not bossBuffs then
