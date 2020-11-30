@@ -19,7 +19,7 @@ StaticPopupDialogs[KHMRaidFrames.reloadConfirmation] = {
 
 
 function KHMRaidFrames:OnInitialize()
-     self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")
+     self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")  
 end
 
 function KHMRaidFrames:Setup()
@@ -33,6 +33,7 @@ function KHMRaidFrames:Setup()
     self.virtual = {
         shown = false,
         frames = {},
+        groupType = "raid",
     } 
     self.aurasCache = {}
     self.processedFrames = {}
@@ -125,7 +126,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
                 self.deffered = true
             elseif event == "RAID_TARGET_UPDATE" or event == "PLAYER_ROLES_ASSIGNED" then
                 self:UpdateRaidMark(groupType)
-                self:HightLightOptions()
+                self:CustomizeOptions()
             end
         end
     ) 
@@ -152,7 +153,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
      self:SecureHook(
         self.dialog,
         "FeedGroup", 
-        function() self:HightLightOptions() end
+        function() self:CustomizeOptions() end
     )
 
     self:SecureHook(
@@ -199,6 +200,8 @@ function KHMRaidFrames:RefreshConfig(groupType)
         self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
         self:SetUpAbsorb(frame)
     end
+
+    self:SetUpSoloFrame()
 end    
 
 function KHMRaidFrames:GetRaidProfileSettings(profile)
@@ -234,11 +237,11 @@ function KHMRaidFrames:OnOptionShow()
 
     self.isOpen = true
     self:ShowRaidFrame()
-    self:HightLightOptions()    
 end
 
 function KHMRaidFrames:OnOptionHide()
     self.isOpen = false
+
     self:HideRaidFrame()
 end
 
@@ -250,7 +253,7 @@ function KHMRaidFrames:ShowRaidFrame()
 end
 
 function KHMRaidFrames:HideRaidFrame()
-    if not InCombatLockdown() and not IsInGroup() and self.useCompactPartyFrames then
+    if not self.db.profile.party.frames.showPartySolo and not InCombatLockdown() and not IsInGroup() and self.useCompactPartyFrames then
         CompactRaidFrameContainer:Hide()
         CompactRaidFrameManager:Hide()
     end

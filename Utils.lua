@@ -222,27 +222,30 @@ function KHMRaidFrames:ExcludeAuras(name, debuffType, spellId)
     end
 end
 
-function KHMRaidFrames:HightLightOptions()
-    local groupType = IsInRaid() and "raid" or "party"
-    local frame
+function KHMRaidFrames:CustomizeOptions()
+    local virtualFramesButton = self.dialog.general.obj.children and self.dialog.general.obj.children[1]
+    
+    if virtualFramesButton then
+        virtualFramesButton:ClearAllPoints()
+        virtualFramesButton:SetPoint("TOPRIGHT", self.dialog.general.obj.label:GetParent(), "TOPRIGHT", -10, -15)
+    end
 
-    for i=1, 5 do
-        local groupFrame = "AceGUITabGroup"..i
+    local groupTypelabel = self.dialog.general.obj.children 
+    and self.dialog.general.obj.children[2]
+    and self.dialog.general.obj.children[2].children
+    and self.dialog.general.obj.children[2].children[1]
+    and self.dialog.general.obj.children[2].children[1].label
 
-        for j=1, 5 do
-            frame = _G[groupFrame.."Tab"..j]
-            if frame and frame.value == groupType and self.isOpen then
-                local texture = frame.currentGroup or frame:CreateTexture("currentGroup", "BACKGROUND")
-                texture:SetTexture("Interface/OptionsFrame/UI-OptionsFrame-ActiveTab")
-                frame.currentGroup = texture
-                frame.currentGroup:SetPoint("BOTTOMLEFT")
-                frame.currentGroup:SetPoint("BOTTOMRIGHT")
-                frame.currentGroup:SetVertexColor(1, 0, 0, 1)
-                -- frame.currentGroup:SetTexCoord(0, 1, -0.1, 0.5)
-                frame.currentGroup:Show()
-            elseif frame and frame.currentGroup then
-                frame.currentGroup:Hide()
-            end
-        end
+    if groupTypelabel then
+        local label = L["You are in |cFFC80000<text>|r"]:gsub("<text>", IsInRaid() and L["Raid"] or L["Party"])
+        groupTypelabel:SetText(label)
+    end
+end
+
+function KHMRaidFrames.Print(obj, name)
+    if ViragDevTool_AddData then
+        ViragDevTool_AddData(obj, name) 
+    else 
+        print(obj)
     end
 end

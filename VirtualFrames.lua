@@ -16,6 +16,12 @@ function KHMRaidFrames:GetVirtualFrames()
 
             frame.texture = texture
 
+            local text = frame:CreateFontString(f, "OVERLAY", "GameTooltipText")
+            text:SetPoint("CENTER", 0, 0)
+            text:SetText(i)
+
+            frame.text = text
+
             if frameType == "buffFrames" then
                 texture:SetTexture("Interface\\Icons\\ability_rogue_sprint")
             elseif frameType == "debuffFrames" then
@@ -29,7 +35,7 @@ function KHMRaidFrames:GetVirtualFrames()
     end
 end
 
-function KHMRaidFrames:ShowVirtual(groupType)
+function KHMRaidFrames:ShowVirtual()
     local frame 
 
     for _frame in self:IterateCompactFrames("raid") do
@@ -51,9 +57,9 @@ function KHMRaidFrames:ShowVirtual(groupType)
     self.virtual.shown = true 
     self.virtual.frame = frame
 
-    self:SetUpVirtual("buffFrames", groupType, self.componentScale)
-    self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
-    self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
+    self:SetUpVirtual("buffFrames", self.virtual.groupType, self.componentScale)
+    self:SetUpVirtual("debuffFrames", self.virtual.groupType, self.componentScale, true)
+    self:SetUpVirtual("dispelDebuffFrames", self.virtual.groupType, 1)
 end
 
 function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
@@ -78,7 +84,17 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
     self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, resize)
 
     if db.showBigDebuffs and bigSized then
-        typedframes[1]:SetSize(db.bigDebuffSize * resize, db.bigDebuffSize * resize)
+        typedframes[1].isBossAura = true
+        typedframes[2].isBossAura = true
+
+        local size = db.bigDebuffSize * resize
+
+        typedframes[1]:SetSize(size, size)
+        typedframes[2]:SetSize(size, size)
+
+        if db.smartAnchoring then      
+            self:SmartAnchoring(self.virtual.frame, typedframes, db)
+        end
     end    
 end
 

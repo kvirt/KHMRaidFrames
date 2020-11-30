@@ -12,11 +12,18 @@ KHMRaidFrames.mirrorPositions = {
     ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
 }
 
+KHMRaidFrames.smartAnchoring = {
+    ["BOTTOM"] = {"LEFT", "RIGHT"},
+    ["TOP"] = {"LEFT", "RIGHT"},
+    ["RIGHT"] = {"BOTTOM", "TOP"},
+    ["LEFT"] = {"BOTTOM", "TOP"},          
+}
+
 KHMRaidFrames.rowsPositions = {
     ["LEFT"] = {"TOPRIGHT", "TOPLEFT"},
     ["BOTTOM"] = {"TOPRIGHT", "BOTTOMRIGHT"},
     ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
-    ["TOP"] = {"BOTTOMRIGHT", "TOPRIGHT"},         
+    ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
 }
 
 KHMRaidFrames.rowsGrows = {
@@ -178,4 +185,89 @@ function KHMRaidFrames:AdditionalAura(name, debuffType, spellId)
     end
 
     return false
+end
+
+function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
+    local frameNum = 1
+    local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
+
+    local size = db.size * self.componentScale
+    local bigSize = size * 2
+    local rowCounter = 1
+    local rowStart = 1
+
+    while frameNum <= #typedframes do
+        local rowLen = db.numInRow
+        local index = 1
+        local bigs = 0
+
+        while true do
+            if frameNum > #typedframes then break end
+
+            typedframe = typedframes[frameNum]
+            typedframe:ClearAllPoints()
+
+            if frameNum == 1 then
+                anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
+            elseif index == 1 then
+                anchor1, relativeFrame, anchor2 = self.rowsPositions[db.rowsGrowDirection][1], typedframes[rowStart], self.rowsPositions[db.rowsGrowDirection][2]
+                rowStart = frameNum
+            elseif index % rowLen == 1 then
+                if bigs > 0 and rowLen > bigs then
+                    for j=1, rowLen - (bigs * 2) do
+                        if frameNum > #typedframes then break end
+
+                        typedframe = typedframes[frameNum]
+                        typedframe:ClearAllPoints()
+
+                        anchor1, relativeFrame, anchor2 = self.smartAnchoring[db.growDirection][1], typedframes[frameNum - (rowLen - (bigs * 2))], self.smartAnchoring[db.growDirection][2]
+
+                        typedframe:SetPoint(
+                            anchor1, 
+                            relativeFrame, 
+                            anchor2, 
+                            xOffset, 
+                            yOffset
+                        )
+
+                        typedframe:SetSize(typedframe.isBossAura and bigSize or size, typedframe.isBossAura and bigSize or size)
+
+                        frameNum = frameNum + 1                    
+                    end
+                end               
+                break              
+            else
+                anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]           
+            end
+
+            if frameNum == 1 then
+                xOffset, yOffset = self:Offsets(anchor1)
+                xOffset = xOffset + db.xOffset
+                yOffset = yOffset + db.yOffset
+            else
+                xOffset, yOffset = 0, 0
+            end
+
+            typedframe:SetPoint(
+                anchor1, 
+                relativeFrame, 
+                anchor2, 
+                xOffset, 
+                yOffset
+            )
+
+            typedframe:SetSize(typedframe.isBossAura and bigSize or size, typedframe.isBossAura and bigSize or size)
+
+            frameNum = frameNum + 1
+
+            if typedframe.isBossAura then 
+                index = index + 2
+                bigs = bigs + 1
+
+                if index > rowLen then break end
+            else 
+                index = index + 1 
+            end            
+        end
+    end 
 end

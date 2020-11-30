@@ -151,6 +151,8 @@ function KHMRaidFrames:ResizeGroups(frame, yOffset)
 end
 
 function KHMRaidFrames:SetUpAbsorb(frame)
+    if not frame then return end
+
     if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end   
      
     local absorbBar = frame.totalAbsorb
@@ -193,3 +195,13 @@ function KHMRaidFrames:SetUpAbsorb(frame)
         absorbOverlay:Show()
     end  
 end
+
+function KHMRaidFrames:SetUpSoloFrame()
+    if self.db.profile.party.frames.showPartySolo then
+        if not self.ticker or self.ticker:IsCancelled() then
+            self.ticker = C_Timer.NewTicker(1, function() self:ShowRaidFrame() end)
+        end
+    elseif not self.db.profile.party.frames.showPartySolo and self.ticker then
+        self.ticker:Cancel()
+    end
+end    

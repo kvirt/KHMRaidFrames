@@ -45,6 +45,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     debuffFrame.border:SetVertexColor(color.r, color.g, color.b)
 
     debuffFrame.isBossBuff = isBossBuff
+    debuffFrame.isBossAura = isBossAura
 
     local size
 
@@ -152,9 +153,9 @@ function KHMRaidFrames:CompactUnitFrame_Util_ShouldDisplayDebuff(...)
         return false
     end
 
-    -- if self:AdditionalAura(name, debuffType, spellId) then
-    --     return true
-    -- end
+    if self:AdditionalAura(name, debuffType, spellId) then
+        return true
+    end
 
     local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
     if ( hasCustom ) then
@@ -171,9 +172,9 @@ function KHMRaidFrames:CompactUnitFrame_UtilShouldDisplayBuff(...)
         return false
     end
 
-    -- if self:AdditionalAura(name, debuffType, spellId) then
-    --     return true
-    -- end
+    if self:AdditionalAura(name, debuffType, spellId) then
+        return true
+    end
 
     local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
 
@@ -217,10 +218,12 @@ function KHMRaidFrames:SetDebuffsHelper(debuffFrames, frameNum, maxDebuffs, filt
                 self:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, "HARMFUL", isBossAura, isBossBuff, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, nameplateShowPersonal, spellId)
                 frameNum = frameNum + 1
 
-                if isBossAura then
-                    --Boss auras are about twice as big as normal debuffs, so we may need to display fewer buffs
-                    local bossDebuffScale = (debuffFrame.baseSize + BOSS_DEBUFF_SIZE_INCREASE)/debuffFrame.baseSize
-                    maxDebuffs = maxDebuffs - (bossDebuffScale - 1)
+                if not self.db.profile[IsInRaid() and "raid" or "party"].debuffFrames.smartAnchoring then
+                    if isBossAura then
+                        --Boss auras are about twice as big as normal debuffs, so we may need to display fewer buffs
+                        local bossDebuffScale = (debuffFrame.baseSize + BOSS_DEBUFF_SIZE_INCREASE)/debuffFrame.baseSize
+                        maxDebuffs = maxDebuffs - (bossDebuffScale - 1)
+                    end
                 end
             end
         end
@@ -395,6 +398,11 @@ function KHMRaidFrames:UpdateAuras(frame)
     self:CompactUnitFrame_HideAllDebuffs(frame, numUsedDebuffs + 1, self.db.profile.glows.auraGlow)
     CompactUnitFrame_HideAllDispelDebuffs(frame, numUsedDispelDebuffs + 1)
 
+    db = self:GroupTypeDB().debuffFrames
+
+    if db.showBigDebuffs and db.smartAnchoring then
+        self:SmartAnchoring(frame, frame.debuffFrames, db)
+    end
 
     db = self.db.profile.glows.frameGlow
 

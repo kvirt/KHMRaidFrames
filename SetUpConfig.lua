@@ -119,6 +119,22 @@ function KHMRaidFrames:SetupOptions()
         },                 
     }
 
+    options.args.virtualFrames = {
+        name = L["Show\\Hide Test Frames"],
+        desc = "",
+        descStyle = "inline",
+        width = "double",
+        type = "execute",
+        order = 4,
+        func = function(info,val)
+            if self.virtual.shown == true then            
+                self:HideVirtual()
+            else                
+                self:ShowVirtual()      
+            end
+        end,
+    }
+
     return options
 end
 
@@ -127,22 +143,17 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
 
     self.groupType = groupType
     local options = {} 
-    
-    options.virtualFrames = {
-        name = L["Show\\Hide Test Frames"],
-        desc = "",
-        descStyle = "inline",
-        width = "full",
-        type = "execute",
-        order = 6,
-        func = function(info,val)
-            if self.virtual.shown == true then            
-                self:HideVirtual()
-            else                
-                self:ShowVirtual(groupType)      
-            end
+
+    options.currentGroupType = {
+        name = function()
+            self.virtual.groupType = groupType
+            self:SafeRefresh(groupType)        
+            return L["You are in |cFFC80000<text>|r"]
         end,
+        type = "header",
+        order = 1,     
     }
+
     options.frames = {
         type = "group",
         order = 2,
@@ -317,7 +328,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
                 db.hideGroupTitles = val
                 self:SafeRefresh(groupType)
             end,
-            get = function(info) 
+            get = function(info)
                 return db.hideGroupTitles 
             end
         },                   
@@ -348,7 +359,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             name = L["Click Through Auras"],
             desc = "",
             descStyle = "inline",
-            width = "double",
+            width = "normal",
             type = "toggle",
             order = 4,        
             set = function(info,val)
@@ -363,7 +374,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             name = L["Enhanced Absorbs"],
             desc = "",
             descStyle = "inline",
-            width = "double",
+            width = "normal",
             type = "toggle",
             order = 5,
             confirm = true,
@@ -376,7 +387,25 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             get = function(info) 
                 return db.enhancedAbsorbs 
             end
-        },        
+        },
+        [frameType.."Show Party When Solo"] = {
+            name = L["Show Party When Solo"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "toggle",
+            order = 6,
+            hidden = function(info)
+                return groupType == "raid"
+            end,                      
+            set = function(info,val)
+                db.showPartySolo = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) 
+                return db.showPartySolo 
+            end
+        },                        
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
             desc = L["Track Auras that are not shown by default by Blizzard"],
@@ -384,7 +413,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "full",
             type = "input",
             multiline = 10, 
-            order = 6,                   
+            order = 7,                   
             set = function(info,val)
                 db.tracking = self:SanitizeStrings(val)
                 db.trackingStr = val
@@ -394,11 +423,11 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             get = function(info)
                 return db.trackingStr
             end              
-        },                           
+        },                                 
         [frameType.."Skip"] = {
             type = "header",
             name = "",
-            order = 7,
+            order = 8,
         },                         
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
@@ -407,7 +436,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "full",
             type = "execute",
             confirm = true,
-            order = 8,
+            order = 9,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,

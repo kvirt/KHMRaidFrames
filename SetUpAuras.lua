@@ -304,18 +304,36 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
                 return db.showBigDebuffs 
             end
         },
+        ["Smart Anchoring"] = {
+            name = L["Smart Anchoring"],
+            desc = "",
+            descStyle = "inline",
+            width = "normal",
+            type = "toggle",
+            order = 6,
+            disabled = function(info)
+                return not db.showBigDebuffs
+            end,                    
+            set = function(info,val)
+                db.smartAnchoring = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) 
+                return db.smartAnchoring 
+            end
+        },        
         ["bigDebuffSize"] = {
             name = L["Size"],
             desc = "",
             descStyle = "inline",
-            width = "double",
+            width = "normal",
             type = "range",
             min = 1,
             max = 100,
             step = 1,
-            order = 6,
+            order = 7,
             disabled = function(info)
-                return not db.showBigDebuffs
+                return not db.showBigDebuffs or db.smartAnchoring
             end,                         
             set = function(info,val)
                 db.bigDebuffSize = val
@@ -326,7 +344,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
-            order = 7,
+            order = 8,
         },                
         ["exclude"] = {
             name = L["Exclude"],
@@ -335,7 +353,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             width = "full",
             type = "input",
             multiline = 5, 
-            order = 8,                   
+            order = 9,                   
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -352,7 +370,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             descStyle = "inline",
             width = "full",
             type = "execute",
-            order = 9,
+            order = 10,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "debuffFrames")

@@ -21,6 +21,7 @@ function KHMRaidFrames:Defaults()
                 texture = "Blizzard Raid Bar",
                 clickThrough = false,
                 enhancedAbsorbs = false,
+                showPartySolo = false,
                 tracking = {},
                 trackingStr = "",                                
             },        
@@ -159,6 +160,8 @@ function KHMRaidFrames:CUFDefaults(groupType)
             end
         end
     end
+
+    self:SetUpSoloFrame()
 end
 
 function KHMRaidFrames:DefaultGroupSetUp(frame, groupType, isInCombatLockDown)

@@ -67,3 +67,6 @@ L["Track Auras that are not shown by default by Blizzard"] = true
 L["Big Debuffs"] = true
 L["Enhanced Absorbs"] = true
 L["UI will be reloaded to apply settings"] = true
+L["Show Party When Solo"] = true
+L["Smart Anchoring"] = true
+L["You are in |cFFC80000<text>|r"] = true

@@ -67,3 +67,6 @@ L["Track Auras that are not shown by default by Blizzard"] = "Показыват
 L["Big Debuffs"] = "Большие дебаффы"
 L["Enhanced Absorbs"] = "Расширенные Поглощения"
 L["UI will be reloaded to apply settings"] = "Интерфейс будет перезагружен"
+L["Show Party When Solo"] = "Показывать группу в соло"
+L["Smart Anchoring"] = "Умное расположение"
+L["You are in |cFFC80000<text>|r"] = "Вы сейчас в |cFFC80000<text>|r"
