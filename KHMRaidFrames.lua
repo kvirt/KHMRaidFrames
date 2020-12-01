@@ -159,14 +159,16 @@ function KHMRaidFrames:SetUpAbsorb(frame)
     if not absorbBar or absorbBar:IsForbidden()then return end
     
     local absorbOverlay = frame.totalAbsorbOverlay
-    if not absorbOverlay or absorbOverlay:IsForbidden() then return end
+    if not absorbOverlay or absorbOverlay:IsForbidden() or not absorbOverlay.tileSize then return end
     
     local healthBar = frame.healthBar
     if not healthBar or healthBar:IsForbidden() then return end
     
     local _, maxHealth = healthBar:GetMinMaxValues()
     if maxHealth <= 0 then return end
-    
+
+    if not frame.displayedUnit then return end
+
     local totalAbsorb = UnitGetTotalAbsorbs(frame.displayedUnit) or 0
     if totalAbsorb > maxHealth then
         totalAbsorb = maxHealth
@@ -188,7 +190,7 @@ function KHMRaidFrames:SetUpAbsorb(frame)
 
         local totalWidth, totalHeight = healthBar:GetSize()           
         local barSize = totalAbsorb / maxHealth * totalWidth
-        
+
         absorbOverlay:SetWidth(barSize)
         absorbOverlay:SetTexCoord(0, barSize / absorbOverlay.tileSize, 0, totalHeight / absorbOverlay.tileSize)
         absorbBar:SetAlpha(0.5)
