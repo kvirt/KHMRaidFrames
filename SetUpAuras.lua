@@ -154,14 +154,25 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             get = function(info)
                 return db.excludeStr
             end              
-        },                      
+        },
+        ["Copy"] = {
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+            width = "normal",
+            type = "execute",
+            order = 6,
+            confirm = true,
+            func = function(info,val)
+                self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].buffFrames)
+            end,
+        },                                
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "double",
             type = "execute",
-            order = 6,
+            order = 7,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "buffFrames")
@@ -363,14 +374,25 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             get = function(info)
                 return db.excludeStr
             end              
-        },                      
+        },
+        ["Copy"] = {
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+            width = "normal",
+            type = "execute",
+            order = 10,
+            confirm = true,
+            func = function(info,val)
+                self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].debuffFrames)
+            end,
+        },                               
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "double",
             type = "execute",
-            order = 10,
+            order = 11,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "debuffFrames")
@@ -515,14 +537,25 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             get = function(info)
                 return db.excludeStr
             end              
-        },                      
+        },
+        ["Copy"] = {
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+            width = "normal",
+            type = "execute",
+            order = 6,
+            confirm = true,
+            func = function(info,val)
+                self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].dispelDebuffFrames)
+            end,
+        },                               
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "double",
             type = "execute",
-            order = 6,
+            order = 7,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "dispelDebuffFrames")

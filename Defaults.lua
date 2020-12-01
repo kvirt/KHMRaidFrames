@@ -49,7 +49,8 @@ function KHMRaidFrames:Defaults()
                 exclude = {},
                 excludeStr = "",
                 bigDebuffSize = 11 + 9,
-                showBigDebuffs = true,                                            
+                showBigDebuffs = true,
+                smartAnchoring = true,                                            
             },
             buffFrames = {
                 num = 3,
@@ -69,7 +70,40 @@ function KHMRaidFrames:Defaults()
                 xOffset = 0,
                 yOffset = 0,
                 anchorPoint = "TOP",
-            },      
+            },
+            others = {
+                name = {
+                    font = "",
+                    size = "",
+                    anchorPoint = "",
+                    xOffset = 0,
+                    yOffset = 0,                    
+                },
+                roleIcon = {
+                    anchorPoint = "",
+                    size = "",
+                    xOffset = 0,
+                    yOffset = 0,                    
+                },
+                readyCheck = {
+                    anchorPoint = "",
+                    size = "",
+                    xOffset = 0,
+                    yOffset = 0,                    
+                },
+                summonIcon = {
+                    anchorPoint = "",
+                    size = "",
+                    xOffset = 0,
+                    yOffset = 0,                    
+                },
+                phaseIcon = {
+                    anchorPoint = "",
+                    size = "",
+                    xOffset = 0,
+                    yOffset = 0,                    
+                },                                                
+            },                    
     }
     defaults_settings.profile.party = commons
     defaults_settings.profile.raid = commons
@@ -137,6 +171,21 @@ function KHMRaidFrames:RestoreDefaults(groupType, frameType)
     self:SafeRefresh(groupType)
 end
 
+function KHMRaidFrames:CopySettings(dbFrom, dbTo)
+    if InCombatLockdown() then
+        print("Can not refresh settings while in combat")      
+        return
+    end
+
+    for k, v in pairs(dbFrom) do
+        if dbTo[k] ~= nil then 
+            dbTo[k] = v
+        end
+    end
+
+    self:SafeRefresh(groupType)
+end
+
 function KHMRaidFrames:CUFDefaults(groupType)
     local deferred
     local isInCombatLockDown = InCombatLockdown()
@@ -187,6 +236,11 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 
     self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, self.componentScale)
     self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, self.componentScale)
+
+    if db.showBigDebuffs and db.smartAnchoring then
+        self:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
+    end
+
     self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, 1)
 
     self:SetUpRaidIcon(frame, groupType)

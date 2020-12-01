@@ -100,7 +100,7 @@ function KHMRaidFrames:SetupOptions()
                         type = "header",
                         name = "",
                         order = 2,
-                    },                                       
+                    },                                                       
                     ["glow block list Reset"] = {
                         name = L["Reset to Default"],
                         desc = "",
@@ -141,13 +141,16 @@ end
 function KHMRaidFrames:SetupOptionsByType(groupType)
     local db = self.db.profile[groupType]
 
-    self.groupType = groupType
     local options = {} 
 
     options.currentGroupType = {
         name = function()
             self.virtual.groupType = groupType
-            self:SafeRefresh(groupType)        
+
+            self:SetUpVirtual("buffFrames", groupType, self.componentScale)
+            self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
+            self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
+            
             return L["You are in |cFFC80000<text>|r"]
         end,
         type = "header",
@@ -194,6 +197,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         childGroups = "tab",  
         args = self:SetupRaidIconOptions("raidIcon", db, groupType),  
     }
+
     return options
 end        
 
@@ -294,15 +298,26 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
             type = "header",
             name = "",
             order = 6,
-        },                                       
+        },
+        ["Copy"] = {
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+            width = "normal",
+            type = "execute",
+            order = 7,
+            confirm = true,
+            func = function(info,val)
+                self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)][frameType])
+            end,
+        },                                               
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "double",
             type = "execute",
             confirm = true,
-            order = 7,
+            order = 8,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,
@@ -428,15 +443,26 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             type = "header",
             name = "",
             order = 8,
-        },                         
+        },
+        ["Copy"] = {
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+            width = "normal",
+            type = "execute",
+            order = 9,
+            confirm = true,
+            func = function(info,val)
+                self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)][frameType])
+            end,
+        },                                  
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
             descStyle = "inline",
-            width = "full",
+            width = "double",
             type = "execute",
             confirm = true,
-            order = 9,
+            order = 10,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,

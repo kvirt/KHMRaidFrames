@@ -16,7 +16,7 @@ function KHMRaidFrames:GetVirtualFrames()
 
             frame.texture = texture
 
-            local text = frame:CreateFontString(f, "OVERLAY", "GameTooltipText")
+            local text = frame:CreateFontString(frame, "OVERLAY", "GameTooltipText")
             text:SetPoint("CENTER", 0, 0)
             text:SetText(i)
 

@@ -70,3 +70,4 @@ L["UI will be reloaded to apply settings"] = true
 L["Show Party When Solo"] = true
 L["Smart Anchoring"] = true
 L["You are in |cFFC80000<text>|r"] = true
+L["Copy settings to |cFFffd100<text>|r"] = true

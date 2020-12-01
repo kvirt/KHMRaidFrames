@@ -70,3 +70,4 @@ L["UI will be reloaded to apply settings"] = "Интерфейс будет пе
 L["Show Party When Solo"] = "Показывать группу в соло"
 L["Smart Anchoring"] = "Умное расположение"
 L["You are in |cFFC80000<text>|r"] = "Вы сейчас в |cFFC80000<text>|r"
+L["Copy settings to |cFFffd100<text>|r"] = "Копировать настройки в |cFFffd100<text>|r"

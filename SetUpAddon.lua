@@ -54,7 +54,7 @@ function KHMRaidFrames:Setup()
 
     local defaults_settings = self:Defaults()
     self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)
-
+    
     local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
     local LibDualSpec = LibStub("LibDualSpec-1.0")
@@ -186,6 +186,8 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 end
 
 function KHMRaidFrames:RefreshConfig(groupType)
+    if groupType ~= (IsInRaid() and "raid" or "party") then return end
+
     local isInCombatLockDown = InCombatLockdown()
 
     self:SetUpVirtual("buffFrames", groupType, self.componentScale)
@@ -237,6 +239,7 @@ function KHMRaidFrames:OnOptionShow()
 
     self.isOpen = true
     self:ShowRaidFrame()
+    self:ConfigOptionsOpen()
 end
 
 function KHMRaidFrames:OnOptionHide()

@@ -56,9 +56,9 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             xOffset, 
             yOffset
         )
-
+        
         typedframe:SetSize(db.size * resize, db.size * resize)
-
+        
         if self.db.profile[groupType].frames.clickThrough then
             typedframe:EnableMouse(false)
         else

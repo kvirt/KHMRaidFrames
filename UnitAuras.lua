@@ -19,6 +19,25 @@ KHMRaidFrames.smartAnchoring = {
     ["LEFT"] = {"BOTTOM", "TOP"},          
 }
 
+KHMRaidFrames.smartAnchoringRowsPositions = {
+    ["LEFT"] = {
+        ["BOTTOM"] = {"TOPRIGHT", "TOPLEFT"},
+        ["TOP"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
+    },
+    ["BOTTOM"] = {
+        ["LEFT"] = {"TOPRIGHT", "BOTTOMRIGHT"},
+        ["RIGHT"] = {"TOPLEFT", "BOTTOMLEFT"},    
+    },
+    ["RIGHT"] = {
+        ["BOTTOM"] = {"TOPLEFT", "TOPRIGHT"},
+        ["TOP"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
+    },
+    ["TOP"] ={
+        ["LEFT"] = {"BOTTOMRIGHT", "TOPRIGHT"},
+        ["RIGHT"] = {"BOTTOMLEFT", "TOPLEFT"},    
+    },         
+}
+
 KHMRaidFrames.rowsPositions = {
     ["LEFT"] = {"TOPRIGHT", "TOPLEFT"},
     ["BOTTOM"] = {"TOPRIGHT", "BOTTOMRIGHT"},
@@ -210,7 +229,7 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
             if frameNum == 1 then
                 anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
             elseif index == 1 then
-                anchor1, relativeFrame, anchor2 = self.rowsPositions[db.rowsGrowDirection][1], typedframes[rowStart], self.rowsPositions[db.rowsGrowDirection][2]
+                anchor1, relativeFrame, anchor2 = self.smartAnchoringRowsPositions[db.rowsGrowDirection][db.growDirection][1], typedframes[rowStart], self.smartAnchoringRowsPositions[db.rowsGrowDirection][db.growDirection][2]
                 rowStart = frameNum
             elseif index % rowLen == 1 then
                 if bigs > 0 and rowLen > bigs then

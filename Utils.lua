@@ -30,6 +30,10 @@ function KHMRaidFrames:SafeRefresh(groupType)
     end
 end
 
+function KHMRaidFrames.ReverseGroupType(groupType)
+    return groupType == "party" and "raid" or "party"
+end
+
 function KHMRaidFrames:IterateCompactFrames(isInRaid)
     local index = 0
     local groupIndex = 0
@@ -240,6 +244,13 @@ function KHMRaidFrames:CustomizeOptions()
         local label = L["You are in |cFFC80000<text>|r"]:gsub("<text>", IsInRaid() and L["Raid"] or L["Party"])
         groupTypelabel:SetText(label)
     end
+end
+
+function KHMRaidFrames:ConfigOptionsOpen()
+    local tabsP = self.dialog.general.obj.children 
+    and self.dialog.general.obj.children[2]
+    and self.dialog.general.obj.children[2]
+    tabsP:SelectTab(IsInRaid() and "raid" or "party")
 end
 
 function KHMRaidFrames.Print(obj, name)
