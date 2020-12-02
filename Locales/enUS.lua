@@ -92,4 +92,6 @@ L["Flags"] = true
 L["Name Options"] = true
 L["Font"] = true
 L["Flags"] = true
-
+L["OUTLINE"] = true
+L["THICKOUTLINE"] = true
+L["MONOCHROME"] = true

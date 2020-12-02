@@ -230,7 +230,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
-                self.Print(self.sortedFonts, "fonts")
                     for i, font in ipairs(self.sortedFonts) do
                         if db.name.font == font then return i end
                     end
