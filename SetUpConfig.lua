@@ -24,7 +24,6 @@ local grow_positions = {
 function KHMRaidFrames:SetupOptions()
     local options = {
         name = L["KHMRaidFrames"],
-        descStyle = "inline",
         type = "group",
         childGroups = "tab",  
         order = 1,            
@@ -36,7 +35,7 @@ function KHMRaidFrames:SetupOptions()
         type = "group",
         order = 1,
         name = L["Raid"],
-        desc = "",
+        desc = L["Raid settings"],
         childGroups = "tab",  
         args = self:SetupOptionsByType("raid"),
     }
@@ -44,7 +43,7 @@ function KHMRaidFrames:SetupOptions()
         type = "group",
         order = 2,
         name = L["Party"],
-        desc = "",
+        desc = L["Party settings"],
         childGroups = "tab",          
         args = self:SetupOptionsByType("party"),                  
     }
@@ -52,14 +51,14 @@ function KHMRaidFrames:SetupOptions()
         type = "group",
         order = 3,
         name = L["Glows"],
-        desc = "",
+        desc = L["Glows settings"],
         childGroups = "tab",          
         args = {
             ["aura glow"] = {
                 type = "group",
                 order = 1,
                 name = L["Aura Glow"],
-                desc = "",
+                desc = L["Glow effect options for your Buffs and Debuffs"],
                 childGroups = "tab",  
                 args = self:GlowSubTypes("auraGlow"),     
             },
@@ -67,7 +66,7 @@ function KHMRaidFrames:SetupOptions()
                 type = "group",
                 order = 2,
                 name = L["Frame Glow"],
-                desc = "",
+                desc = L["Glow effect options for your Frames"],
                 childGroups = "tab",  
                 args = self:GlowSubTypes("frameGlow"),        
             },
@@ -75,7 +74,7 @@ function KHMRaidFrames:SetupOptions()
                 type = "group",
                 order = 3,
                 name = L["Block List"],
-                desc = "",
+                desc = L["Exclude auras from Glows"],
                 childGroups = "tab",  
                 args = {
                     ["glowBlockList"] = {
@@ -103,8 +102,7 @@ function KHMRaidFrames:SetupOptions()
                     },                                                       
                     ["glow block list Reset"] = {
                         name = L["Reset to Default"],
-                        desc = "",
-                        descStyle = "inline",
+                        desc = "",                       
                         width = "full",
                         type = "execute",
                         confirm = true,
@@ -122,7 +120,6 @@ function KHMRaidFrames:SetupOptions()
     options.args.virtualFrames = {
         name = L["Show\\Hide Test Frames"],
         desc = "",
-        descStyle = "inline",
         width = "double",
         type = "execute",
         order = 4,
@@ -161,7 +158,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         type = "group",
         order = 2,
         name = L["General"],
-        desc = "",
+        desc = L["General options"],
         childGroups = "tab",  
         args = self:SetupFrameOptions("frames", db, groupType),     
     }
@@ -185,7 +182,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         type = "group",
         order = 5,
         name = L["Dispell Debuffs"],
-        desc = "",
+        desc = L["Dispell Debuffs options"],
         childGroups = "tab",  
         args = self:SetupDispelldebuffFrames(db.dispelDebuffFrames, groupType),  
     }
@@ -193,7 +190,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         type = "group",
         order = 6,
         name = L["Raid Icon"],
-        desc = "",
+        desc = L["Raid Icon options"],
         childGroups = "tab",  
         args = self:SetupRaidIconOptions("raidIcon", db, groupType),  
     }
@@ -208,7 +205,6 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
         [frameType.."enabled"] = {
             name = L["Enable"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "toggle",
             order = 1,
@@ -223,7 +219,6 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
         ["size"..frameType] = {
             name = L["Size"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "range",
             min = 1,
@@ -242,7 +237,6 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
         ["xOffset"..frameType] = {
             name = L["X Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -261,7 +255,6 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
         ["yOffset"..frameType] = {
             name = L["Y Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -280,7 +273,6 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
         [frameType.."AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = positions,
@@ -313,7 +305,6 @@ function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "execute",
             confirm = true,
@@ -334,8 +325,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
     local options = {            
         [frameType.."HideGroupTitles"] = {
             name = L["Hide Group Title"],
-            desc = "",
-            descStyle = "inline",
+            desc = "",            
             width = "normal",
             type = "toggle",
             order = 2,
@@ -350,7 +340,6 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         [frameType.."Texture"] = {
             name = L["Texture"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "select",
             values = function(info, val) return self.sortedTextures end, 
@@ -372,8 +361,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         },
         [frameType.."Click Through"] = {
             name = L["Click Through Auras"],
-            desc = "",
-            descStyle = "inline",
+            desc = L["Click Through Auras1"],
             width = "normal",
             type = "toggle",
             order = 4,        
@@ -387,8 +375,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         },
         [frameType.."Enhanced Absorbs"] = {
             name = L["Enhanced Absorbs"],
-            desc = "",
-            descStyle = "inline",
+            desc = L["Enhanced Absorbs1"],
             width = "normal",
             type = "toggle",
             order = 5,
@@ -405,8 +392,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         },
         [frameType.."Show Party When Solo"] = {
             name = L["Show Party When Solo"],
-            desc = "",
-            descStyle = "inline",
+            desc = L["Show Party When Solo1"],
             width = "normal",
             type = "toggle",
             order = 6,
@@ -458,7 +444,6 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "execute",
             confirm = true,

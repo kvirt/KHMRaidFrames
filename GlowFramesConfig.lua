@@ -72,7 +72,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
             ["color magic"] = {
                 name = L["Magic"],
                 desc = "",
-                descStyle = "inline",
                 width = "full",
                 type = "color",
                 order = 1,
@@ -88,7 +87,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
             ["color curse"] = {
                 name = L["Curse"],
                 desc = "",
-                descStyle = "inline",
                 width = "full",
                 type = "color",
                 order = 2,
@@ -104,7 +102,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
             ["color disease"] = {
                 name = L["Disease"],
                 desc = "",
-                descStyle = "inline",
                 width = "full",
                 type = "color",
                 order = 3,
@@ -120,7 +117,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
             ["color poison"] = {
                 name = L["Poison"],
                 desc = "",
-                descStyle = "inline",
                 width = "full",
                 type = "color",
                 order = 4,
@@ -136,7 +132,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
             ["color physical"] = {
                 name = L["Physical"],
                 desc = "",
-                descStyle = "inline",
                 width = "full",
                 type = "color",
                 order = 5,
@@ -157,7 +152,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
             ["Color Reset"] = {
                 name = L["Reset to Default"],
                 desc = "",
-                descStyle = "inline",
                 width = "full",
                 type = "execute",
                 confirm = true,
@@ -183,7 +177,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["enabled"..frameName] = {
             name = L["Enable"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "toggle",
             order = 1,          
@@ -214,7 +207,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["glowType"..frameName] = {
             name = L["Glow Type"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             order = 2,
@@ -237,7 +229,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["color"..frameName] = {
             name = L["Color"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "color",
             order = 2,
@@ -257,7 +248,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["frequency"..frameName] = {
             name = L["Frequency"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -1,
@@ -281,7 +271,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["num"..frameName] = {
             name = L["Num"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 1,
@@ -304,7 +293,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["xOffset"..frameName] = {
             name = L["X Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -100,
@@ -327,7 +315,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
        ["yOffset"..frameName] = {
             name = L["Y Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -100,
@@ -350,7 +337,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["th"..frameName] = {
             name = L["Thickness"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 0.1,
@@ -373,7 +359,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         ["border"..frameName] = {
             name = L["Border"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "toggle",
             order = 8,
@@ -431,7 +416,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            descStyle = "inline",
             width = "full",
             type = "execute",
             confirm = true,
