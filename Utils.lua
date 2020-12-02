@@ -208,6 +208,22 @@ function KHMRaidFrames:GetTextures()
     return textures, s
 end
 
+function KHMRaidFrames:GetFons()
+    local fonts = SharedMedia:HashTable("font")
+
+    local s = {}
+    for k, v in pairs(fonts) do
+        table.insert(s, k)
+    end
+
+
+    table.sort(s, function(a, b)
+        return a:sub(1, 1):lower() < b:sub(1, 1):lower() 
+    end) 
+
+    return fonts, s
+end
+
 function KHMRaidFrames:TrackAuras(name, debuffType, spellId, db)
     for _, aura in ipairs(db) do
         if (aura == name or aura == debuffType or aura == spellId) then

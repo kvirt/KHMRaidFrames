@@ -51,6 +51,7 @@ function KHMRaidFrames:Setup()
     self:GetVirtualFrames()
 
     self.textures, self.sortedTextures = self:GetTextures()
+    self.fonts, self.sortedFonts = self:GetFons()
 
     local defaults_settings = self:Defaults()
     self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)

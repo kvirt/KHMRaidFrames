@@ -71,13 +71,18 @@ function KHMRaidFrames:Defaults()
                 yOffset = 0,
                 anchorPoint = "TOP",
             },
-            others = {
+            nameAndIcons = {
                 name = {
-                    font = "",
-                    size = "",
-                    anchorPoint = "",
+                    font = "Friz Quadrata TT",
+                    size = 6,
+                    flags = {                    
+                        ["OUTLINE"] = false, 
+                        ["THICKOUTLINE"] = false,
+                        ["MONOCHROME"] = false,
+                    },
+                    anchorPoint = "TOPLEFT",
                     xOffset = 0,
-                    yOffset = 0,                    
+                    yOffset = -1,                    
                 },
                 roleIcon = {
                     anchorPoint = "",
@@ -244,6 +249,8 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
     self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, 1)
 
     self:SetUpRaidIcon(frame, groupType)
+
+    self:SetUpName(frame, groupType)
 
     frame.healthBar:SetStatusBarTexture(self.textures[db.frames.texture], "BORDER")
 

@@ -206,4 +206,36 @@ function KHMRaidFrames:SetUpSoloFrame()
     elseif not self.db.profile.party.frames.showPartySolo and self.ticker then
         self.ticker:Cancel()
     end
-end    
+end
+
+function KHMRaidFrames:SetUpName(frame, groupType)
+    local db = self.db.profile[groupType].nameAndIcons.name
+    local name = frame.name
+    local size = db.size * self.componentScale
+
+    local flags = ""
+
+    for k, v in pairs(db.flags) do
+        if v then flags = flags..k..", " end
+    end
+
+    name:SetFont(
+        self.fonts[db.font], 
+        size,
+        flags
+    )
+
+    name:ClearAllPoints()
+
+    xOffset, yOffset = self:Offsets(db.anchorPoint)
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset
+
+    name:SetPoint(
+        db.anchorPoint, 
+        frame, 
+        db.anchorPoint, 
+        xOffset, 
+        yOffset
+    )    
+end

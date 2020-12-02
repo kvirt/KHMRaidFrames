@@ -194,9 +194,160 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         childGroups = "tab",  
         args = self:SetupRaidIconOptions("raidIcon", db, groupType),  
     }
+    options.nameAndIcons = {
+        type = "group",
+        order = 6,
+        name = L["Name and Icons"],
+        desc = L["Name and Icons options"],
+        childGroups = "tab",  
+        args = self:SetupNameAndIconsOptions("nameAndIcons", db, groupType),  
+    }
 
     return options
 end        
+
+function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
+    db = db[frameType]
+
+    local options = {}
+
+    options.name = {
+        type = "group",
+        order = 1,
+        name = L["Name"],
+        desc = L["Name Options"],
+        childGroups = "tab",  
+        args = {                  
+            ["Font"] = {
+                name = L["Font"],
+                desc = "",
+                width = "double",
+                type = "select",
+                values = function(info, val) return self.sortedFonts end, 
+                order = 1,        
+                set = function(info,val)
+                    db.name.font = self.sortedFonts[val]
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                self.Print(self.sortedFonts, "fonts")
+                    for i, font in ipairs(self.sortedFonts) do
+                        if db.name.font == font then return i end
+                    end
+
+                    db.name.font = "Friz Quadrata TT"
+                    self:SafeRefresh(groupType)
+                    
+                    return db.name.font
+                end
+            },           
+            ["size"] = {
+                name = L["Size"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 1,
+                max = 100,
+                step = 1,
+                order = 2,           
+                set = function(info,val)
+                    db.name.size = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.name.size end
+            },
+            ["Flags"] = {
+                name = L["Flags"],
+                desc = "",
+                width = "normal",
+                type = "multiselect",
+                values = {                        
+                    ["OUTLINE"] = L["OUTLINE"], 
+                    ["THICKOUTLINE"] = L["THICKOUTLINE"],
+                    ["MONOCHROME"] = L["MONOCHROME"],
+                },
+                order = 3,           
+                set = function(info,key,val)
+                    db.name.flags[key] = val        
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return db.name.flags[value] end
+            },                         
+            ["xOffset"] = {
+                name = L["X Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 4,          
+                set = function(info,val)
+                    db.name.xOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.name.xOffset end
+            },
+            ["yOffset"] = {
+                name = L["Y Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 5,          
+                set = function(info,val)
+                    db.name.yOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.name.yOffset end
+            },                                           
+            ["AnchorPoint"] = {
+                name = L["Anchor Point"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = positions,
+                order = 6,           
+                set = function(info,val)
+                    db.name.anchorPoint = val        
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.name.anchorPoint end
+            },                              
+            [frameType.."Skip"] = {
+                type = "header",
+                name = "",
+                order = 7,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 8,
+                confirm = true,
+                func = function(info,val)
+                    self:CopySettings(db.name, self.db.profile[self.ReverseGroupType(groupType)][frameType].name)
+                end,
+            },                                  
+            [frameType.."Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "double",
+                type = "execute",
+                confirm = true,
+                order = 9,
+                func = function(info,val)
+                    self:RestoreDefaults(groupType, frameType)
+                end,
+            },             
+        },
+    }
+
+    return options    
+end
 
 function KHMRaidFrames:SetupRaidIconOptions(frameType, db, groupType)
     db = db[frameType]

@@ -83,3 +83,13 @@ L["Click Through Auras Desc"] = "Removes Aura Tooltips"
 L["Enhanced Absorbs Desc"] = "Permanent feedback on total shielding amounts regardless of whether the shielded person's HP is full or not"
 L["Always Show Party Frame Desc"] = "Show Party Frame even outside group"
 L["Align Big Debuffs Desc"] = "Align debuffs related to \"big\" ones" 
+L["Name and Icons"] = true
+L["Name and Icons options"] = true
+L["Name"] = true
+L["Name Options"] = true
+L["Font"] = true
+L["Flags"] = true
+L["Name Options"] = true
+L["Font"] = true
+L["Flags"] = true
+
