@@ -300,8 +300,8 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             end
         },
         ["Smart Anchoring"] = {
-            name = L["Smart Anchoring"],
-            desc = L["Smart Anchoring1"],
+            name = L["Align Big Debuffs"],
+            desc = L["Align Big Debuffs Desc"],
             width = "normal",
             type = "toggle",
             order = 6,

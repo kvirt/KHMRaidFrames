@@ -361,7 +361,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         },
         [frameType.."Click Through"] = {
             name = L["Click Through Auras"],
-            desc = L["Click Through Auras1"],
+            desc = L["Click Through Auras Desc"],
             width = "normal",
             type = "toggle",
             order = 4,        
@@ -375,7 +375,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         },
         [frameType.."Enhanced Absorbs"] = {
             name = L["Enhanced Absorbs"],
-            desc = L["Enhanced Absorbs1"],
+            desc = L["Enhanced Absorbs Desc"],
             width = "normal",
             type = "toggle",
             order = 5,
@@ -391,8 +391,8 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             end
         },
         [frameType.."Show Party When Solo"] = {
-            name = L["Show Party When Solo"],
-            desc = L["Show Party When Solo1"],
+            name = L["Always Show Party Frame"],
+            desc = L["Always Show Party Frame Desc"],
             width = "normal",
             type = "toggle",
             order = 6,
