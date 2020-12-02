@@ -17,6 +17,7 @@ function KHMRaidFrames:GetVirtualFrames()
             frame.texture = texture
 
             local text = frame:CreateFontString(frame, "OVERLAY", "GameTooltipText")
+            text:SetFont("Fonts\\FRIZQT__.TTF", 11, "THICKOUTLINE, MONOCHROME")
             text:SetPoint("CENTER", 0, 0)
             text:SetText(i)
 
@@ -39,14 +40,18 @@ function KHMRaidFrames:ShowVirtual()
     local frame 
 
     for _frame in self:IterateCompactFrames("raid") do
-        frame = _frame
-        break
+        if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then        
+            frame = _frame
+            break
+        end
     end
 
     if frame == nil then
         for _frame in self:IterateCompactFrames("party") do
-            frame = _frame
-            break
+            if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then        
+                frame = _frame
+                break
+            end
         end
     end
 
@@ -85,12 +90,10 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
 
     if db.showBigDebuffs and bigSized then
         typedframes[1].isBossAura = true
-        typedframes[2].isBossAura = true
 
         local size = db.bigDebuffSize * resize
 
         typedframes[1]:SetSize(size, size)
-        typedframes[2]:SetSize(size, size)
 
         if db.smartAnchoring then      
             self:SmartAnchoring(self.virtual.frame, typedframes, db)

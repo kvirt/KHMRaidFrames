@@ -25,7 +25,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["num"] = {
             name = L["Num"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 0,
@@ -41,7 +40,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["size"] = {
             name = L["Size"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "range",
             min = 1,
@@ -57,7 +55,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["numInRow"] = {
             name = L["Num In Row"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 1,
@@ -73,7 +70,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -89,7 +85,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["yOffset"] = {
             name = L["Y Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -105,7 +100,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = positions,
@@ -120,7 +114,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["GrowDirection"] = {
             name = L["Grow Direction"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = grow_positions,
@@ -169,7 +162,6 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "execute",
             order = 7,
@@ -188,7 +180,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["num"] = {
             name = L["Num"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 0,
@@ -204,7 +195,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["size"] = {
             name = L["Size"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "range",
             min = 1,
@@ -220,7 +210,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["numInRow"] = {
             name = L["Num In Row"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 1,
@@ -236,7 +225,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -252,7 +240,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["yOffset"] = {
             name = L["Y Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -268,7 +255,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = positions,
@@ -283,7 +269,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["GrowDirection"] = {
             name = L["Grow Direction"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = grow_positions,
@@ -303,7 +288,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["Show Big Debuffs"] = {
             name = L["Show Big Debuffs"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "toggle",
             order = 5,        
@@ -316,9 +300,8 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             end
         },
         ["Smart Anchoring"] = {
-            name = L["Smart Anchoring"],
-            desc = "",
-            descStyle = "inline",
+            name = L["Align Big Debuffs"],
+            desc = L["Align Big Debuffs Desc"],
             width = "normal",
             type = "toggle",
             order = 6,
@@ -336,7 +319,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["bigDebuffSize"] = {
             name = L["Size"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 1,
@@ -389,7 +371,6 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "execute",
             order = 11,
@@ -408,7 +389,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["num"] = {
             name = L["Num"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 0,
@@ -424,7 +404,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["size"] = {
             name = L["Size"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "range",
             min = 1,
@@ -440,7 +419,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["numInRow"] = {
             name = L["Num In Row"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = 1,
@@ -456,7 +434,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -472,7 +449,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["yOffset"] = {
             name = L["Y Offset"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "range",
             min = -200,
@@ -488,7 +464,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = positions,
@@ -503,7 +478,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["GrowDirection"] = {
             name = L["Grow Direction"],
             desc = "",
-            descStyle = "inline",
             width = "normal",
             type = "select",
             values = grow_positions,
@@ -552,7 +526,6 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            descStyle = "inline",
             width = "double",
             type = "execute",
             order = 7,
