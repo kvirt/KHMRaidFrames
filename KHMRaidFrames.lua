@@ -239,3 +239,35 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         yOffset
     )    
 end
+
+function KHMRaidFrames:SetUpStatusText(frame, groupType)
+    local db = self.db.profile[groupType].nameAndIcons.statusText
+    local statusText = frame.statusText
+    local size = db.size * self.componentScale
+
+    local flags = ""
+
+    for k, v in pairs(db.flags) do
+        if v then flags = flags..k..", " end
+    end
+
+    statusText:SetFont(
+        self.fonts[db.font], 
+        size,
+        flags
+    )
+
+    statusText:ClearAllPoints()
+
+    xOffset, yOffset = self:Offsets(db.anchorPoint)
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset
+
+    statusText:SetPoint(
+        db.anchorPoint, 
+        frame, 
+        db.anchorPoint, 
+        xOffset, 
+        yOffset
+    )    
+end

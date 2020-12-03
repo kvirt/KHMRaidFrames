@@ -84,6 +84,18 @@ function KHMRaidFrames:Defaults()
                     xOffset = 0,
                     yOffset = -1,                    
                 },
+                statusText = {
+                    font = "Friz Quadrata TT",
+                    size = 10,
+                    flags = {                    
+                        ["OUTLINE"] = false, 
+                        ["THICKOUTLINE"] = false,
+                        ["MONOCHROME"] = false,
+                    },
+                    anchorPoint = "CENTER",
+                    xOffset = 0,
+                    yOffset = 0,                    
+                },                
                 roleIcon = {
                     anchorPoint = "",
                     size = "",
@@ -251,6 +263,7 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
     self:SetUpRaidIcon(frame, groupType)
 
     self:SetUpName(frame, groupType)
+    self:SetUpStatusText(frame, groupType)
 
     frame.healthBar:SetStatusBarTexture(self.textures[db.frames.texture], "BORDER")
 

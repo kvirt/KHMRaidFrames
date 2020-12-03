@@ -95,3 +95,5 @@ L["Flags"] = true
 L["OUTLINE"] = true
 L["THICKOUTLINE"] = true
 L["MONOCHROME"] = true
+L["Status Text"] = true
+L["Status Text Options"] = true

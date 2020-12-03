@@ -345,6 +345,140 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
         },
     }
 
+    options.statusText = {
+        type = "group",
+        order = 1,
+        name = L["Status Text"],
+        desc = L["Status Text Options"],
+        childGroups = "tab",  
+        args = {                  
+            ["Font"] = {
+                name = L["Font"],
+                desc = "",
+                width = "double",
+                type = "select",
+                values = function(info, val) return self.sortedFonts end, 
+                order = 1,        
+                set = function(info,val)
+                    db.statusText.font = self.sortedFonts[val]
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    for i, font in ipairs(self.sortedFonts) do
+                        if db.statusText.font == font then return i end
+                    end
+
+                    db.statusText.font = "Friz Quadrata TT"
+                    self:SafeRefresh(groupType)
+                    
+                    return db.statusText.font
+                end
+            },           
+            ["size"] = {
+                name = L["Size"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 1,
+                max = 100,
+                step = 1,
+                order = 2,           
+                set = function(info,val)
+                    db.statusText.size = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.statusText.size end
+            },
+            ["Flags"] = {
+                name = L["Flags"],
+                desc = "",
+                width = "normal",
+                type = "multiselect",
+                values = {                        
+                    ["OUTLINE"] = L["OUTLINE"], 
+                    ["THICKOUTLINE"] = L["THICKOUTLINE"],
+                    ["MONOCHROME"] = L["MONOCHROME"],
+                },
+                order = 3,           
+                set = function(info,key,val)
+                    db.statusText.flags[key] = val        
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return db.statusText.flags[value] end
+            },                         
+            ["xOffset"] = {
+                name = L["X Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 4,          
+                set = function(info,val)
+                    db.statusText.xOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.statusText.xOffset end
+            },
+            ["yOffset"] = {
+                name = L["Y Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 5,          
+                set = function(info,val)
+                    db.statusText.yOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.statusText.yOffset end
+            },                                           
+            ["AnchorPoint"] = {
+                name = L["Anchor Point"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = positions,
+                order = 6,           
+                set = function(info,val)
+                    db.statusText.anchorPoint = val        
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.statusText.anchorPoint end
+            },                              
+            [frameType.."Skip"] = {
+                type = "header",
+                name = "",
+                order = 7,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 8,
+                confirm = true,
+                func = function(info,val)
+                    self:CopySettings(db.statusText, self.db.profile[self.ReverseGroupType(groupType)][frameType].statusText)
+                end,
+            },                                  
+            [frameType.."Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "double",
+                type = "execute",
+                confirm = true,
+                order = 9,
+                func = function(info,val)
+                    self:RestoreDefaults(groupType, frameType)
+                end,
+            },             
+        },
+    }
+
     return options    
 end
 
