@@ -222,12 +222,14 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     end
 
     name:ClearAllPoints()
+
     local _name
 
-    if db.showServer then
+    if db.showServer and frame.unit then
         _name = GetUnitName(frame.unit, true)
     else
-        _name = GetUnitName(frame.unit, false):gsub("%p", "")
+        _name = GetUnitName(frame.unit, false)
+        _name = _name and _name:gsub("%p", "")
     end
 
     name:SetText(_name)
