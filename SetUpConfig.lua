@@ -13,6 +13,12 @@ local positions = {
     ["CENTER"] = L["CENTER"],           
 }
 
+local positionsText = {
+    ["LEFT"] = L["LEFT"],
+    ["RIGHT"] = L["RIGHT"],
+    ["CENTER"] = L["CENTER"],        
+}
+
 local grow_positions = {
     ["LEFT"] = L["LEFT"],
     ["BOTTOM"] = L["BOTTOM"],
@@ -302,30 +308,47 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 end,
                 get = function(info) return db.name.yOffset end
             },                                           
-            ["AnchorPoint"] = {
-                name = L["Anchor Point"],
+            ["Horizontal Justify"] = {
+                name = L["Horizontal Justify"],
                 desc = "",
                 width = "normal",
                 type = "select",
-                values = positions,
-                order = 6,           
+                values = positionsText,
+                order = 6,
+                confirm = true,
+                confirmText = L["UI will be reloaded to apply settings"],         
                 set = function(info,val)
-                    db.name.anchorPoint = val        
+                    db.name.hJustify = val        
+                    self:SafeRefresh(groupType)
+                    ReloadUI()
+                end,
+                get = function(info) return db.name.hJustify end
+            },
+            ["Show Server"] = {
+                name = L["Show Server"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 7,
+                set = function(info,val)
+                    db.name.showServer = val
                     self:SafeRefresh(groupType)
                 end,
-                get = function(info) return db.name.anchorPoint end
-            },                              
+                get = function(info) 
+                    return db.name.showServer 
+                end
+            },                                      
             [frameType.."Skip"] = {
                 type = "header",
                 name = "",
-                order = 7,
+                order = 8,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 8,
+                order = 9,
                 confirm = true,
                 func = function(info,val)
                     self:CopySettings(db.name, self.db.profile[self.ReverseGroupType(groupType)][frameType].name)
@@ -337,7 +360,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "double",
                 type = "execute",
                 confirm = true,
-                order = 9,
+                order = 10,
                 func = function(info,val)
                     self:RestoreDefaults(groupType, frameType)
                 end,

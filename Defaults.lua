@@ -80,9 +80,10 @@ function KHMRaidFrames:Defaults()
                         ["THICKOUTLINE"] = false,
                         ["MONOCHROME"] = false,
                     },
-                    anchorPoint = "TOPLEFT",
+                    hJustify = "LEFT",
                     xOffset = 0,
-                    yOffset = -1,                    
+                    yOffset = -1,
+                    showServer = true,                    
                 },
                 statusText = {
                     font = "Friz Quadrata TT",

@@ -5,6 +5,15 @@ local _G, tostring, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tostring, tin
 local CUF_AURA_BOTTOM_OFFSET = 2
 local powerBarHeight = 8
 
+KHMRaidFrames.textMirrors = {
+    ["TOPLEFT"] = {"TOPRIGHT", "LEFT"},
+    ["LEFT"] = {"RIGHT", "LEFT"},
+    ["BOTTOMLEFT"] = {"BOTTOMRIGHT", "LEFT"},
+    ["BOTTOMRIGHT"] = {"BOTTOMLEFT", "RIGHT"},
+    ["RIGHT"] = {"LEFT", "RIGHT"},
+    ["TOPRIGHT"] = {"BOTTOMLEFT", "RIGHT"},
+}
+
 KHMRaidFrames.mirrorPositions = {
     ["LEFT"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
     ["BOTTOM"] = {"TOPLEFT", "BOTTOMLEFT"},

@@ -209,6 +209,8 @@ function KHMRaidFrames:SetUpSoloFrame()
 end
 
 function KHMRaidFrames:SetUpName(frame, groupType)
+    if not frame.unit then return end
+        
     local db = self.db.profile[groupType].nameAndIcons.name
     local name = frame.name
     local size = db.size * self.componentScale
@@ -219,25 +221,30 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         if v then flags = flags..k..", " end
     end
 
+    name:ClearAllPoints()
+
+    name:SetText(GetUnitName(frame.unit, db.showServer))
+
     name:SetFont(
         self.fonts[db.font], 
         size,
         flags
     )
 
-    name:ClearAllPoints()
-
     xOffset, yOffset = self:Offsets(db.anchorPoint)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
     name:SetPoint(
-        db.anchorPoint, 
+        "TOPLEFT", 
         frame, 
-        db.anchorPoint, 
+        "TOPLEFT", 
         xOffset, 
         yOffset
-    )    
+    )
+
+    name:SetPoint("TOPRIGHT", -3, -3)
+    name:SetJustifyH(db.hJustify)
 end
 
 function KHMRaidFrames:SetUpStatusText(frame, groupType)

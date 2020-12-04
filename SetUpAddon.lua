@@ -165,7 +165,12 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
             self:UpdateAuras(frame)
         end
     )
-    
+
+     self:SecureHook(
+        "CompactUnitFrame_UpdateName", 
+        function(frame) self:SetUpName(frame, IsInRaid() and "raid" or "party") end
+    )
+
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile", "GetRaidProfileSettings")
 
     self:SecureHook(
