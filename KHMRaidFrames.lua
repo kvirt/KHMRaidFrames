@@ -314,6 +314,8 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
 
     roleIcon:SetSize(size, size)
 
+    if not frame.unit then return end
+
     local raidID = UnitInRaid(frame.unit)
 
     if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
@@ -361,6 +363,8 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     readyCheckIcon:SetSize(size, size)
 
+    if not frame.unit then return end
+
     local readyCheckStatus = GetReadyCheckStatus(frame.unit)
     if db[readyCheckStatus] ~= "" then
         readyCheckIcon:SetTexture(db[readyCheckStatus])
@@ -390,6 +394,8 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     centerStatusIcon:SetSize(size, size)
 
+    if not frame.unit then return end
+    
     if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) and db.inOtherGroup ~= "" then
         centerStatusIcon.texture:SetTexture(db.inOtherGroup)
         centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
