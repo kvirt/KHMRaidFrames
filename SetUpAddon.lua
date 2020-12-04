@@ -166,9 +166,24 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         end
     )
 
-     self:SecureHook(
+    self:SecureHook(
         "CompactUnitFrame_UpdateName", 
         function(frame) self:SetUpName(frame, IsInRaid() and "raid" or "party") end
+    )
+
+    self:SecureHook(
+        "CompactUnitFrame_UpdateRoleIcon", 
+        function(frame) self:SetUpRoleIcon(frame, IsInRaid() and "raid" or "party") end
+    )
+
+    self:SecureHook(
+        "CompactUnitFrame_UpdateReadyCheck", 
+        function(frame) self:SetUpReadyCheckIcon(frame, IsInRaid() and "raid" or "party") end
+    )
+
+    self:SecureHook(
+        "CompactUnitFrame_UpdateCenterStatusIcon", 
+        function(frame) self:SetUpCenterStatusIcon(frame, IsInRaid() and "raid" or "party") end
     )
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile", "GetRaidProfileSettings")

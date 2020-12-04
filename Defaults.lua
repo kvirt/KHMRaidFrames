@@ -98,29 +98,33 @@ function KHMRaidFrames:Defaults()
                     yOffset = 0,                    
                 },                
                 roleIcon = {
-                    anchorPoint = "",
-                    size = "",
+                    size = 12,
                     xOffset = 0,
-                    yOffset = 0,                    
+                    yOffset = 0,
+                    healer = "",
+                    damager = "",
+                    tank = "",
+                    vehicle = "",                  
                 },
-                readyCheck = {
-                    anchorPoint = "",
-                    size = "",
+                readyCheckIcon  = {
+                    size = 15 ,
                     xOffset = 0,
-                    yOffset = 0,                    
+                    yOffset = 0,
+                    ready = "",
+                    notready = "",
+                    waiting = "",               
                 },
-                summonIcon = {
-                    anchorPoint = "",
-                    size = "",
+                centerStatusIcon = {
+                    size = 22,
                     xOffset = 0,
-                    yOffset = 0,                    
-                },
-                phaseIcon = {
-                    anchorPoint = "",
-                    size = "",
-                    xOffset = 0,
-                    yOffset = 0,                    
-                },                                                
+                    yOffset = 0,
+                    inOtherGroup = "",
+                    hasIncomingResurrection = "",
+                    hasIncomingSummonPending = "",
+                    hasIncomingSummonAccepted = "",
+                    hasIncomingSummonDeclined = "",
+                    inOtherPhase = "",                                        
+                },                                               
             },                    
     }
     defaults_settings.profile.party = commons
@@ -265,6 +269,9 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 
     self:SetUpName(frame, groupType)
     self:SetUpStatusText(frame, groupType)
+    self:SetUpRoleIcon(frame, groupType)
+    self:SetUpReadyCheckIcon(frame, groupType)
+    self:SetUpCenterStatusIcon(frame, groupType)
 
     frame.healthBar:SetStatusBarTexture(self.textures[db.frames.texture], "BORDER")
 

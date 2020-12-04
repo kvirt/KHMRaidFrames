@@ -520,7 +520,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = 1,
                 max = 100,
                 step = 1,
-                order = 2,           
+                order = 1,           
                 set = function(info,val)
                     db.roleIcon.size = val
                     self:SafeRefresh(groupType)
@@ -556,18 +556,71 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info) return db.roleIcon.yOffset end
-            },                                                                     
-            [frameType.."Skip"] = {
+            },
+            [frameType.."Skip1"] = {
+                type = "header",
+                name = L["Custom Texture"],
+                order = 4,
+            },            
+            ["healer"] = {
+                name = L["Healer"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 5,          
+                set = function(info,val)
+                    db.roleIcon.healer = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.healer end
+            },
+            ["damager"] = {
+                name = L["Damager"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 6,          
+                set = function(info,val)
+                    db.roleIcon.damager = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.damager end
+            },
+            ["tank"] = {
+                name = L["Tank"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 7,          
+                set = function(info,val)
+                    db.roleIcon.tank = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.tank end
+            },
+            ["vehicle"] = {
+                name = L["Vehicle"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 8,          
+                set = function(info,val)
+                    db.roleIcon.vehicle = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.vehicle end
+            },                                                                                                        
+            [frameType.."Skip2"] = {
                 type = "header",
                 name = "",
-                order = 7,
+                order = 9,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 8,
+                order = 10,
                 confirm = true,
                 func = function(info,val)
                     self:CopySettings(db.roleIcon, self.db.profile[self.ReverseGroupType(groupType)][frameType].roleIcon)
@@ -579,7 +632,289 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "double",
                 type = "execute",
                 confirm = true,
+                order = 11,
+                func = function(info,val)
+                    self:RestoreDefaults(groupType, frameType)
+                end,
+            },             
+        },
+    }
+
+    options.readyCheckIcon = {
+        type = "group",
+        order = 4,
+        name = L["Ready Check Icon"],
+        desc = L["Ready Check Icon Options"],
+        childGroups = "tab",  
+        args = {                           
+            ["size"] = {
+                name = L["Size"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 1,
+                max = 100,
+                step = 1,
+                order = 1,           
+                set = function(info,val)
+                    db.readyCheckIcon.size = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.readyCheckIcon.size end
+            },                       
+            ["xOffset"] = {
+                name = L["X Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 2,          
+                set = function(info,val)
+                    db.readyCheckIcon.xOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.readyCheckIcon.xOffset end
+            },
+            ["yOffset"] = {
+                name = L["Y Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 3,          
+                set = function(info,val)
+                    db.readyCheckIcon.yOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.readyCheckIcon.yOffset end
+            },          
+            [frameType.."Skip1"] = {
+                type = "header",
+                name = L["Custom Texture"],
+                order = 4,
+            },            
+            ["ready"] = {
+                name = L["Ready"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 5,          
+                set = function(info,val)
+                    db.readyCheckIcon.ready = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.readyCheckIcon.ready end
+            },
+            ["notready"] = {
+                name = L["Not Ready"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 6,          
+                set = function(info,val)
+                    db.readyCheckIcon.notready = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.readyCheckIcon.notready end
+            },
+            ["waiting"] = {
+                name = L["Waiting"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 7,          
+                set = function(info,val)
+                    db.readyCheckIcon.waiting = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.readyCheckIcon.waiting end
+            },                                                                                                     
+            [frameType.."Skip2"] = {
+                type = "header",
+                name = "",
+                order = 8,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
                 order = 9,
+                confirm = true,
+                func = function(info,val)
+                    self:CopySettings(db.readyCheckIcon, self.db.profile[self.ReverseGroupType(groupType)][frameType].readyCheckIcon)
+                end,
+            },                                  
+            [frameType.."Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "double",
+                type = "execute",
+                confirm = true,
+                order = 10,
+                func = function(info,val)
+                    self:RestoreDefaults(groupType, frameType)
+                end,
+            },             
+        },
+    }
+
+    options.centerStatusIcon = {
+        type = "group",
+        order = 5,
+        name = L["Center Status Icon"],
+        desc = L["Center Status Icon Options"],
+        childGroups = "tab",  
+        args = {                           
+            ["size"] = {
+                name = L["Size"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 1,
+                max = 100,
+                step = 1,
+                order = 1,           
+                set = function(info,val)
+                    db.centerStatusIcon.size = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.size end
+            },                       
+            ["xOffset"] = {
+                name = L["X Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 2,          
+                set = function(info,val)
+                    db.centerStatusIcon.xOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.xOffset end
+            },
+            ["yOffset"] = {
+                name = L["Y Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 3,          
+                set = function(info,val)
+                    db.centerStatusIcon.yOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.yOffset end
+            },          
+            [frameType.."Skip1"] = {
+                type = "header",
+                name = L["Custom Texture"],
+                order = 4,
+            },            
+            ["inOtherGroup "] = {
+                name = L["In Other Group"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 5,          
+                set = function(info,val)
+                    db.centerStatusIcon.inOtherGroup = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.inOtherGroup end
+            },
+            ["hasIncomingResurrection"] = {
+                name = L["Has Icoming Ressurection"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 6,          
+                set = function(info,val)
+                    db.centerStatusIcon.hasIncomingResurrection = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.hasIncomingResurrection end
+            },
+            ["hasIncomingSummonPending"] = {
+                name = L["Incoming Summon Pending"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 7,          
+                set = function(info,val)
+                    db.centerStatusIcon.hasIncomingSummonPending = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.hasIncomingSummonPending end
+            },
+            ["hasIncomingSummonAccepted"] = {
+                name = L["Incoming Summon Accepted"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 8,          
+                set = function(info,val)
+                    db.centerStatusIcon.hasIncomingSummonAccepted = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.hasIncomingSummonAccepted end
+            },
+             ["hasIncomingSummonDeclined"] = {
+                name = L["Incoming Summon Declined"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 9,          
+                set = function(info,val)
+                    db.centerStatusIcon.hasIncomingSummonDeclined = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.hasIncomingSummonDeclined end
+            },
+             ["inOtherPhase"] = {
+                name = L["In Other Phase"],
+                desc = L["Custom Texture Options"],
+                width = "full",
+                type = "input",
+                order = 10,          
+                set = function(info,val)
+                    db.centerStatusIcon.inOtherPhase = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.centerStatusIcon.inOtherPhase end
+            },                                                                                                                 
+            [frameType.."Skip2"] = {
+                type = "header",
+                name = "",
+                order = 11,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 12,
+                confirm = true,
+                func = function(info,val)
+                    self:CopySettings(db.centerStatusIcon, self.db.profile[self.ReverseGroupType(groupType)][frameType].centerStatusIcon)
+                end,
+            },                                  
+            [frameType.."Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "double",
+                type = "execute",
+                confirm = true,
+                order = 13,
                 func = function(info,val)
                     self:RestoreDefaults(groupType, frameType)
                 end,

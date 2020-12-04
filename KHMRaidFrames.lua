@@ -2,7 +2,7 @@ local addonName, addonTable = ...
 addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "AceHook-3.0", "AceEvent-3.0", "AceConsole-3.0")
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
-local _G = _G
+local _G, GetReadyCheckStatus, UnitInRaid, UnitHasVehicleUI, UnitInVehicle, GetRaidRosterInfo, UnitGroupRolesAssigned = _G, GetReadyCheckStatus, UnitInRaid, UnitHasVehicleUI, UnitInVehicle, GetRaidRosterInfo, UnitGroupRolesAssigned
 local UnitPopupButtons = {
     ["RAID_TARGET_1"] = UnitPopupButtons["RAID_TARGET_1"],
     ["RAID_TARGET_2"] = UnitPopupButtons["RAID_TARGET_2"],
@@ -240,7 +240,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         flags
     )
 
-    xOffset, yOffset = self:Offsets(db.anchorPoint)
+    xOffset, yOffset = self:Offsets("TOPLEFT")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
@@ -275,7 +275,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
         flags
     )
 
-    xOffset, yOffset = self:Offsets(db.anchorPoint)
+    xOffset, yOffset = self:Offsets("BOTTOMLEFT")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
 
@@ -289,4 +289,132 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", xOffset, yOffset)
     statusText:SetJustifyH(db.hJustify)   
+end
+
+function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
+    if not frame.roleIcon then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.roleIcon
+    local roleIcon = frame.roleIcon
+    local size = db.size
+
+    roleIcon:ClearAllPoints()
+
+    xOffset, yOffset = self:Offsets("TOPLEFT")
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset
+
+    roleIcon:SetPoint(
+        "TOPLEFT", 
+        frame, 
+        "TOPLEFT", 
+        xOffset, 
+        yOffset
+    )
+
+    roleIcon:SetSize(size, size)
+
+    local raidID = UnitInRaid(frame.unit)
+
+    if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
+        if db.vehicle ~= "" then
+            roleIcon:SetTexture(db.vehicle)
+            roleIcon:SetTexCoord(0, 1, 0, 1)
+        end
+    elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
+        local role = select(10, GetRaidRosterInfo(raidID))
+        if db[role:lower()] ~= "" then
+            roleIcon:SetTexture(db[role:lower()])
+            roleIcon:SetTexCoord(0, 1, 0, 1)
+        end
+    else
+        local role = UnitGroupRolesAssigned(frame.unit)
+        if frame.optionTable.displayRoleIcon and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
+            if db[role:lower()] ~= "" then
+                roleIcon:SetTexture(db[role:lower()])
+                roleIcon:SetTexCoord(0, 1, 0, 1)
+            end
+        end
+    end    
+end
+
+function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
+    if not frame.readyCheckIcon then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
+    local readyCheckIcon = frame.readyCheckIcon
+    local size = db.size * self.componentScale
+
+    readyCheckIcon:ClearAllPoints()
+
+    xOffset, yOffset = self:Offsets("BOTTOM")
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
+
+    readyCheckIcon:SetPoint(
+        "BOTTOM", 
+        frame, 
+        "BOTTOM", 
+        xOffset, 
+        yOffset
+    )
+
+    readyCheckIcon:SetSize(size, size)
+
+    local readyCheckStatus = GetReadyCheckStatus(frame.unit)
+    if db[readyCheckStatus] ~= "" then
+        readyCheckIcon:SetTexture(db[readyCheckStatus])
+    end
+end
+
+function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
+    if not frame.centerStatusIcon then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
+    local centerStatusIcon = frame.centerStatusIcon
+    local size = db.size * self.componentScale
+
+    centerStatusIcon:ClearAllPoints()
+
+    xOffset, yOffset = self:Offsets("BOTTOM")
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
+
+    centerStatusIcon:SetPoint(
+        "BOTTOM", 
+        frame, 
+        "BOTTOM", 
+        xOffset, 
+        yOffset
+    )
+
+    centerStatusIcon:SetSize(size, size)
+
+    if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) and db.inOtherGroup ~= "" then
+        centerStatusIcon.texture:SetTexture(db.inOtherGroup)
+        centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
+    elseif frame.optionTable.displayIncomingResurrect and UnitHasIncomingResurrection(frame.unit) and db.hasIncomingResurrection ~= "" then
+        centerStatusIcon.texture:SetTexture(db.hasIncomingResurrection)
+        centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+    elseif frame.optionTable.displayIncomingSummon and C_IncomingSummon.HasIncomingSummon(frame.unit) then
+        local status = C_IncomingSummon.IncomingSummonStatus(frame.unit)
+        if status == Enum.SummonStatus.Pending and db.hasIncomingSummonPending ~= "" then
+            centerStatusIcon.texture:SetTexture(db.hasIncomingSummonPending)
+            centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        elseif status == Enum.SummonStatus.Accepted and db.hasIncomingSummonAccepted ~= "" then
+            centerStatusIcon.texture:SetTexture(db.hasIncomingSummonAccepted)
+            centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        elseif status == Enum.SummonStatus.Declined and db.hasIncomingSummonDeclined ~= "" then
+            centerStatusIcon.texture:SetTexture(db.hasIncomingSummonDeclined)
+            centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        end
+    else
+        if frame.inDistance and frame.optionTable.displayInOtherPhase and db.inOtherPhase ~= "" then
+            local phaseReason = UnitPhaseReason(frame.unit)
+            if phaseReason then
+                centerStatusIcon.texture:SetTexture(db.inOtherPhase)
+                centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
+            end
+        end
+    end    
 end
