@@ -252,7 +252,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         yOffset
     )
 
-    name:SetPoint("TOPRIGHT", -3, -3)
+    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, -3)
     name:SetJustifyH(db.hJustify)
 end
 
@@ -267,23 +267,26 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
         if v then flags = flags..k..", " end
     end
 
+    statusText:ClearAllPoints()
+
     statusText:SetFont(
         self.fonts[db.font], 
         size,
         flags
     )
 
-    statusText:ClearAllPoints()
-
     xOffset, yOffset = self:Offsets(db.anchorPoint)
     xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset
+    yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
 
     statusText:SetPoint(
-        db.anchorPoint, 
+        "BOTTOMLEFT", 
         frame, 
-        db.anchorPoint, 
+        "BOTTOMLEFT", 
         xOffset, 
         yOffset
-    )    
+    )
+
+    statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", xOffset, yOffset)
+    statusText:SetJustifyH(db.hJustify)   
 end

@@ -99,3 +99,5 @@ L["Status Text"] = true
 L["Status Text Options"] = true
 L["Show Server"] = true
 L["Horizontal Justify"] = true
+L["Role Icon"] = true
+L["Role Icon Options"] = true

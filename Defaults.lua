@@ -87,13 +87,13 @@ function KHMRaidFrames:Defaults()
                 },
                 statusText = {
                     font = "Friz Quadrata TT",
-                    size = 10,
+                    size = 12,
                     flags = {                    
                         ["OUTLINE"] = false, 
                         ["THICKOUTLINE"] = false,
                         ["MONOCHROME"] = false,
                     },
-                    anchorPoint = "CENTER",
+                    hJustify = "CENTER",
                     xOffset = 0,
                     yOffset = 0,                    
                 },                

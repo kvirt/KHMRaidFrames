@@ -370,7 +370,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
 
     options.statusText = {
         type = "group",
-        order = 1,
+        order = 2,
         name = L["Status Text"],
         desc = L["Status Text Options"],
         childGroups = "tab",  
@@ -459,19 +459,22 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 end,
                 get = function(info) return db.statusText.yOffset end
             },                                           
-            ["AnchorPoint"] = {
-                name = L["Anchor Point"],
+            ["Horizontal Justify"] = {
+                name = L["Horizontal Justify"],
                 desc = "",
                 width = "normal",
                 type = "select",
-                values = positions,
-                order = 6,           
+                values = positionsText,
+                order = 6,
+                confirm = true,
+                confirmText = L["UI will be reloaded to apply settings"],         
                 set = function(info,val)
-                    db.statusText.anchorPoint = val        
+                    db.statusText.hJustify = val        
                     self:SafeRefresh(groupType)
+                    ReloadUI()
                 end,
-                get = function(info) return db.statusText.anchorPoint end
-            },                              
+                get = function(info) return db.statusText.hJustify end
+            },                            
             [frameType.."Skip"] = {
                 type = "header",
                 name = "",
@@ -486,6 +489,88 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 confirm = true,
                 func = function(info,val)
                     self:CopySettings(db.statusText, self.db.profile[self.ReverseGroupType(groupType)][frameType].statusText)
+                end,
+            },                                  
+            [frameType.."Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "double",
+                type = "execute",
+                confirm = true,
+                order = 9,
+                func = function(info,val)
+                    self:RestoreDefaults(groupType, frameType)
+                end,
+            },             
+        },
+    }
+
+    options.roleIcon = {
+        type = "group",
+        order = 3,
+        name = L["Role Icon"],
+        desc = L["Role Icon Options"],
+        childGroups = "tab",  
+        args = {                           
+            ["size"] = {
+                name = L["Size"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 1,
+                max = 100,
+                step = 1,
+                order = 2,           
+                set = function(info,val)
+                    db.roleIcon.size = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.size end
+            },                       
+            ["xOffset"] = {
+                name = L["X Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 2,          
+                set = function(info,val)
+                    db.roleIcon.xOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.xOffset end
+            },
+            ["yOffset"] = {
+                name = L["Y Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 3,          
+                set = function(info,val)
+                    db.roleIcon.yOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return db.roleIcon.yOffset end
+            },                                                                     
+            [frameType.."Skip"] = {
+                type = "header",
+                name = "",
+                order = 7,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 8,
+                confirm = true,
+                func = function(info,val)
+                    self:CopySettings(db.roleIcon, self.db.profile[self.ReverseGroupType(groupType)][frameType].roleIcon)
                 end,
             },                                  
             [frameType.."Reset"] = {
