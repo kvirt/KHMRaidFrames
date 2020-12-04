@@ -210,7 +210,7 @@ end
 
 function KHMRaidFrames:SetUpName(frame, groupType)
     if not frame.unit then return end
-        
+
     local db = self.db.profile[groupType].nameAndIcons.name
     local name = frame.name
     local size = db.size * self.componentScale
@@ -222,8 +222,15 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     end
 
     name:ClearAllPoints()
+    local _name
 
-    name:SetText(GetUnitName(frame.unit, db.showServer))
+    if db.showServer then
+        _name = GetUnitName(frame.unit, true)
+    else
+        _name = GetUnitName(frame.unit, false):gsub("%p", "")
+    end
+
+    name:SetText(_name)
 
     name:SetFont(
         self.fonts[db.font], 
