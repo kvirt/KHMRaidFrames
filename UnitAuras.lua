@@ -1,7 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
-local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
-local _G, tostring, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE = _G, tostring, tinsert, math, BOSS_DEBUFF_SIZE_INCREASE
+local _G, tostring, CreateFrame, IsInRaid = _G, tostring, CreateFrame, IsInRaid
 local CUF_AURA_BOTTOM_OFFSET = 2
 local powerBarHeight = 8
 
@@ -18,14 +17,14 @@ KHMRaidFrames.mirrorPositions = {
     ["LEFT"] = {"BOTTOMRIGHT", "BOTTOMLEFT"},
     ["BOTTOM"] = {"TOPLEFT", "BOTTOMLEFT"},
     ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
-    ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
+    ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},
 }
 
 KHMRaidFrames.smartAnchoring = {
     ["BOTTOM"] = {"LEFT", "RIGHT"},
     ["TOP"] = {"LEFT", "RIGHT"},
     ["RIGHT"] = {"BOTTOM", "TOP"},
-    ["LEFT"] = {"BOTTOM", "TOP"},          
+    ["LEFT"] = {"BOTTOM", "TOP"},
 }
 
 KHMRaidFrames.smartAnchoringRowsPositions = {
@@ -35,7 +34,7 @@ KHMRaidFrames.smartAnchoringRowsPositions = {
     },
     ["BOTTOM"] = {
         ["LEFT"] = {"TOPRIGHT", "BOTTOMRIGHT"},
-        ["RIGHT"] = {"TOPLEFT", "BOTTOMLEFT"},    
+        ["RIGHT"] = {"TOPLEFT", "BOTTOMLEFT"},
     },
     ["RIGHT"] = {
         ["BOTTOM"] = {"TOPLEFT", "TOPRIGHT"},
@@ -43,15 +42,15 @@ KHMRaidFrames.smartAnchoringRowsPositions = {
     },
     ["TOP"] ={
         ["LEFT"] = {"BOTTOMRIGHT", "TOPRIGHT"},
-        ["RIGHT"] = {"BOTTOMLEFT", "TOPLEFT"},    
-    },         
+        ["RIGHT"] = {"BOTTOMLEFT", "TOPLEFT"},
+    },
 }
 
 KHMRaidFrames.rowsPositions = {
     ["LEFT"] = {"TOPRIGHT", "TOPLEFT"},
     ["BOTTOM"] = {"TOPRIGHT", "BOTTOMRIGHT"},
     ["RIGHT"] = {"BOTTOMLEFT", "BOTTOMRIGHT"},
-    ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},         
+    ["TOP"] = {"BOTTOMLEFT", "TOPLEFT"},
 }
 
 KHMRaidFrames.rowsGrows = {
@@ -108,12 +107,12 @@ KHMRaidFrames.rowsGrows = {
         ["BOTTOM"] = "RIGHT",
         ["RIGHT"] = "TOP",
         ["TOP"] =  "RIGHT",
-    }          
+    }
 }
 
 
 function KHMRaidFrames:Offsets(anchor)
-    local powerBarUsedHeight = (self.displayPowerBar and powerBarHeight or 0) + CUF_AURA_BOTTOM_OFFSET 
+    local powerBarUsedHeight = (self.displayPowerBar and powerBarHeight or 0) + CUF_AURA_BOTTOM_OFFSET
     local xOffset, yOffset = 0, 0
 
     if anchor == "LEFT" then
@@ -131,14 +130,14 @@ function KHMRaidFrames:Offsets(anchor)
     elseif anchor == "TOPLEFT" then
         xOffset, yOffset = 3, -3
     elseif anchor == "TOPRIGHT" then
-        xOffset, yOffset = -3, -3                                    
+        xOffset, yOffset = -3, -3
     end
 
     return xOffset, yOffset
 end
 
 function KHMRaidFrames:AddSubFrames(frame, groupType)
-    for subFrameType in self:IterateSubFrameTypes() do
+    for subFrameType in self.IterateSubFrameTypes() do
         local frameName, template
         local db = self.db.profile[groupType][subFrameType]
 
@@ -151,7 +150,7 @@ function KHMRaidFrames:AddSubFrames(frame, groupType)
         elseif subFrameType == "dispelDebuffFrames" then
             template = "CompactDispelDebuffTemplate"
             frameName = frame:GetName().."DispelDebuff"
-        end  
+        end
 
         for i=#frame[subFrameType] + 1, db.num do
             local typedFrame = _G[frameName..i] or CreateFrame("Button", frameName..i, frame, template)
@@ -176,10 +175,10 @@ function KHMRaidFrames:FilterAuras(name, debuffType, spellId, frameType)
 end
 
 function KHMRaidFrames:FilterAurasInternal(name, debuffType, spellId, db)
-    if #db == 0 then return false end    
+    if #db == 0 then return false end
 
-    name = name and self:SanitazeString(name)
-    debuffType = debuffType and self:SanitazeString(debuffType)
+    name = name and self.SanitazeString(name)
+    debuffType = debuffType and self.SanitazeString(debuffType)
     spellId = tostring(spellId)
 
     for _, aura in ipairs(db) do
@@ -202,8 +201,8 @@ function KHMRaidFrames:AdditionalAura(name, debuffType, spellId)
 
     if #db == 0 then return false end
 
-    name = name and self:SanitazeString(name)
-    debuffType = debuffType and self:SanitazeString(debuffType)
+    name = name and self.SanitazeString(name)
+    debuffType = debuffType and self.SanitazeString(debuffType)
     spellId = tostring(spellId)
 
     for _, aura in ipairs(db) do
@@ -221,7 +220,6 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
 
     local size = db.size * self.componentScale
     local bigSize = size * 2
-    local rowCounter = 1
     local rowStart = 1
 
     while frameNum <= #typedframes do
@@ -251,21 +249,21 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
                         anchor1, relativeFrame, anchor2 = self.smartAnchoring[db.growDirection][1], typedframes[frameNum - (rowLen - (bigs * 2))], self.smartAnchoring[db.growDirection][2]
 
                         typedframe:SetPoint(
-                            anchor1, 
-                            relativeFrame, 
-                            anchor2, 
-                            xOffset, 
+                            anchor1,
+                            relativeFrame,
+                            anchor2,
+                            xOffset,
                             yOffset
                         )
 
                         typedframe:SetSize(typedframe.isBossAura and bigSize or size, typedframe.isBossAura and bigSize or size)
 
-                        frameNum = frameNum + 1                    
+                        frameNum = frameNum + 1
                     end
-                end               
-                break              
+                end
+                break
             else
-                anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]           
+                anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]
             end
 
             if frameNum == 1 then
@@ -277,10 +275,10 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
             end
 
             typedframe:SetPoint(
-                anchor1, 
-                relativeFrame, 
-                anchor2, 
-                xOffset, 
+                anchor1,
+                relativeFrame,
+                anchor2,
+                xOffset,
                 yOffset
             )
 
@@ -288,14 +286,14 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
 
             frameNum = frameNum + 1
 
-            if typedframe.isBossAura then 
+            if typedframe.isBossAura then
                 index = index + 2
                 bigs = bigs + 1
 
                 if index > rowLen then break end
-            else 
-                index = index + 1 
-            end            
+            else
+                index = index + 1
+            end
         end
-    end 
+    end
 end

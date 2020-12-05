@@ -9,17 +9,15 @@ StaticPopupDialogs[KHMRaidFrames.reloadConfirmation] = {
     button2 = NO,
     OnAccept = function(self)
         ReloadUI()
-    end, 
-    OnCancel = function(self)
-       KHMRaidFrames:Print("The user interface is not reloaded. To fix it, enter \"\/reload\" in chat.")
-        end,
+    end,
+    OnCancel = function(self) end,
     timeout = 0,
     hideOnEscape = 1,
 }
 
 
 function KHMRaidFrames:OnInitialize()
-     self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")  
+     self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")
 end
 
 function KHMRaidFrames:Setup()
@@ -29,12 +27,12 @@ function KHMRaidFrames:Setup()
 
     self.isOpen = false
 
-    self.maxFrames = 10 
+    self.maxFrames = 10
     self.virtual = {
         shown = false,
         frames = {},
         groupType = "raid",
-    } 
+    }
     self.aurasCache = {}
     self.processedFrames = {}
     self.glowingFrames = {
@@ -44,18 +42,18 @@ function KHMRaidFrames:Setup()
         },
         frameGlow = {
             buffFrames = {},
-            debuffFrames = {},            
+            debuffFrames = {},
         },
     }
 
     self:GetVirtualFrames()
 
-    self.textures, self.sortedTextures = self:GetTextures()
-    self.fonts, self.sortedFonts = self:GetFons()
+    self.textures, self.sortedTextures = self.GetTextures()
+    self.fonts, self.sortedFonts = self.GetFons()
 
     local defaults_settings = self:Defaults()
     self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)
-    
+
     local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
     local LibDualSpec = LibStub("LibDualSpec-1.0")
@@ -73,42 +71,42 @@ function KHMRaidFrames:Setup()
     self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
     self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
 
-    self:RegisterChatCommand("khm", function() 
+    self:RegisterChatCommand("khm", function()
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
     end)
 
-    self:RegisterChatCommand("лрь", function() 
+    self:RegisterChatCommand("лрь", function()
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
     end)
 
-    self:RegisterChatCommand("кд", function() ReloadUI() end)         
+    self:RegisterChatCommand("кд", function() ReloadUI() end)
 end
 
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
     self.db.RegisterCallback(
-        self, "OnProfileChanged", 
-        function(...) StaticPopup_Show(self.reloadConfirmation)                    
+        self, "OnProfileChanged",
+        function(...) StaticPopup_Show(self.reloadConfirmation)
     end)
     self.db.RegisterCallback(
-        self, "OnProfileCopied", 
-        function(...) StaticPopup_Show(self.reloadConfirmation)                             
+        self, "OnProfileCopied",
+        function(...) StaticPopup_Show(self.reloadConfirmation)
     end)
     self.db.RegisterCallback(
-        self, "OnProfileReset", 
-        function(...) StaticPopup_Show(self.reloadConfirmation)               
+        self, "OnProfileReset",
+        function(...) StaticPopup_Show(self.reloadConfirmation)
     end)
 
     local deferrFrame = CreateFrame("Frame")
     deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     deferrFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     deferrFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
-    deferrFrame:RegisterEvent("RAID_TARGET_UPDATE")  -- raid target icon    
+    deferrFrame:RegisterEvent("RAID_TARGET_UPDATE")  -- raid target icon
     deferrFrame:SetScript(
-        "OnEvent", 
+        "OnEvent",
         function(frame, event)
             local groupType = IsInRaid() and "raid" or "party"
 
@@ -116,7 +114,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
                 self:GetRaidProfileSettings()
                 self:SafeRefresh(groupType)
 
-                if self.deffered then                
+                if self.deffered then
                     InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
                     InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
 
@@ -130,19 +128,19 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
                 self:CustomizeOptions()
             end
         end
-    ) 
+    )
 
     self:SecureHook(
-        "CompactRaidFrameContainer_LayoutFrames", 
+        "CompactRaidFrameContainer_LayoutFrames",
         function()
             local groupType = IsInRaid() and "raid" or "party"
             self:CUFDefaults(groupType)
         end
     )
 
-    if self.db.profile.raid.frames.enhancedAbsorbs or self.db.profile.party.frames.enhancedAbsorbs then 
+    if self.db.profile.raid.frames.enhancedAbsorbs or self.db.profile.party.frames.enhancedAbsorbs then
         self:SecureHook(
-            "CompactUnitFrame_UpdateHealPrediction", 
+            "CompactUnitFrame_UpdateHealPrediction",
             function(frame)
                 if not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
 
@@ -153,53 +151,65 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
      self:SecureHook(
         self.dialog,
-        "FeedGroup", 
+        "FeedGroup",
         function() self:CustomizeOptions() end
     )
 
     self:SecureHook(
-        "CompactUnitFrame_UpdateAuras", 
+        "CompactUnitFrame_UpdateAuras",
         function(frame)
-            if not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
+            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
 
             self:UpdateAuras(frame)
         end
     )
 
     self:SecureHook(
-        "CompactUnitFrame_UpdateName", 
-        function(frame) self:SetUpName(frame, IsInRaid() and "raid" or "party") end
+        "CompactUnitFrame_UpdateName",
+        function(frame)
+            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+            self:SetUpName(frame, IsInRaid() and "raid" or "party") end
     )
 
     self:SecureHook(
-        "CompactUnitFrame_UpdateRoleIcon", 
-        function(frame) self:SetUpRoleIcon(frame, IsInRaid() and "raid" or "party") end
+        "CompactUnitFrame_UpdateRoleIcon",
+        function(frame)
+        if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+         self:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party") end
     )
 
     self:SecureHook(
-        "CompactUnitFrame_UpdateReadyCheck", 
-        function(frame) self:SetUpReadyCheckIcon(frame, IsInRaid() and "raid" or "party") end
+        "CompactUnitFrame_UpdateReadyCheck",
+        function(frame)
+            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+            self:SetUpReadyCheckIconInternal(frame, IsInRaid() and "raid" or "party") end
     )
 
     self:SecureHook(
-        "CompactUnitFrame_UpdateCenterStatusIcon", 
-        function(frame) self:SetUpCenterStatusIcon(frame, IsInRaid() and "raid" or "party") end
+        "CompactUnitFrame_UpdateCenterStatusIcon",
+        function(frame)
+            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+            self:SetUpCenterStatusIconInternal(frame, IsInRaid() and "raid" or "party") end
     )
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile", "GetRaidProfileSettings")
 
     self:SecureHook(
-        "SetCVar",         
+        "SetCVar",
         function(cvar, value)
             local groupType = IsInRaid() and "raid" or "party"
 
             if cvar == "useCompactPartyFrames" then
                 self.useCompactPartyFrames = value
-                
+
                 if self.db then
                     self:SafeRefresh(groupType)
                 end
-            end        
+            end
         end
     )
 
@@ -215,7 +225,7 @@ function KHMRaidFrames:RefreshConfig(groupType)
     self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
     self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
 
-    for group in self:IterateCompactGroups(groupType) do
+    for group in self.IterateCompactGroups(groupType) do
         self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)
     end
 
@@ -225,7 +235,7 @@ function KHMRaidFrames:RefreshConfig(groupType)
     end
 
     self:SetUpSoloFrame()
-end    
+end
 
 function KHMRaidFrames:GetRaidProfileSettings(profile)
     if InCombatLockdown() then return end
@@ -252,7 +262,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
 end
 
 function KHMRaidFrames:OnOptionShow()
-    if InCombatLockdown() then        
+    if InCombatLockdown() then
         self:HideAll()
         self.deffered = true
         return
@@ -286,5 +296,5 @@ function KHMRaidFrames:HideRaidFrame()
 end
 
 function KHMRaidFrames:HideAll()
-    _G["InterfaceOptionsFrame"]:Hide()  
+    _G["InterfaceOptionsFrame"]:Hide()
 end

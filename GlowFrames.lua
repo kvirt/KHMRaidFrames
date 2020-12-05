@@ -11,7 +11,7 @@ function KHMRaidFrames:StartGlow(frame, db, color, key, gType)
     if glowType == "button" then
         glowOptions.start(frame, color, options.frequency)
     elseif glowType == "pixel" then
-        glowOptions.start(frame, color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, key or "")    
+        glowOptions.start(frame, color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, key or "")
     elseif glowType == "auto" then
         glowOptions.start(frame, color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset, key or "")
     end
@@ -19,7 +19,7 @@ function KHMRaidFrames:StartGlow(frame, db, color, key, gType)
     self.glowingFrames[gType][key][frame] = color
 end
 
-function KHMRaidFrames:StopGlow(frame, db, key, gType)  
+function KHMRaidFrames:StopGlow(frame, db, key, gType)
     db.options[db.type].stop(frame, key or "")
 
     self.glowingFrames[gType][key][frame] = nil

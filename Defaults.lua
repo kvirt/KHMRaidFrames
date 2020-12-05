@@ -2,7 +2,7 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
 local _G, tinsert, CompactRaidFrameContainer = _G, tinsert, CompactRaidFrameContainer
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
-KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH = 72   
+KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH = 72
 
 KHMRaidFrames.defuffsColors = {
     magic = {0.2, 0.6, 1.0, 1},
@@ -23,8 +23,8 @@ function KHMRaidFrames:Defaults()
                 enhancedAbsorbs = false,
                 showPartySolo = false,
                 tracking = {},
-                trackingStr = "",                                
-            },        
+                trackingStr = "",
+            },
             dispelDebuffFrames = {
                 num = 3,
                 numInRow = 3,
@@ -35,12 +35,12 @@ function KHMRaidFrames:Defaults()
                 xOffset = 0,
                 yOffset = 0,
                 exclude = {},
-                excludeStr = "",                            
+                excludeStr = "",
             },
             debuffFrames = {
                 num = 3,
                 numInRow = 3,
-                rowsGrowDirection = "TOP",                
+                rowsGrowDirection = "TOP",
                 anchorPoint = "BOTTOMLEFT",
                 growDirection = "RIGHT",
                 size = 11,
@@ -50,19 +50,19 @@ function KHMRaidFrames:Defaults()
                 excludeStr = "",
                 bigDebuffSize = 11 + 9,
                 showBigDebuffs = true,
-                smartAnchoring = true,                                            
+                smartAnchoring = true,
             },
             buffFrames = {
                 num = 3,
                 numInRow = 3,
-                rowsGrowDirection = "TOP",                  
+                rowsGrowDirection = "TOP",
                 anchorPoint = "BOTTOMRIGHT",
                 growDirection = "LEFT",
                 size = 11,
                 xOffset = 0,
                 yOffset = 0,
                 exclude = {},
-                excludeStr = "",                                               
+                excludeStr = "",
             },
             raidIcon = {
                 enabled = true,
@@ -75,28 +75,29 @@ function KHMRaidFrames:Defaults()
                 name = {
                     font = "Friz Quadrata TT",
                     size = 6,
-                    flags = {                    
-                        ["OUTLINE"] = false, 
+                    flags = {
+                        ["OUTLINE"] = false,
                         ["THICKOUTLINE"] = false,
                         ["MONOCHROME"] = false,
                     },
                     hJustify = "LEFT",
                     xOffset = 0,
                     yOffset = -1,
-                    showServer = true,                    
+                    showServer = true,
+                    classColoredNames = false,
                 },
                 statusText = {
                     font = "Friz Quadrata TT",
                     size = 12,
-                    flags = {                    
-                        ["OUTLINE"] = false, 
+                    flags = {
+                        ["OUTLINE"] = false,
                         ["THICKOUTLINE"] = false,
                         ["MONOCHROME"] = false,
                     },
                     hJustify = "CENTER",
                     xOffset = 0,
-                    yOffset = 0,                    
-                },                
+                    yOffset = 0,
+                },
                 roleIcon = {
                     size = 12,
                     xOffset = 0,
@@ -104,7 +105,7 @@ function KHMRaidFrames:Defaults()
                     healer = "",
                     damager = "",
                     tank = "",
-                    vehicle = "",                  
+                    vehicle = "",
                 },
                 readyCheckIcon  = {
                     size = 15 ,
@@ -112,7 +113,7 @@ function KHMRaidFrames:Defaults()
                     yOffset = 0,
                     ready = "",
                     notready = "",
-                    waiting = "",               
+                    waiting = "",
                 },
                 centerStatusIcon = {
                     size = 22,
@@ -123,9 +124,9 @@ function KHMRaidFrames:Defaults()
                     hasIncomingSummonPending = "",
                     hasIncomingSummonAccepted = "",
                     hasIncomingSummonDeclined = "",
-                    inOtherPhase = "",                                        
-                },                                               
-            },                    
+                    inOtherPhase = "",
+                },
+            },
     }
     defaults_settings.profile.party = commons
     defaults_settings.profile.raid = commons
@@ -136,17 +137,17 @@ function KHMRaidFrames:Defaults()
                 type = "pixel",
                 options = self.GetGlowOptions(),
                 tracking = {},
-                trackingStr = "",    
+                trackingStr = "",
                 enabled = false,
-                useDefaultsColors = true,                
+                useDefaultsColors = true,
             },
             debuffFrames = {
                 type = "pixel",
                 options = self.GetGlowOptions(),
                 tracking = {},
-                trackingStr = "",    
+                trackingStr = "",
                 enabled = false,
-                useDefaultsColors = true,                
+                useDefaultsColors = true,
             },
             defaultColors = self.defuffsColors,
         },
@@ -155,24 +156,24 @@ function KHMRaidFrames:Defaults()
                 type = "pixel",
                 options = self.GetGlowOptions(),
                 tracking = {},
-                trackingStr = "",    
+                trackingStr = "",
                 enabled = false,
-                useDefaultsColors = true,                
+                useDefaultsColors = true,
             },
             debuffFrames = {
                 type = "pixel",
                 options = self.GetGlowOptions(),
                 tracking = {},
-                trackingStr = "",    
+                trackingStr = "",
                 enabled = false,
-                useDefaultsColors = true,                
+                useDefaultsColors = true,
             },
-            defaultColors = self.defuffsColors,                                                       
+            defaultColors = self.defuffsColors,
         },
         glowBlockList = {
             tracking = {},
-            trackingStr = "",              
-        },       
+            trackingStr = "",
+        },
     }
 
     return defaults_settings
@@ -180,7 +181,7 @@ end
 
 function KHMRaidFrames:RestoreDefaults(groupType, frameType)
     if InCombatLockdown() then
-        print("Can not refresh settings while in combat")      
+        print("Can not refresh settings while in combat")
         return
     end
 
@@ -195,12 +196,12 @@ end
 
 function KHMRaidFrames:CopySettings(dbFrom, dbTo)
     if InCombatLockdown() then
-        print("Can not refresh settings while in combat")      
+        print("Can not refresh settings while in combat")
         return
     end
 
     for k, v in pairs(dbFrom) do
-        if dbTo[k] ~= nil then 
+        if dbTo[k] ~= nil then
             dbTo[k] = v
         end
     end
@@ -212,11 +213,11 @@ function KHMRaidFrames:CUFDefaults(groupType)
     local deferred
     local isInCombatLockDown = InCombatLockdown()
 
-    for group in self:IterateCompactGroups(groupType) do
+    for group in self.IterateCompactGroups(groupType) do
         if self.processedFrames[group] == nil then
             deferred = self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)
 
-            if deferred == false then 
+            if deferred == false then
                 self.processedFrames[group] = true
             end
         end
@@ -226,7 +227,7 @@ function KHMRaidFrames:CUFDefaults(groupType)
         if self.processedFrames[frame] == nil then
             deferred = self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 
-            if deferred == false then 
+            if deferred == false then
                 self.processedFrames[frame] = true
             end
         end
@@ -239,11 +240,11 @@ function KHMRaidFrames:DefaultGroupSetUp(frame, groupType, isInCombatLockDown)
     local db = self.db.profile[groupType]
 
     if db.frames.hideGroupTitles then
-        frame.title:Hide()    
+        frame.title:Hide()
     else
         frame.title:Show()
-    end             
-        
+    end
+
 end
 
 function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
@@ -253,8 +254,8 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
     if not isInCombatLockDown then
         self:AddSubFrames(frame, groupType)
     else
-        deferred = true   
-    end 
+        deferred = true
+    end
 
     self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, self.componentScale)
     self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, self.componentScale)

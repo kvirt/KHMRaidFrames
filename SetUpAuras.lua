@@ -10,7 +10,7 @@ local positions = {
     ["RIGHT"] = L["RIGHT"],
     ["TOPRIGHT"] = L["TOPRIGHT"],
     ["TOP"] = L["TOP"],
-    ["CENTER"] = L["CENTER"],           
+    ["CENTER"] = L["CENTER"],
 }
 
 local grow_positions = {
@@ -21,7 +21,7 @@ local grow_positions = {
 }
 
 function KHMRaidFrames:SetupBuffFrames(db, groupType)
-    local options = {                
+    local options = {
         ["num"] = {
             name = L["Num"],
             desc = "",
@@ -30,13 +30,13 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             min = 0,
             max = self.maxFrames,
             step = 1,
-            order = 1,          
+            order = 1,
             set = function(info,val)
                 db.num = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.num end
-        },       
+        },
         ["size"] = {
             name = L["Size"],
             desc = "",
@@ -45,7 +45,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             min = 1,
             max = 100,
             step = 1,
-            order = 1,           
+            order = 1,
             set = function(info,val)
                 db.size = val
                 self:SafeRefresh(groupType)
@@ -60,13 +60,13 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             min = 1,
             max = self.maxFrames,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.numInRow = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.numInRow end
-        },                
+        },
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
@@ -75,7 +75,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.xOffset = val
                 self:SafeRefresh(groupType)
@@ -90,23 +90,23 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.yOffset = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.yOffset end
-        },                                           
+        },
         ["AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
             width = "normal",
             type = "select",
             values = positions,
-            order = 3,           
+            order = 3,
             set = function(info,val)
                 db.anchorPoint = val
-                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]              
+                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.anchorPoint end
@@ -124,20 +124,20 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.growDirection end
-        },                                   
+        },
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
             order = 4,
-        },                
+        },
         ["exclude"] = {
             name = L["Exclude"],
             desc = L["Exclude auras"],
             usage = self:TrackingHelpText(),
             width = "full",
             type = "input",
-            multiline = 5, 
-            order = 5,                   
+            multiline = 5,
+            order = 5,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -146,10 +146,10 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             end,
             get = function(info)
                 return db.excludeStr
-            end              
+            end
         },
         ["Copy"] = {
-            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
@@ -158,7 +158,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].buffFrames)
             end,
-        },                                
+        },
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
@@ -169,14 +169,14 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             func = function(info,val)
                 self:RestoreDefaults(groupType, "buffFrames")
             end,
-        },                       
+        },
     }
-    return options   
+    return options
 end
 
 function KHMRaidFrames:SetupDebuffFrames(db, groupType)
 
-    local options = {                
+    local options = {
         ["num"] = {
             name = L["Num"],
             desc = "",
@@ -185,13 +185,13 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = 0,
             max = self.maxFrames,
             step = 1,
-            order = 1,          
+            order = 1,
             set = function(info,val)
                 db.num = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.num end
-        },       
+        },
         ["size"] = {
             name = L["Size"],
             desc = "",
@@ -200,7 +200,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = 1,
             max = 100,
             step = 1,
-            order = 1,           
+            order = 1,
             set = function(info,val)
                 db.size = val
                 self:SafeRefresh(groupType)
@@ -215,13 +215,13 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = 1,
             max = self.maxFrames,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.numInRow = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.numInRow end
-        },                
+        },
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
@@ -230,7 +230,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.xOffset = val
                 self:SafeRefresh(groupType)
@@ -245,23 +245,23 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.yOffset = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.yOffset end
-        },                                           
+        },
         ["AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
             width = "normal",
             type = "select",
             values = positions,
-            order = 3,           
+            order = 3,
             set = function(info,val)
                 db.anchorPoint = val
-                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]              
+                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.anchorPoint end
@@ -279,7 +279,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.growDirection end
-        },                              
+        },
         ["Skip2"] = {
             type = "header",
             name = L["Big Debuffs"],
@@ -290,13 +290,13 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             desc = "",
             width = "normal",
             type = "toggle",
-            order = 5,        
+            order = 5,
             set = function(info,val)
                 db.showBigDebuffs = val
                 self:SafeRefresh(groupType)
             end,
-            get = function(info) 
-                return db.showBigDebuffs 
+            get = function(info)
+                return db.showBigDebuffs
             end
         },
         ["Smart Anchoring"] = {
@@ -307,15 +307,15 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             order = 6,
             disabled = function(info)
                 return not db.showBigDebuffs
-            end,                    
+            end,
             set = function(info,val)
                 db.smartAnchoring = val
                 self:SafeRefresh(groupType)
             end,
-            get = function(info) 
-                return db.smartAnchoring 
+            get = function(info)
+                return db.smartAnchoring
             end
-        },        
+        },
         ["bigDebuffSize"] = {
             name = L["Size"],
             desc = "",
@@ -327,26 +327,26 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             order = 7,
             disabled = function(info)
                 return not db.showBigDebuffs or db.smartAnchoring
-            end,                         
+            end,
             set = function(info,val)
                 db.bigDebuffSize = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.bigDebuffSize end
-        },        
+        },
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
             order = 8,
-        },                
+        },
         ["exclude"] = {
             name = L["Exclude"],
             desc = L["Exclude auras"],
             usage = self:TrackingHelpText(),
             width = "full",
             type = "input",
-            multiline = 5, 
-            order = 9,                   
+            multiline = 5,
+            order = 9,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -355,10 +355,10 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             end,
             get = function(info)
                 return db.excludeStr
-            end              
+            end
         },
         ["Copy"] = {
-            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
@@ -367,7 +367,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].debuffFrames)
             end,
-        },                               
+        },
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
@@ -378,14 +378,14 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             func = function(info,val)
                 self:RestoreDefaults(groupType, "debuffFrames")
             end,
-        },                       
+        },
     }
-    return options   
+    return options
 end
 
 function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
 
-    local options = {                
+    local options = {
         ["num"] = {
             name = L["Num"],
             desc = "",
@@ -394,13 +394,13 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             min = 0,
             max = 4,
             step = 1,
-            order = 1,          
+            order = 1,
             set = function(info,val)
                 db.num = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.num end
-        },       
+        },
         ["size"] = {
             name = L["Size"],
             desc = "",
@@ -409,7 +409,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             min = 1,
             max = 100,
             step = 1,
-            order = 1,           
+            order = 1,
             set = function(info,val)
                 db.size = val
                 self:SafeRefresh(groupType)
@@ -424,13 +424,13 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             min = 1,
             max = 4,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.numInRow = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.numInRow end
-        },                
+        },
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
@@ -439,7 +439,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.xOffset = val
                 self:SafeRefresh(groupType)
@@ -454,23 +454,23 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 2,          
+            order = 2,
             set = function(info,val)
                 db.yOffset = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.yOffset end
-        },                                           
+        },
         ["AnchorPoint"] = {
             name = L["Anchor Point"],
             desc = "",
             width = "normal",
             type = "select",
             values = positions,
-            order = 3,           
+            order = 3,
             set = function(info,val)
                 db.anchorPoint = val
-                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]              
+                db.rowsGrowDirection = self.rowsGrows[val][db.growDirection]
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.anchorPoint end
@@ -488,20 +488,20 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
                 self:SafeRefresh(groupType)
             end,
             get = function(info) return db.growDirection end
-        },                                    
+        },
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
             order = 4,
-        },                
+        },
         ["exclude"] = {
             name = L["Exclude"],
             desc = L["Exclude auras"],
             usage = self:TrackingHelpText(),
             width = "full",
             type = "input",
-            multiline = 5, 
-            order = 5,                   
+            multiline = 5,
+            order = 5,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -510,10 +510,10 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             end,
             get = function(info)
                 return db.excludeStr
-            end              
+            end
         },
         ["Copy"] = {
-            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),          
+            name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
@@ -522,7 +522,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].dispelDebuffFrames)
             end,
-        },                               
+        },
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
@@ -533,7 +533,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             func = function(info,val)
                 self:RestoreDefaults(groupType, "dispelDebuffFrames")
             end,
-        },                       
+        },
     }
-    return options   
+    return options
 end

@@ -1,12 +1,12 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
-local _G = _G
+local UnitIsPlayer, CreateFrame, UIParent = UnitIsPlayer, CreateFrame, UIParent
 
 
 function KHMRaidFrames:GetVirtualFrames()
     local frame
 
-    for frameType in self:IterateSubFrameTypes() do
+    for frameType in self.IterateSubFrameTypes() do
         for i=1, self.maxFrames do
             frame = CreateFrame("Frame", nil, UIParent)
             self.virtual.frames[frameType..i] = frame
@@ -37,10 +37,10 @@ function KHMRaidFrames:GetVirtualFrames()
 end
 
 function KHMRaidFrames:ShowVirtual()
-    local frame 
+    local frame
 
     for _frame in self:IterateCompactFrames("raid") do
-        if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then        
+        if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then
             frame = _frame
             break
         end
@@ -48,7 +48,7 @@ function KHMRaidFrames:ShowVirtual()
 
     if frame == nil then
         for _frame in self:IterateCompactFrames("party") do
-            if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then        
+            if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then
                 frame = _frame
                 break
             end
@@ -59,7 +59,7 @@ function KHMRaidFrames:ShowVirtual()
         return
     end
 
-    self.virtual.shown = true 
+    self.virtual.shown = true
     self.virtual.frame = frame
 
     self:SetUpVirtual("buffFrames", self.virtual.groupType, self.componentScale)
@@ -84,7 +84,7 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
         elseif frameNum <= db.num then
             typedframes[frameNum]:Show()
         end
-    end 
+    end
 
     self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, resize)
 
@@ -95,10 +95,10 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
 
         typedframes[1]:SetSize(size, size)
 
-        if db.smartAnchoring then      
+        if db.smartAnchoring then
             self:SmartAnchoring(self.virtual.frame, typedframes, db)
         end
-    end    
+    end
 end
 
 function KHMRaidFrames:HideVirtual()
@@ -106,5 +106,5 @@ function KHMRaidFrames:HideVirtual()
         frame:Hide()
     end
 
-    self.virtual.shown = false        
+    self.virtual.shown = false
 end

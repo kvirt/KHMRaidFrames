@@ -2,27 +2,50 @@ local addonName, addonTable = ...
 addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "AceHook-3.0", "AceEvent-3.0", "AceConsole-3.0")
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
-local _G, GetReadyCheckStatus, UnitInRaid, UnitHasVehicleUI, UnitInVehicle, GetRaidRosterInfo, UnitGroupRolesAssigned = _G, GetReadyCheckStatus, UnitInRaid, UnitHasVehicleUI, UnitInVehicle, GetRaidRosterInfo, UnitGroupRolesAssigned
-local UnitPopupButtons = {
-    ["RAID_TARGET_1"] = UnitPopupButtons["RAID_TARGET_1"],
-    ["RAID_TARGET_2"] = UnitPopupButtons["RAID_TARGET_2"],
-    ["RAID_TARGET_3"] = UnitPopupButtons["RAID_TARGET_3"],
-    ["RAID_TARGET_4"] = UnitPopupButtons["RAID_TARGET_4"],
-    ["RAID_TARGET_5"] = UnitPopupButtons["RAID_TARGET_5"],
-    ["RAID_TARGET_6"] = UnitPopupButtons["RAID_TARGET_6"],
-    ["RAID_TARGET_7"] = UnitPopupButtons["RAID_TARGET_7"],
-    ["RAID_TARGET_8"] = UnitPopupButtons["RAID_TARGET_8"],             
-}
+local _G = _G
+local GetReadyCheckStatus = GetReadyCheckStatus
+local UnitInRaid = UnitInRaid
+local UnitHasVehicleUI = UnitHasVehicleUI
+local UnitInVehicle = UnitInVehicle
+local GetRaidRosterInfo = GetRaidRosterInfo
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+local UnitPhaseReason = UnitPhaseReason
+local Enum = Enum
+local C_IncomingSummon = C_IncomingSummon
+local UnitHasIncomingResurrection = UnitHasIncomingResurrection
+local UnitInOtherParty = UnitInOtherParty
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local UnitClass = UnitClass
+local UnitPopupButtons = UnitPopupButtons
+local GetRaidTargetIndex = GetRaidTargetIndex
+local IsInRaid = IsInRaid
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
+local C_Timer = C_Timer
+local GetUnitName = GetUnitName
 
+local englishClasses = {
+    "WARRIOR",
+    "PALADIN",
+    "HUNTER",
+    "ROGUE",
+    "PRIEST",
+    "DEATHKNIGHT",
+    "SHAMAN",
+    "MAGE",
+    "WARLOCK",
+    "MONK",
+    "DRUID",
+    "DEMONHUNTER",
+}
 
 function KHMRaidFrames:UpdateRaidMark()
     for frame in self:IterateCompactFrames("raid") do
-        self:SetUpRaidIcon(frame, "raid") 
+        self:SetUpRaidIcon(frame, "raid")
     end
 
     for frame in self:IterateCompactFrames("party") do
-        self:SetUpRaidIcon(frame, "party") 
-    end      
+        self:SetUpRaidIcon(frame, "party")
+    end
 end
 
 function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, resize)
@@ -38,7 +61,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         elseif frameNum % (db.numInRow) == 1 then
             anchor1, relativeFrame, anchor2 = self.rowsPositions[db.rowsGrowDirection][1], typedframes[frameNum - db.numInRow], self.rowsPositions[db.rowsGrowDirection][2]
         else
-            anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]           
+            anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]
         end
 
         if frameNum == 1 then
@@ -50,15 +73,15 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         end
 
         typedframe:SetPoint(
-            anchor1, 
-            relativeFrame, 
-            anchor2, 
-            xOffset, 
+            anchor1,
+            relativeFrame,
+            anchor2,
+            xOffset,
             yOffset
         )
-        
+
         typedframe:SetSize(db.size * resize, db.size * resize)
-        
+
         if self.db.profile[groupType].frames.clickThrough then
             typedframe:EnableMouse(false)
         else
@@ -66,7 +89,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         end
 
         frameNum = frameNum + 1
-    end     
+    end
 end
 
 function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
@@ -89,7 +112,7 @@ function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
         index = 0
     else
         index = tonumber(index)
-    end    
+    end
 
     if index and index >= 1 and index <= 8 then
         local options = UnitPopupButtons["RAID_TARGET_"..index]
@@ -107,8 +130,8 @@ function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
         frame.raidIcon:Show()
     else
         frame.raidIcon:Hide()
-    end  
-end                  
+    end
+end
 
 function KHMRaidFrames:ResizeGroups(frame, yOffset)
     local totalHeight, totalWidth = 0, 0
@@ -120,7 +143,7 @@ function KHMRaidFrames:ResizeGroups(frame, yOffset)
         local frame1 = _G[frame:GetName().."Member1"];
         frame1:ClearAllPoints()
         frame1:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, yOffset)
-        
+
         for i=2, 5 do
             local unitFrame = _G[frame:GetName().."Member"..i]
             unitFrame:ClearAllPoints()
@@ -136,7 +159,7 @@ function KHMRaidFrames:ResizeGroups(frame, yOffset)
         local frame1 = _G[frame:GetName().."Member1"];
         frame1:ClearAllPoints()
         frame1:SetPoint("TOP", frame, "TOP", 0, yOffset)
-        
+
         for i=2, 5 do
             local unitFrame = _G[frame:GetName().."Member"..i]
             unitFrame:ClearAllPoints()
@@ -147,23 +170,23 @@ function KHMRaidFrames:ResizeGroups(frame, yOffset)
         totalWidth = totalWidth + _G[frame:GetName().."Member1"]:GetWidth()
     end
 
-    return totalHeight, totalWidth           
+    return totalHeight, totalWidth
 end
 
 function KHMRaidFrames:SetUpAbsorb(frame)
     if not frame then return end
 
-    if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end   
-     
+    if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end
+
     local absorbBar = frame.totalAbsorb
     if not absorbBar or absorbBar:IsForbidden()then return end
-    
+
     local absorbOverlay = frame.totalAbsorbOverlay
     if not absorbOverlay or absorbOverlay:IsForbidden() or not absorbOverlay.tileSize then return end
-    
+
     local healthBar = frame.healthBar
     if not healthBar or healthBar:IsForbidden() then return end
-    
+
     local _, maxHealth = healthBar:GetMinMaxValues()
     if maxHealth <= 0 then return end
 
@@ -173,7 +196,7 @@ function KHMRaidFrames:SetUpAbsorb(frame)
     if totalAbsorb > maxHealth then
         totalAbsorb = maxHealth
     end
-    
+
     local overAbsorbGlow = frame.overAbsorbGlow
     if overAbsorbGlow and not overAbsorbGlow:IsForbidden() then overAbsorbGlow:Hide() end
 
@@ -185,17 +208,17 @@ function KHMRaidFrames:SetUpAbsorb(frame)
             absorbOverlay:SetPoint("BOTTOMRIGHT", absorbBar, "BOTTOMRIGHT", 0, 0)
         else
             absorbOverlay:SetPoint("TOPRIGHT", healthBar, "TOPRIGHT", 0, 0)
-            absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", 0, 0)             
+            absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", 0, 0)
         end
 
-        local totalWidth, totalHeight = healthBar:GetSize()           
+        local totalWidth, totalHeight = healthBar:GetSize()
         local barSize = totalAbsorb / maxHealth * totalWidth
 
         absorbOverlay:SetWidth(barSize)
         absorbOverlay:SetTexCoord(0, barSize / absorbOverlay.tileSize, 0, totalHeight / absorbOverlay.tileSize)
         absorbBar:SetAlpha(0.5)
         absorbOverlay:Show()
-    end  
+    end
 end
 
 function KHMRaidFrames:SetUpSoloFrame()
@@ -232,23 +255,33 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         _name = _name and _name:gsub("%p", "")
     end
 
+    if db.classColoredNames then
+        local _, _, id = UnitClass(frame.unit)
+
+        if id then
+            local englishClass = englishClasses[id]
+            local classColor = RAID_CLASS_COLORS[englishClass]
+            name:SetTextColor(classColor.r, classColor.g, classColor.b)
+        end
+    end
+
     name:SetText(_name)
 
     name:SetFont(
-        self.fonts[db.font], 
+        self.fonts[db.font],
         size,
         flags
     )
 
-    xOffset, yOffset = self:Offsets("TOPLEFT")
+    local xOffset, yOffset = self:Offsets("TOPLEFT")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
     name:SetPoint(
-        "TOPLEFT", 
-        frame, 
-        "TOPLEFT", 
-        xOffset, 
+        "TOPLEFT",
+        frame,
+        "TOPLEFT",
+        xOffset,
         yOffset
     )
 
@@ -270,25 +303,25 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:ClearAllPoints()
 
     statusText:SetFont(
-        self.fonts[db.font], 
+        self.fonts[db.font],
         size,
         flags
     )
 
-    xOffset, yOffset = self:Offsets("BOTTOMLEFT")
+    local xOffset, yOffset = self:Offsets("BOTTOMLEFT")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
 
     statusText:SetPoint(
-        "BOTTOMLEFT", 
-        frame, 
-        "BOTTOMLEFT", 
-        xOffset, 
+        "BOTTOMLEFT",
+        frame,
+        "BOTTOMLEFT",
+        xOffset,
         yOffset
     )
 
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", xOffset, yOffset)
-    statusText:SetJustifyH(db.hJustify)   
+    statusText:SetJustifyH(db.hJustify)
 end
 
 function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
@@ -300,21 +333,29 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
 
     roleIcon:ClearAllPoints()
 
-    xOffset, yOffset = self:Offsets("TOPLEFT")
+    local xOffset, yOffset = self:Offsets("TOPLEFT")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
     roleIcon:SetPoint(
-        "TOPLEFT", 
-        frame, 
-        "TOPLEFT", 
-        xOffset, 
+        "TOPLEFT",
+        frame,
+        "TOPLEFT",
+        xOffset,
         yOffset
     )
 
     roleIcon:SetSize(size, size)
 
+    self:SetUpRoleIconInternal(frame, groupType)
+end
+
+function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     if not frame.unit then return end
+    if not frame.roleIcon then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.roleIcon
+    local roleIcon = frame.roleIcon
 
     local raidID = UnitInRaid(frame.unit)
 
@@ -337,7 +378,7 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
                 roleIcon:SetTexCoord(0, 1, 0, 1)
             end
         end
-    end    
+    end
 end
 
 function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
@@ -349,21 +390,29 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     readyCheckIcon:ClearAllPoints()
 
-    xOffset, yOffset = self:Offsets("BOTTOM")
+    local xOffset, yOffset = self:Offsets("BOTTOM")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
 
     readyCheckIcon:SetPoint(
-        "BOTTOM", 
-        frame, 
-        "BOTTOM", 
-        xOffset, 
+        "BOTTOM",
+        frame,
+        "BOTTOM",
+        xOffset,
         yOffset
     )
 
     readyCheckIcon:SetSize(size, size)
 
+    self:SetUpReadyCheckIconInternal(frame, groupType)
+end
+
+function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
     if not frame.unit then return end
+    if not frame.readyCheckIcon then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
+    local readyCheckIcon = frame.readyCheckIcon
 
     local readyCheckStatus = GetReadyCheckStatus(frame.unit)
     if db[readyCheckStatus] ~= "" then
@@ -380,22 +429,30 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     centerStatusIcon:ClearAllPoints()
 
-    xOffset, yOffset = self:Offsets("BOTTOM")
+    local xOffset, yOffset = self:Offsets("BOTTOM")
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
 
     centerStatusIcon:SetPoint(
-        "BOTTOM", 
-        frame, 
-        "BOTTOM", 
-        xOffset, 
+        "BOTTOM",
+        frame,
+        "BOTTOM",
+        xOffset,
         yOffset
     )
 
     centerStatusIcon:SetSize(size, size)
 
+    self:SetUpCenterStatusIconInternal(frame, groupType)
+end
+
+function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
     if not frame.unit then return end
-    
+    if not frame.centerStatusIcon then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
+    local centerStatusIcon = frame.centerStatusIcon
+
     if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) and db.inOtherGroup ~= "" then
         centerStatusIcon.texture:SetTexture(db.inOtherGroup)
         centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
@@ -422,5 +479,5 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
                 centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
             end
         end
-    end    
+    end
 end

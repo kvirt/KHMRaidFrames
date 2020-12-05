@@ -17,7 +17,7 @@ function KHMRaidFrames.GetGlowOptions(key)
                 border = false,
             },
             start = LCG.PixelGlow_Start,
-            stop = LCG.PixelGlow_Stop,   
+            stop = LCG.PixelGlow_Stop,
         },
         auto = {
             options = {
@@ -27,47 +27,47 @@ function KHMRaidFrames.GetGlowOptions(key)
                 scale = 1,
                 xOffset = 0,
                 yOffset = 0,
-            },            
+            },
             start = LCG.AutoCastGlow_Start,
-            stop = LCG.AutoCastGlow_Stop,                       
+            stop = LCG.AutoCastGlow_Stop,
         },
         button = {
             options = {
                 color = {0.95, 0.95, 0.32, 1},
                 frequency = 0.125,
-            },          
+            },
             start = LCG.ButtonGlow_Start,
-            stop = LCG.ButtonGlow_Stop,                   
-        },      
+            stop = LCG.ButtonGlow_Stop,
+        },
     }
     if key and options[key] then return options[key] else return options end
 end
 
 function KHMRaidFrames:GlowSubTypes(glowType)
-    options = {}
+    local options = {}
 
     options.buffFrames = {
         type = "group",
         order = 1,
         name = L["Buffs"],
         desc = "",
-        childGroups = "tab",  
-        args = self:SetupGlowOptions("buffFrames", glowType),        
+        childGroups = "tab",
+        args = self:SetupGlowOptions("buffFrames", glowType),
     }
     options.debuffFrames = {
         type = "group",
         order = 2,
         name = L["Debuffs"],
         desc = "",
-        childGroups = "tab",  
-        args = self:SetupGlowOptions("debuffFrames", glowType),        
+        childGroups = "tab",
+        args = self:SetupGlowOptions("debuffFrames", glowType),
     }
     options.defaultColors = {
         type = "group",
         order = 3,
         name = L["Default Colors"],
         desc = "",
-        childGroups = "tab",  
+        childGroups = "tab",
         args = {
             ["color magic"] = {
                 name = L["Magic"],
@@ -75,22 +75,22 @@ function KHMRaidFrames:GlowSubTypes(glowType)
                 width = "full",
                 type = "color",
                 order = 1,
-                hasAlpha = true,                   
+                hasAlpha = true,
                 set = function(info, r, g, b, a)
-                    self.db.profile.glows[glowType].defaultColors.magic = {r, g, b, a} 
+                    self.db.profile.glows[glowType].defaultColors.magic = {r, g, b, a}
                 end,
                 get = function(info)
                     local color = self.db.profile.glows[glowType].defaultColors.magic
                     return color[1], color[2], color[3], color[4]
                 end
-            }, 
+            },
             ["color curse"] = {
                 name = L["Curse"],
                 desc = "",
                 width = "full",
                 type = "color",
                 order = 2,
-                hasAlpha = true,                   
+                hasAlpha = true,
                 set = function(info, r, g, b, a)
                     self.db.profile.glows[glowType].defaultColors.curse = {r, g, b, a}
                 end,
@@ -98,29 +98,29 @@ function KHMRaidFrames:GlowSubTypes(glowType)
                     local color = self.db.profile.glows[glowType].defaultColors.curse
                     return color[1], color[2], color[3], color[4]
                 end
-            },  
+            },
             ["color disease"] = {
                 name = L["Disease"],
                 desc = "",
                 width = "full",
                 type = "color",
                 order = 3,
-                hasAlpha = true,                   
+                hasAlpha = true,
                 set = function(info, r, g, b, a)
-                    self.db.profile.glows[glowType].defaultColors.disease = {r, g, b, a} 
+                    self.db.profile.glows[glowType].defaultColors.disease = {r, g, b, a}
                 end,
                 get = function(info)
                     local color = self.db.profile.glows[glowType].defaultColors.disease
                     return color[1], color[2], color[3], color[4]
                 end
-            },  
+            },
             ["color poison"] = {
                 name = L["Poison"],
                 desc = "",
                 width = "full",
                 type = "color",
                 order = 4,
-                hasAlpha = true,                   
+                hasAlpha = true,
                 set = function(info, r, g, b, a)
                     self.db.profile.glows[glowType].defaultColors.poison = {r, g, b, a}
                 end,
@@ -128,16 +128,16 @@ function KHMRaidFrames:GlowSubTypes(glowType)
                     local color = self.db.profile.glows[glowType].defaultColors.poison
                     return color[1], color[2], color[3], color[4]
                 end
-            },  
+            },
             ["color physical"] = {
                 name = L["Physical"],
                 desc = "",
                 width = "full",
                 type = "color",
                 order = 5,
-                hasAlpha = true,                   
+                hasAlpha = true,
                 set = function(info, r, g, b, a)
-                    self.db.profile.glows[glowType].defaultColors.physical = {r, g, b, a} 
+                    self.db.profile.glows[glowType].defaultColors.physical = {r, g, b, a}
                 end,
                 get = function(info)
                     local color = self.db.profile.glows[glowType].defaultColors.physical
@@ -148,7 +148,7 @@ function KHMRaidFrames:GlowSubTypes(glowType)
                 type = "header",
                 name = "",
                 order = 6,
-            },                                       
+            },
             ["Color Reset"] = {
                 name = L["Reset to Default"],
                 desc = "",
@@ -159,11 +159,11 @@ function KHMRaidFrames:GlowSubTypes(glowType)
                 func = function(info,val)
                     self:RestoreDefaultColors(glowType)
                     self:RestartOptionsGlows("buffFrames", glowType)
-                    self:RestartOptionsGlows("debuffFrames", glowType)              
+                    self:RestartOptionsGlows("debuffFrames", glowType)
                 end,
-            },                                                                            
-        },      
-    }    
+            },
+        },
+    }
 
     return options
 end
@@ -179,31 +179,31 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             desc = "",
             width = "double",
             type = "toggle",
-            order = 1,          
+            order = 1,
             set = function(info,val)
                 db.enabled = val
-                self:RestartOptionsGlows(frameType, glowType)                                  
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info)
-                self:HideVirtual() 
-                return db.enabled 
+                self:HideVirtual()
+                return db.enabled
             end
         },
         ["useDefaultsColors"..frameName] = {
             name = L["Use Default Colors"],
-            desc = self:DebuffColorsText(),
+            desc = self.DebuffColorsText(),
             width = "normal",
             type = "toggle",
             order = 2,
             disabled = function(info)
                 return not db.enabled
-            end,                       
+            end,
             set = function(info,val)
                 db.useDefaultsColors = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.useDefaultsColors end
-        },              
+        },
         ["glowType"..frameName] = {
             name = L["Glow Type"],
             desc = "",
@@ -215,14 +215,14 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             end,
             values = function(info, val)
                 return {
-                    pixel = "pixel", 
-                    auto = "auto", 
+                    pixel = "pixel",
+                    auto = "auto",
                     button = "button",
                 }
-            end,      
+            end,
             set = function(info,val)
                 db.type = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.type end
         },
@@ -235,16 +235,16 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             hasAlpha = true,
             disabled = function(info)
                 return not db.enabled or db.useDefaultsColors
-            end,                     
+            end,
             set = function(info, r, g, b, a)
                 db.options[db.type].options.color = {r, g, b, a}
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info)
                 local color = db.options[db.type].options.color
                 return color[1], color[2], color[3], color[4]
             end
-        },               
+        },
         ["frequency"..frameName] = {
             name = L["Frequency"],
             desc = "",
@@ -256,10 +256,10 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 2,
             disabled = function(info)
                 return not db.enabled
-            end,                    
+            end,
             set = function(info,val)
                 db.options[db.type].options.frequency = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.frequency end
         },
@@ -267,7 +267,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             type = "header",
             name = "",
             order = 3,
-        },         
+        },
         ["num"..frameName] = {
             name = L["Num"],
             desc = "",
@@ -279,14 +279,14 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 4,
             disabled = function(info)
                 return not db.enabled
-            end,            
+            end,
             hidden = function(info)
                 local options = self.GetGlowOptions(db.type)
                 if options.options["N"] ~= nil then return false else return true end
-            end,                  
+            end,
             set = function(info,val)
                 db.options[db.type].options.N = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.N end
         },
@@ -301,14 +301,14 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 5,
             disabled = function(info)
                 return not db.enabled
-            end,            
+            end,
             hidden = function(info)
                 local options = self.GetGlowOptions(db.type)
                 if options.options["xOffset"] ~= nil then return false else return true end
-            end,                     
+            end,
             set = function(info,val)
                 db.options[db.type].options.xOffset = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.xOffset end
         },
@@ -323,14 +323,14 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 6,
             disabled = function(info)
                 return not db.enabled
-            end,            
+            end,
             hidden = function(info)
                 local options = self.GetGlowOptions(db.type)
                 if options.options["yOffset"] ~= nil then return false else return true end
-            end,                     
+            end,
             set = function(info,val)
                 db.options[db.type].options.yOffset = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.yOffset end
         },
@@ -345,17 +345,17 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 7,
             disabled = function(info)
                 return not db.enabled
-            end,            
+            end,
             hidden = function(info)
                 local options = self.GetGlowOptions(db.type)
                 if options.options["th"] ~= nil then return false else return true end
-            end,                       
+            end,
             set = function(info,val)
                 db.options[db.type].options.th = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.th end
-        },      
+        },
         ["border"..frameName] = {
             name = L["Border"],
             desc = "",
@@ -364,14 +364,14 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 8,
             disabled = function(info)
                 return not db.enabled
-            end,            
+            end,
             hidden = function(info)
                 local options = self.GetGlowOptions(db.type)
                 if options.options["border"] ~= nil then return false else return true end
-            end,                       
+            end,
             set = function(info,val)
                 db.options[db.type].options.border = val
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.border end
         },
@@ -382,37 +382,37 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             hidden = function(info)
                 local options = self.GetGlowOptions(db.type)
                 if options.options["N"] ~= nil then return false else return true end
-            end,             
-        },                                        
+            end,
+        },
         ["tracking"..frameName] = {
             name = L["Tracking"],
             desc = L["Track auras"],
             width = "full",
             type = "input",
             usage = self:TrackingHelpText(),
-            multiline = 5, 
+            multiline = 5,
             order = 10,
             hidden = function(info)
                 return frameType == "dispelDebuffFrames"
             end,
             disabled = function(info)
                 return not db.enabled
-            end,                 
+            end,
             set = function(info,val)
                 db.tracking = self:SanitizeStrings(val)
                 db.trackingStr = val
 
-                self:RestartOptionsGlows(frameType, glowType)   
+                self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info)
                 return db.trackingStr
-            end             
+            end
         },
         [frameType.."Skip"] = {
             type = "header",
             name = "",
             order = 11,
-        },                                       
+        },
         [frameType.."Reset"] = {
             name = L["Reset to Default"],
             desc = "",
@@ -422,16 +422,16 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 12,
             func = function(info,val)
                 self:RestoreGlowDefaults(frameType, glowType)
-                self:RestartOptionsGlows(frameType, glowType)               
+                self:RestartOptionsGlows(frameType, glowType)
             end,
-        },                                 
+        },
     }
     return options
 end
 
 function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
     if InCombatLockdown() then
-        print("Can not refresh settings while in combat")      
+        print("Can not refresh settings while in combat")
         return
     end
 
@@ -456,15 +456,15 @@ end
 
 function KHMRaidFrames:RestartOptionsGlows(frameType, glowType)
     local db = self.db.profile.glows[glowType][frameType]
-    
+
     for frame, color in pairs(self.glowingFrames[glowType][frameType]) do
         for _, _glowType in ipairs{"pixel", "auto", "button"} do
             self.GetGlowOptions(_glowType).stop(frame, frameType or "")
 
-            self.glowingFrames[glowType][frameType][frame] = nil            
+            self.glowingFrames[glowType][frameType][frame] = nil
         end
 
         local color = db.useDefaultsColors and color or db.options[db.type].color
-        self:StartGlow(frame, db, color, frameType, glowType)           
-    end  
+        self:StartGlow(frame, db, color, frameType, glowType)
+    end
 end
