@@ -404,6 +404,10 @@ function KHMRaidFrames:UpdateAuras(frame)
         self:SmartAnchoring(frame, frame.debuffFrames, db)
     end
 
+    if self.Masque then
+        self.Masque.debuffFrames:ReSkin()
+    end
+
     db = self.db.profile.glows.frameGlow
 
     if db.buffFrames.enabled then

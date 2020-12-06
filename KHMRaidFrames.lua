@@ -96,6 +96,12 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             self.Masque[subFrameType]:RemoveButton(button)
             self.Masque[subFrameType]:AddButton(button, {Icon = typedframe.icon, Cooldown = typedframe.cooldown})
 
+            if self.db.profile[groupType].frames.clickThrough then
+                button:EnableMouse(false)
+            else
+                button:EnableMouse(true)
+            end
+
             button:SetAllPoints()
         end
 
