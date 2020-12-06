@@ -572,9 +572,13 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 get = function(info) return db.roleIcon.yOffset end
             },
             [frameType.."Skip1"] = {
-                type = "header",
+                type = "execute",
                 name = L["Custom Texture"],
                 order = 4,
+                width = "full",
+                func = function(info,val)
+                    db.roleIcon.toggle = not db.roleIcon.toggle
+                end,
             },
             ["healer"] = {
                 name = L["Healer"],
@@ -582,6 +586,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 5,
+                hidden = function(info)
+                    return not db.roleIcon.toggle
+                end,
                 set = function(info,val)
                     db.roleIcon.healer = val
                     self:SafeRefresh(groupType)
@@ -594,6 +601,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 6,
+                hidden = function(info)
+                    return not db.roleIcon.toggle
+                end,
                 set = function(info,val)
                     db.roleIcon.damager = val
                     self:SafeRefresh(groupType)
@@ -606,6 +616,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 7,
+                hidden = function(info)
+                    return not db.roleIcon.toggle
+                end,
                 set = function(info,val)
                     db.roleIcon.tank = val
                     self:SafeRefresh(groupType)
@@ -618,6 +631,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 8,
+                hidden = function(info)
+                    return not db.roleIcon.toggle
+                end,
                 set = function(info,val)
                     db.roleIcon.vehicle = val
                     self:SafeRefresh(groupType)
@@ -707,9 +723,13 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 get = function(info) return db.readyCheckIcon.yOffset end
             },
             [frameType.."Skip1"] = {
-                type = "header",
+                type = "execute",
                 name = L["Custom Texture"],
                 order = 4,
+                width = "full",
+                func = function(info,val)
+                    db.readyCheckIcon.toggle = not db.readyCheckIcon.toggle
+                end,
             },
             ["ready"] = {
                 name = L["Ready"],
@@ -717,6 +737,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 5,
+                hidden = function(info)
+                    return not db.readyCheckIcon.toggle
+                end,
                 set = function(info,val)
                     db.readyCheckIcon.ready = val
                     self:SafeRefresh(groupType)
@@ -729,6 +752,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 6,
+                hidden = function(info)
+                    return not db.readyCheckIcon.toggle
+                end,
                 set = function(info,val)
                     db.readyCheckIcon.notready = val
                     self:SafeRefresh(groupType)
@@ -741,6 +767,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 7,
+                hidden = function(info)
+                    return not db.readyCheckIcon.toggle
+                end,
                 set = function(info,val)
                     db.readyCheckIcon.waiting = val
                     self:SafeRefresh(groupType)
@@ -830,9 +859,13 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 get = function(info) return db.centerStatusIcon.yOffset end
             },
             [frameType.."Skip1"] = {
-                type = "header",
+                type = "execute",
                 name = L["Custom Texture"],
                 order = 4,
+                width = "full",
+                func = function(info,val)
+                    db.centerStatusIcon.toggle = not db.centerStatusIcon.toggle
+                end,
             },
             ["inOtherGroup "] = {
                 name = L["In Other Group"],
@@ -840,6 +873,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 5,
+                hidden = function(info)
+                    return not db.centerStatusIcon.toggle
+                end,
                 set = function(info,val)
                     db.centerStatusIcon.inOtherGroup = val
                     self:SafeRefresh(groupType)
@@ -852,6 +888,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 6,
+                hidden = function(info)
+                    return not db.centerStatusIcon.toggle
+                end,
                 set = function(info,val)
                     db.centerStatusIcon.hasIncomingResurrection = val
                     self:SafeRefresh(groupType)
@@ -864,6 +903,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 7,
+                hidden = function(info)
+                    return not db.centerStatusIcon.toggle
+                end,
                 set = function(info,val)
                     db.centerStatusIcon.hasIncomingSummonPending = val
                     self:SafeRefresh(groupType)
@@ -876,6 +918,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 8,
+                hidden = function(info)
+                    return not db.centerStatusIcon.toggle
+                end,
                 set = function(info,val)
                     db.centerStatusIcon.hasIncomingSummonAccepted = val
                     self:SafeRefresh(groupType)
@@ -888,6 +933,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 9,
+                hidden = function(info)
+                    return not db.centerStatusIcon.toggle
+                end,
                 set = function(info,val)
                     db.centerStatusIcon.hasIncomingSummonDeclined = val
                     self:SafeRefresh(groupType)
@@ -900,6 +948,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "full",
                 type = "input",
                 order = 10,
+                hidden = function(info)
+                    return not db.centerStatusIcon.toggle
+                end,
                 set = function(info,val)
                     db.centerStatusIcon.inOtherPhase = val
                     self:SafeRefresh(groupType)

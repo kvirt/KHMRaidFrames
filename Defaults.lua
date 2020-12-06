@@ -106,6 +106,7 @@ function KHMRaidFrames:Defaults()
                     damager = "",
                     tank = "",
                     vehicle = "",
+                    toggle = false,
                 },
                 readyCheckIcon  = {
                     size = 15 ,
@@ -114,6 +115,7 @@ function KHMRaidFrames:Defaults()
                     ready = "",
                     notready = "",
                     waiting = "",
+                    toggle = false,
                 },
                 centerStatusIcon = {
                     size = 22,
@@ -125,6 +127,7 @@ function KHMRaidFrames:Defaults()
                     hasIncomingSummonAccepted = "",
                     hasIncomingSummonDeclined = "",
                     inOtherPhase = "",
+                    toggle = false,
                 },
             },
     }
