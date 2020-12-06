@@ -90,6 +90,8 @@ function KHMRaidFrames:Setup()
     end)
 
     self:RegisterChatCommand("кд", function() ReloadUI() end)
+
+    self.Print(_G["CompactRaidFrame1"].debuffFrames[1], "buff")
 end
 
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
