@@ -2,7 +2,7 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
-local _G, IsInRaid, InCombatLockdown, ViragDevTool_AddData = _G, IsInRaid, InCombatLockdown, ViragDevTool_AddData
+local _G, IsInRaid, InCombatLockdown = _G, IsInRaid, InCombatLockdown
 
 local subFrameTypes = {"debuffFrames", "buffFrames", "dispelDebuffFrames"}
 

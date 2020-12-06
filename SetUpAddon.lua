@@ -46,6 +46,14 @@ function KHMRaidFrames:Setup()
         },
     }
 
+    local Masque = LibStub("Masque", true)
+
+    if Masque then
+        self.Masque = {}
+        self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
+        self.Masque.debuffFrames = Masque:Group("KHMRaidFrames", "Debuff Auras")
+    end
+
     self:GetVirtualFrames()
 
     self.textures, self.sortedTextures = self.GetTextures()

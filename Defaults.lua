@@ -260,14 +260,20 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
         deferred = true
     end
 
-    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, self.componentScale)
-    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, self.componentScale)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
+    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
 
     if db.showBigDebuffs and db.smartAnchoring then
         self:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
     end
 
-    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, 1)
+    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
+
+    if self.Masque then
+        for name, group in pairs(self.Masque) do
+            group:ReSkin()
+        end
+    end
 
     self:SetUpRaidIcon(frame, groupType)
 
