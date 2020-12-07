@@ -90,6 +90,8 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     parent.debuffFramesGlowing[debuffType] = {name, debuffType, spellId}
     parent.debuffFramesGlowing[name] = {name, debuffType, spellId}
     parent.debuffFramesGlowing[spellId] = {name, debuffType, spellId}
+
+    debuffFrame.border:Hide()
 end
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
@@ -402,6 +404,12 @@ function KHMRaidFrames:UpdateAuras(frame)
 
     if db.showBigDebuffs and db.smartAnchoring then
         self:SmartAnchoring(frame, frame.debuffFrames, db)
+    end
+
+    if self.Masque then
+        for _, _frame in pairs(frame.debuffFrames) do
+            self.Masque.debuffFrames:ReSkin(_frame.MSQbutton)
+        end
     end
 
     db = self.db.profile.glows.frameGlow

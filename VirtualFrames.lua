@@ -8,7 +8,7 @@ function KHMRaidFrames:GetVirtualFrames()
 
     for frameType in self.IterateSubFrameTypes() do
         for i=1, self.maxFrames do
-            frame = CreateFrame("Frame", nil, UIParent)
+            frame = CreateFrame("Button", nil, UIParent)
             self.virtual.frames[frameType..i] = frame
 
             local texture = frame:CreateTexture(nil, "BACKGROUND")
@@ -86,7 +86,7 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
         end
     end
 
-    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, resize)
+    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, subFrameType)
 
     if db.showBigDebuffs and bigSized then
         typedframes[1].isBossAura = true

@@ -2,6 +2,7 @@ local addonName, addonTable = ...
 addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "AceHook-3.0", "AceEvent-3.0", "AceConsole-3.0")
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
+
 local _G = _G
 local GetReadyCheckStatus = GetReadyCheckStatus
 local UnitInRaid = UnitInRaid
@@ -48,9 +49,10 @@ function KHMRaidFrames:UpdateRaidMark()
     end
 end
 
-function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, resize)
+function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, subFrameType)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
+    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and self.componentScale or 1)
 
     while frameNum <= #typedframes do
         typedframe = typedframes[frameNum]
@@ -80,12 +82,28 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             yOffset
         )
 
-        typedframe:SetSize(db.size * resize, db.size * resize)
+        typedframe:SetSize(size, size)
 
         if self.db.profile[groupType].frames.clickThrough then
             typedframe:EnableMouse(false)
         else
             typedframe:EnableMouse(true)
+        end
+
+        if self.Masque and self.Masque[subFrameType] and typedframe:GetName() then
+            if not typedframe.MSQbutton then
+                local button = CreateFrame("Button", nil, typedframe)
+                typedframe.MSQbutton = button
+                self.Masque[subFrameType]:AddButton(button, {Icon = typedframe.icon, Cooldown = typedframe.cooldown})
+            end
+
+            if self.db.profile[groupType].frames.clickThrough then
+                typedframe.MSQbutton:EnableMouse(false)
+            else
+                typedframe.MSQbutton:EnableMouse(true)
+            end
+
+            typedframe.MSQbutton:SetAllPoints()
         end
 
         frameNum = frameNum + 1
@@ -131,46 +149,6 @@ function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
     else
         frame.raidIcon:Hide()
     end
-end
-
-function KHMRaidFrames:ResizeGroups(frame, yOffset)
-    local totalHeight, totalWidth = 0, 0
-
-    if self.horizontalGroups then
-        frame.title:ClearAllPoints()
-        frame.title:SetPoint("TOPLEFT")
-
-        local frame1 = _G[frame:GetName().."Member1"];
-        frame1:ClearAllPoints()
-        frame1:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, yOffset)
-
-        for i=2, 5 do
-            local unitFrame = _G[frame:GetName().."Member"..i]
-            unitFrame:ClearAllPoints()
-            unitFrame:SetPoint("LEFT", _G[frame:GetName().."Member"..(i-1)], "RIGHT", 0, 0)
-        end
-
-        totalHeight = totalHeight + _G[frame:GetName().."Member1"]:GetHeight()
-        totalWidth = totalWidth + _G[frame:GetName().."Member1"]:GetWidth() * 5
-    else
-        frame.title:ClearAllPoints()
-        frame.title:SetPoint("TOP")
-
-        local frame1 = _G[frame:GetName().."Member1"];
-        frame1:ClearAllPoints()
-        frame1:SetPoint("TOP", frame, "TOP", 0, yOffset)
-
-        for i=2, 5 do
-            local unitFrame = _G[frame:GetName().."Member"..i]
-            unitFrame:ClearAllPoints()
-            unitFrame:SetPoint("TOP", _G[frame:GetName().."Member"..(i-1)], "BOTTOM", 0, 0)
-        end
-
-        totalHeight = totalHeight + _G[frame:GetName().."Member1"]:GetHeight() * 5
-        totalWidth = totalWidth + _G[frame:GetName().."Member1"]:GetWidth()
-    end
-
-    return totalHeight, totalWidth
 end
 
 function KHMRaidFrames:SetUpAbsorb(frame)
@@ -244,6 +222,12 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         if v then flags = flags..k..", " end
     end
 
+    name:SetFont(
+        self.fonts[db.font],
+        size,
+        flags
+    )
+
     name:ClearAllPoints()
 
     local _name
@@ -265,13 +249,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         end
     end
 
-    name:SetText(_name)
-
-    name:SetFont(
-        self.fonts[db.font],
-        size,
-        flags
-    )
+    if _name then name:SetText(_name) end
 
     local xOffset, yOffset = self:Offsets("TOPLEFT")
     xOffset = xOffset + db.xOffset

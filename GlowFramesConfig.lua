@@ -268,28 +268,6 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             name = "",
             order = 3,
         },
-        ["num"..frameName] = {
-            name = L["Num"],
-            desc = "",
-            width = "normal",
-            type = "range",
-            min = 1,
-            max = 20,
-            step = 1,
-            order = 4,
-            disabled = function(info)
-                return not db.enabled
-            end,
-            hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
-                if options.options["N"] ~= nil then return false else return true end
-            end,
-            set = function(info,val)
-                db.options[db.type].options.N = val
-                self:RestartOptionsGlows(frameType, glowType)
-            end,
-            get = function(info) return db.options[db.type].options.N end
-        },
         ["xOffset"..frameName] = {
             name = L["X Offset"],
             desc = "",
@@ -298,7 +276,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             min = -100,
             max = 100,
             step = 1,
-            order = 5,
+            order = 4,
             disabled = function(info)
                 return not db.enabled
             end,
@@ -320,7 +298,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             min = -100,
             max = 100,
             step = 1,
-            order = 6,
+            order = 5,
             disabled = function(info)
                 return not db.enabled
             end,
@@ -333,6 +311,28 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info) return db.options[db.type].options.yOffset end
+        },
+        ["num"..frameName] = {
+            name = L["Num"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 1,
+            max = 20,
+            step = 1,
+            order = 6,
+            disabled = function(info)
+                return not db.enabled
+            end,
+            hidden = function(info)
+                local options = self.GetGlowOptions(db.type)
+                if options.options["N"] ~= nil then return false else return true end
+            end,
+            set = function(info,val)
+                db.options[db.type].options.N = val
+                self:RestartOptionsGlows(frameType, glowType)
+            end,
+            get = function(info) return db.options[db.type].options.N end
         },
         ["th"..frameName] = {
             name = L["Thickness"],
