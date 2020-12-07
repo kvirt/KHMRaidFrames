@@ -752,7 +752,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
         name = L["Ready Check Icon"],
         desc = L["Ready Check Icon Options"],
         childGroups = "tab",
-        disabled = function() return not db.enabled end,
         args = {
             ["Enable"] = {
                 name = L["Enable"],
