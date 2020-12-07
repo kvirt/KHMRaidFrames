@@ -121,3 +121,5 @@ L["Incoming Summon Accepted"] = true
 L["Incoming Summon Declined"] = true
 L["In Other Phase"] = true
 L["Class Colored Names"] = true
+L["Enable Masque Support"] = true
+L["Enable Masque Support Desc"] = true

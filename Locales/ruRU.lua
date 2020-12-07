@@ -118,3 +118,5 @@ L["Incoming Summon Accepted"] = "Призыв принят"
 L["Incoming Summon Declined"] = "Призыв отменен"
 L["In Other Phase"] = "В другой фазе"
 L["Class Colored Names"] = "Имена Цветом Класса"
+L["Enable Masque Support"] = true
+L["Enable Masque Support Desc"] = true

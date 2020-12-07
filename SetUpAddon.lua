@@ -20,7 +20,7 @@ function KHMRaidFrames:OnInitialize()
      self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")
 end
 
-function KHMRaidFrames:Setup()
+function KHMRaidFrames:SetInternalVariables()
     self.componentScale = 1
 
     self:GetRaidProfileSettings()
@@ -46,19 +46,23 @@ function KHMRaidFrames:Setup()
         },
     }
 
-    local Masque = LibStub("Masque", true)
+    if self.db.profile.Masque then
+        local Masque = LibStub("Masque", true)
 
-    if Masque then
-        self.Masque = {}
-        self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
-        self.Masque.debuffFrames = Masque:Group("KHMRaidFrames", "Debuff Auras")
+        if Masque then
+            self.Masque = {}
+            self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
+            self.Masque.debuffFrames = Masque:Group("KHMRaidFrames", "Debuff Auras")
+        end
     end
 
     self:GetVirtualFrames()
 
     self.textures, self.sortedTextures = self.GetTextures()
     self.fonts, self.sortedFonts = self.GetFons()
+end
 
+function KHMRaidFrames:Setup()
     local defaults_settings = self:Defaults()
     self.db = LibStub("AceDB-3.0"):New("KHMRaidFramesDB", defaults_settings)
 
@@ -91,6 +95,8 @@ function KHMRaidFrames:Setup()
 
     self:RegisterChatCommand("кд", function() ReloadUI() end)
 
+    self:SetInternalVariables()
+
 end
 
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
@@ -121,7 +127,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
             if event == "PLAYER_REGEN_ENABLED" then
                 self:GetRaidProfileSettings()
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
 
                 if self.deffered then
                     InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
@@ -173,39 +179,15 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         end
     )
 
-    self:SecureHook(
-        "CompactUnitFrame_UpdateName",
-        function(frame)
-            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
-
-            self:SetUpName(frame, IsInRaid() and "raid" or "party") end
-    )
+    self:HookNameAndIcons()
 
     self:SecureHook(
-        "CompactUnitFrame_UpdateRoleIcon",
-        function(frame)
-        if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
-
-         self:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party") end
+        "CompactUnitFrameProfiles_ApplyProfile",
+        function(profile)
+            self:GetRaidProfileSettings()
+            self:SafeRefresh()
+        end
     )
-
-    self:SecureHook(
-        "CompactUnitFrame_UpdateReadyCheck",
-        function(frame)
-            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
-
-            self:SetUpReadyCheckIconInternal(frame, IsInRaid() and "raid" or "party") end
-    )
-
-    self:SecureHook(
-        "CompactUnitFrame_UpdateCenterStatusIcon",
-        function(frame)
-            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
-
-            self:SetUpCenterStatusIconInternal(frame, IsInRaid() and "raid" or "party") end
-    )
-
-    self:SecureHook("CompactUnitFrameProfiles_ApplyProfile", "GetRaidProfileSettings")
 
     self:SecureHook(
         "SetCVar",
@@ -223,6 +205,55 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     )
 
     self:SafeRefresh()
+end
+
+function KHMRaidFrames:HookNameAndIcons()
+    local dbParty = self.db.profile.party.nameAndIcons
+    local dbRaid = self.db.profile.raid.nameAndIcons
+
+    if dbParty.name.enabled or dbRaid.name.enabled then
+        self:SecureHook(
+            "CompactUnitFrame_UpdateName",
+            function(frame)
+                if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+                self:SetUpName(frame, IsInRaid() and "raid" or "party")
+            end
+        )
+    end
+
+    if dbParty.roleIcon.enabled or dbRaid.roleIcon.enabled then
+        self:SecureHook(
+            "CompactUnitFrame_UpdateRoleIcon",
+            function(frame)
+            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+            self:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party")
+         end
+        )
+    end
+
+    if dbParty.readyCheckIcon.enabled or dbRaid.readyCheckIcon.enabled then
+        self:SecureHook(
+            "CompactUnitFrame_UpdateReadyCheck",
+            function(frame)
+                if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+                self:SetUpReadyCheckIconInternal(frame, IsInRaid() and "raid" or "party")
+            end
+        )
+    end
+
+    if dbParty.centerStatusIcon.enabled or dbRaid.centerStatusIcon.enabled then
+        self:SecureHook(
+            "CompactUnitFrame_UpdateCenterStatusIcon",
+            function(frame)
+                if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+
+                self:SetUpCenterStatusIconInternal(frame, IsInRaid() and "raid" or "party")
+            end
+        )
+    end
 end
 
 function KHMRaidFrames:RefreshConfig(groupType)
@@ -264,10 +295,6 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
-
-    if self.db then
-        self:SafeRefresh()
-    end
 end
 
 function KHMRaidFrames:OnOptionShow()

@@ -91,18 +91,19 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         end
 
         if self.Masque and self.Masque[subFrameType] and typedframe:GetName() then
-            local button = typedframe.MSQbutton or CreateFrame("Button", nil, typedframe)
-            typedframe.MSQbutton = button
-            self.Masque[subFrameType]:RemoveButton(button)
-            self.Masque[subFrameType]:AddButton(button, {Icon = typedframe.icon, Cooldown = typedframe.cooldown})
-
-            if self.db.profile[groupType].frames.clickThrough then
-                button:EnableMouse(false)
-            else
-                button:EnableMouse(true)
+            if not typedframe.MSQbutton then
+                local button = CreateFrame("Button", nil, typedframe)
+                typedframe.MSQbutton = button
+                self.Masque[subFrameType]:AddButton(button, {Icon = typedframe.icon, Cooldown = typedframe.cooldown})
             end
 
-            button:SetAllPoints()
+            if self.db.profile[groupType].frames.clickThrough then
+                typedframe.MSQbutton:EnableMouse(false)
+            else
+                typedframe.MSQbutton:EnableMouse(true)
+            end
+
+            typedframe.MSQbutton:SetAllPoints()
         end
 
         frameNum = frameNum + 1
@@ -221,6 +222,12 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         if v then flags = flags..k..", " end
     end
 
+    name:SetFont(
+        self.fonts[db.font],
+        size,
+        flags
+    )
+
     name:ClearAllPoints()
 
     local _name
@@ -242,13 +249,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         end
     end
 
-    name:SetText(_name)
-
-    name:SetFont(
-        self.fonts[db.font],
-        size,
-        flags
-    )
+    if _name then name:SetText(_name) end
 
     local xOffset, yOffset = self:Offsets("TOPLEFT")
     xOffset = xOffset + db.xOffset

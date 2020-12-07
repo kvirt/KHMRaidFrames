@@ -99,12 +99,6 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
             self:SmartAnchoring(self.virtual.frame, typedframes, db)
         end
     end
-
-    if self.Masque then
-        for name, group in pairs(self.Masque) do
-            group:ReSkin()
-        end
-    end
 end
 
 function KHMRaidFrames:HideVirtual()

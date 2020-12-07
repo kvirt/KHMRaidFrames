@@ -407,7 +407,9 @@ function KHMRaidFrames:UpdateAuras(frame)
     end
 
     if self.Masque then
-        self.Masque.debuffFrames:ReSkin()
+        for _, _frame in pairs(frame.debuffFrames) do
+            self.Masque.debuffFrames:ReSkin(_frame.MSQbutton)
+        end
     end
 
     db = self.db.profile.glows.frameGlow

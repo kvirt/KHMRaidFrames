@@ -85,6 +85,7 @@ function KHMRaidFrames:Defaults()
                     yOffset = -1,
                     showServer = true,
                     classColoredNames = false,
+                    enabled = false,
                 },
                 statusText = {
                     font = "Friz Quadrata TT",
@@ -97,6 +98,7 @@ function KHMRaidFrames:Defaults()
                     hJustify = "CENTER",
                     xOffset = 0,
                     yOffset = 0,
+                    enabled = false,
                 },
                 roleIcon = {
                     size = 12,
@@ -107,6 +109,7 @@ function KHMRaidFrames:Defaults()
                     tank = "",
                     vehicle = "",
                     toggle = false,
+                    enabled = false,
                 },
                 readyCheckIcon  = {
                     size = 15 ,
@@ -116,6 +119,7 @@ function KHMRaidFrames:Defaults()
                     notready = "",
                     waiting = "",
                     toggle = false,
+                    enabled = false,
                 },
                 centerStatusIcon = {
                     size = 22,
@@ -128,6 +132,7 @@ function KHMRaidFrames:Defaults()
                     hasIncomingSummonDeclined = "",
                     inOtherPhase = "",
                     toggle = false,
+                    enabled = false,
                 },
             },
     }
@@ -178,6 +183,8 @@ function KHMRaidFrames:Defaults()
             trackingStr = "",
         },
     }
+
+    defaults_settings.profile.Masque = false
 
     return defaults_settings
 end
@@ -277,11 +284,25 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 
     self:SetUpRaidIcon(frame, groupType)
 
-    self:SetUpName(frame, groupType)
-    self:SetUpStatusText(frame, groupType)
-    self:SetUpRoleIcon(frame, groupType)
-    self:SetUpReadyCheckIcon(frame, groupType)
-    self:SetUpCenterStatusIcon(frame, groupType)
+    if self.db.profile[groupType].nameAndIcons.name.enabled then
+        self:SetUpName(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.statusText.enabled then
+        self:SetUpStatusText(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
+        self:SetUpRoleIcon(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then
+        self:SetUpReadyCheckIcon(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled then
+        self:SetUpCenterStatusIcon(frame, groupType)
+    end
 
     frame.healthBar:SetStatusBarTexture(self.textures[db.frames.texture], "BORDER")
 
