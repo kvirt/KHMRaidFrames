@@ -94,16 +94,20 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             if not typedframe.MSQbutton then
                 local button = CreateFrame("Button", nil, typedframe)
                 typedframe.MSQbutton = button
-                self.Masque[subFrameType]:AddButton(button, {Icon = typedframe.icon, Cooldown = typedframe.cooldown})
+                self.Masque[subFrameType]:AddButton(
+                    button,
+                    {
+                        Icon = typedframe.icon,
+                        Cooldown = typedframe.cooldown,
+                        Count = typedframe.count
+                    }
+                )
             end
 
-            if self.db.profile[groupType].frames.clickThrough then
-                typedframe.MSQbutton:EnableMouse(false)
-            else
-                typedframe.MSQbutton:EnableMouse(true)
-            end
+            typedframe.MSQbutton:EnableMouse(false)
 
             typedframe.MSQbutton:SetAllPoints()
+            self.Masque[subFrameType]:ReSkin(button)
         end
 
         frameNum = frameNum + 1
