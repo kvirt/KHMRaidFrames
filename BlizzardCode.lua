@@ -91,7 +91,9 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     parent.debuffFramesGlowing[name] = {name, debuffType, spellId}
     parent.debuffFramesGlowing[spellId] = {name, debuffType, spellId}
 
-    debuffFrame.border:Hide()
+    if self.Masque then
+        debuffFrame.border:Hide()
+    end
 end
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
