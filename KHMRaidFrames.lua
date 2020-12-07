@@ -198,6 +198,7 @@ function KHMRaidFrames:SetUpSoloFrame()
 end
 
 function KHMRaidFrames:SetUpName(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.name then return end
     if not frame.unit then return end
 
     local db = self.db.profile[groupType].nameAndIcons.name
@@ -256,6 +257,8 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpStatusText(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.statusText then return end
+
     local db = self.db.profile[groupType].nameAndIcons.statusText
     local statusText = frame.statusText
     local size = db.size * self.componentScale
@@ -291,6 +294,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.roleIcon then return end
     if not frame.roleIcon then return end
 
     local db = self.db.profile[groupType].nameAndIcons.roleIcon
@@ -317,6 +321,7 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.roleIcon then return end
     if not frame.unit then return end
     if not frame.roleIcon then return end
 
@@ -348,6 +353,7 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.readyCheckIcon then return end
     if not frame.readyCheckIcon then return end
 
     local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
@@ -374,6 +380,7 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.readyCheckIcon then return end
     if not frame.unit then return end
     if not frame.readyCheckIcon then return end
 
@@ -387,6 +394,7 @@ function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.centerStatusIcon then return end
     if not frame.centerStatusIcon then return end
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
@@ -413,6 +421,7 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 end
 
 function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
+    if not self.db.profile[groupType].nameAndIcons.centerStatusIcon then return end
     if not frame.unit then return end
     if not frame.centerStatusIcon then return end
 

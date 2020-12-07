@@ -212,6 +212,7 @@ function KHMRaidFrames:HookNameAndIcons()
     local dbRaid = self.db.profile.raid.nameAndIcons
 
     if dbParty.name.enabled or dbRaid.name.enabled then
+
         self:SecureHook(
             "CompactUnitFrame_UpdateName",
             function(frame)
