@@ -276,12 +276,6 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 
     self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
 
-    if self.Masque then
-        for name, group in pairs(self.Masque) do
-            group:ReSkin()
-        end
-    end
-
     self:SetUpRaidIcon(frame, groupType)
 
     if self.db.profile[groupType].nameAndIcons.name.enabled then
