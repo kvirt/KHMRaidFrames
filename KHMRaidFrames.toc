@@ -19,6 +19,4 @@ UnitAuras.lua
 Utils.lua
 SetUpAddon.lua
 BlizzardCode.lua
-
-
-
+SetUpProfiles.lua

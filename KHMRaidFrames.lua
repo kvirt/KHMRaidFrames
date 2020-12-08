@@ -205,11 +205,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     local name = frame.name
     local size = db.size * self.componentScale
 
-    local flags = ""
-
-    for k, v in pairs(db.flags) do
-        if v then flags = flags..k..", " end
-    end
+    local flags = db.flag ~= "None" and db.flag or ""
 
     name:SetFont(
         self.fonts[db.font],
@@ -263,19 +259,15 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     local statusText = frame.statusText
     local size = db.size * self.componentScale
 
-    local flags = ""
-
-    for k, v in pairs(db.flags) do
-        if v then flags = flags..k..", " end
-    end
-
-    statusText:ClearAllPoints()
+    local flags = db.flag ~= "None" and db.flag or ""
 
     statusText:SetFont(
         self.fonts[db.font],
         size,
         flags
     )
+
+    statusText:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT")
     xOffset = xOffset + db.xOffset

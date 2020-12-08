@@ -75,11 +75,7 @@ function KHMRaidFrames:Defaults()
                 name = {
                     font = "Friz Quadrata TT",
                     size = 6,
-                    flags = {
-                        ["OUTLINE"] = false,
-                        ["THICKOUTLINE"] = false,
-                        ["MONOCHROME"] = false,
-                    },
+                    flag = "None",
                     hJustify = "LEFT",
                     xOffset = 0,
                     yOffset = -1,
@@ -90,11 +86,7 @@ function KHMRaidFrames:Defaults()
                 statusText = {
                     font = "Friz Quadrata TT",
                     size = 12,
-                    flags = {
-                        ["OUTLINE"] = false,
-                        ["THICKOUTLINE"] = false,
-                        ["MONOCHROME"] = false,
-                    },
+                    flag = "None",
                     hJustify = "CENTER",
                     xOffset = 0,
                     yOffset = 0,

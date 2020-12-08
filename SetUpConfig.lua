@@ -26,6 +26,12 @@ local grow_positions = {
     ["TOP"] = L["TOP"],
 }
 
+local flags = {
+    ["None"] = L["None"],
+    ["OUTLINE"] = L["OUTLINE"],
+    ["THICKOUTLINE"] = L["THICKOUTLINE"],
+    ["MONOCHROME"] = L["MONOCHROME"],
+}
 
 function KHMRaidFrames:SetupOptions()
     local options = {
@@ -268,19 +274,14 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 desc = "",
                 width = "normal",
                 type = "select",
-                values = {
-                    ["None"] = L["None"],
-                    ["OUTLINE"] = L["OUTLINE"],
-                    ["THICKOUTLINE"] = L["THICKOUTLINE"],
-                    ["MONOCHROME"] = L["MONOCHROME"],
-                },
+                values = flags,
                 order = 3,
                 disabled = function() return not db.name.enabled end,
-                set = function(info,key,val)
-                    db.name.flags[key] = val
+                set = function(info,val)
+                    db.name.flag = val
                     self:SafeRefresh(groupType)
                 end,
-                get = function(info, value) return db.name.flags[value] end
+                get = function(info, value) return db.name.flag end
             },
             ["size"] = {
                 name = L["Size"],
@@ -460,19 +461,14 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 desc = "",
                 width = "normal",
                 type = "select",
-                values = {
-                    ["None"] = L["None"],
-                    ["OUTLINE"] = L["OUTLINE"],
-                    ["THICKOUTLINE"] = L["THICKOUTLINE"],
-                    ["MONOCHROME"] = L["MONOCHROME"],
-                },
+                values = flags,
                 order = 3,
                 disabled = function() return not db.statusText.enabled end,
-                set = function(info,key,val)
-                    db.statusText.flags[key] = val
+                set = function(info,val)
+                    db.statusText.flag = val
                     self:SafeRefresh(groupType)
                 end,
-                get = function(info, value) return db.statusText.flags[value] end
+                get = function(info, value) return db.statusText.flag end
             },
             ["size"] = {
                 name = L["Size"],
@@ -1357,13 +1353,13 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
             desc = L["Track Auras that are not shown by default by Blizzard"],
-            usage = self:TrackingHelpText(),
+            usage = self.AdditionalTrackingHelpText(),
             width = "full",
             type = "input",
             multiline = 10,
-            order = 8,
+            order = 10,
             set = function(info,val)
-                db.tracking = self:SanitizeStrings(val)
+                db.tracking = self.SanitizeStringsByUnit(val)
                 db.trackingStr = val
 
                 self:SafeRefresh(groupType)
@@ -1372,17 +1368,17 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
                 return db.trackingStr
             end
         },
-        [frameType.."Skip"] = {
+        [frameType.."Skip2"] = {
             type = "header",
             name = "",
-            order = 9,
+            order = 11,
         },
         ["Copy"] = {
             name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 10,
+            order = 12,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)][frameType])
@@ -1394,7 +1390,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "double",
             type = "execute",
             confirm = true,
-            order = 11,
+            order = 13,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,

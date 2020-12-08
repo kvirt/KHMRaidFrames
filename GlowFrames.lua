@@ -1,4 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
+local LCG = LibStub("LibCustomGlow-1.0")
+
 local tonumber, tostring = tonumber, tostring
 
 
@@ -9,19 +11,24 @@ function KHMRaidFrames:StartGlow(frame, db, color, key, gType)
     local color = color or options.color
 
     if glowType == "button" then
-        glowOptions.start(frame, color, options.frequency)
+        LCG.ButtonGlow_Start(frame, color, options.frequency)
     elseif glowType == "pixel" then
-        glowOptions.start(frame, color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, key or "")
+        LCG.PixelGlow_Start(frame, color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, key or "")
     elseif glowType == "auto" then
-        glowOptions.start(frame, color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset, key or "")
+        LCG.AutoCastGlow_Start(frame, color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset, key or "")
     end
 
     self.glowingFrames[gType][key][frame] = color
 end
 
 function KHMRaidFrames:StopGlow(frame, db, key, gType)
-    db.options[db.type].stop(frame, key or "")
+    if db.type == "button" then
+        LCG.ButtonGlow_Stop(frame, key or "")
+    elseif db.type == "pixel" then
+        LCG.PixelGlow_Stop(frame, key or "")
+    elseif db.type == "auto" then
+        LCG.AutoCastGlow_Stop(frame, key or "")
+    end
 
     self.glowingFrames[gType][key][frame] = nil
-
 end

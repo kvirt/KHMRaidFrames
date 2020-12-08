@@ -123,4 +123,12 @@ L["Class Colored Names"] = "Имена Цветом Класса"
 L["Class Colored Names desc"] = "Окрашивает имена игроков по цвету их класса. При выключении, для возврата к базовым цветам введите /reload"
 L["Enable Masque Support"] = "Masque. Включить поддержку"
 L["Enable Masque Support Desc"] = "Включить поддержку аддона Masque на свой страх и риск"
-L["Show\\Hide Test Frames desc"] = "Тестовые фреймы показывают размер, расположение и колличество ваших бафов/дебафов, но не поддерживают эффекты свечений, masque или метку цели "
+L["Show\\Hide Test Frames desc"] = "Тестовые фреймы помогают с настройкой размера, расположения и колличества ваших бафов/дебафов, но не поддерживают эффекты свечений, masque и прочее"
+L["Masque Reskin"] = "Рескин Masque"
+L["AdditionalTrackingHelpText"] = "Вы можете отфильтровать ауры по юниту:"..
+                                    "\n    Изобилие|cFFC80000::|r|cFFFFFFFFplayer|r,"..
+                                    "\n    Изобилие|cFFC80000::|r|cFFFFFFFFtarget|r,"..
+                                    "\n    Изобилие|cFFC80000::|r|cFFFFFFFFboss|r и т.п."
+L["Export Profile"] = "Экспорт Профиля"
+L["Import Profile"] = "Импорт Профиля"
+L["Are You sure?"] = "Вы уверены?"

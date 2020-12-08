@@ -74,7 +74,7 @@ function KHMRaidFrames:Setup()
 
     self.config = LibStub("AceConfigRegistry-3.0")
     self.config:RegisterOptionsTable("KHMRaidFrames", self:SetupOptions())
-    self.config:RegisterOptionsTable("KHM Profiles", profiles)
+    self.config:RegisterOptionsTable("KHM Profiles", self:SetupProfiles(profiles))
 
     self.dialog = LibStub("AceConfigDialog-3.0")
     self.dialog.general = self.dialog:AddToBlizOptions("KHMRaidFrames", L["KHMRaidFrames"])

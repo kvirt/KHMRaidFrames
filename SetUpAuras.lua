@@ -125,10 +125,21 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             end,
             get = function(info) return db.growDirection end
         },
+        ["Reskin"] = {
+            name = L["Masque Reskin"],
+            desc = "",
+            width = "normal",
+            type = "execute",
+            order = 4,
+            hidden = function() return not self.Masque end,
+            func = function(info,val)
+                self.Masque.buffFrames:ReSkin()
+            end,
+        },
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
-            order = 4,
+            order = 5,
         },
         ["exclude"] = {
             name = L["Exclude"],
@@ -137,7 +148,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             width = "full",
             type = "input",
             multiline = 5,
-            order = 5,
+            order = 6,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -153,7 +164,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 6,
+            order = 7,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].buffFrames)
@@ -164,7 +175,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             desc = "",
             width = "double",
             type = "execute",
-            order = 7,
+            order = 8,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "buffFrames")
@@ -280,17 +291,28 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             end,
             get = function(info) return db.growDirection end
         },
+        ["Reskin"] = {
+            name = L["Masque Reskin"],
+            desc = "",
+            width = "normal",
+            type = "execute",
+            order = 4,
+            hidden = function() return not self.Masque end,
+            func = function(info,val)
+                self.Masque.debuffFrames:ReSkin()
+            end,
+        },
         ["Skip2"] = {
             type = "header",
             name = L["Big Debuffs"],
-            order = 4,
+            order = 5,
         },
         ["Show Big Debuffs"] = {
             name = L["Show Big Debuffs"],
             desc = "",
             width = "normal",
             type = "toggle",
-            order = 5,
+            order = 6,
             set = function(info,val)
                 db.showBigDebuffs = val
                 self:SafeRefresh(groupType)
@@ -304,7 +326,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             desc = L["Align Big Debuffs Desc"],
             width = "normal",
             type = "toggle",
-            order = 6,
+            order = 7,
             disabled = function(info)
                 return not db.showBigDebuffs
             end,
@@ -324,7 +346,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = 1,
             max = 100,
             step = 1,
-            order = 7,
+            order = 8,
             disabled = function(info)
                 return not db.showBigDebuffs or db.smartAnchoring
             end,
@@ -337,7 +359,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
-            order = 8,
+            order = 9,
         },
         ["exclude"] = {
             name = L["Exclude"],
@@ -346,7 +368,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             width = "full",
             type = "input",
             multiline = 5,
-            order = 9,
+            order = 10,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val

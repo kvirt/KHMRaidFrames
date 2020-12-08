@@ -190,7 +190,7 @@ function KHMRaidFrames:FilterAurasInternal(name, debuffType, spellId, db)
     return false
 end
 
-function KHMRaidFrames:AdditionalAura(name, debuffType, spellId)
+function KHMRaidFrames:AdditionalAura(name, debuffType, spellId, unitCaster)
     local db
 
     if IsInRaid() then
@@ -206,8 +206,13 @@ function KHMRaidFrames:AdditionalAura(name, debuffType, spellId)
     spellId = tostring(spellId)
 
     for _, aura in ipairs(db) do
-        if aura == name or aura == debuffType or (spellId ~= nil and aura == spellId) then
-            return true
+        local _aura, unit = aura[1], aura[2]
+        if _aura == name or _aura == debuffType or (spellId ~= nil and _aura == spellId) then
+            if not unit then
+                return true
+            elseif unit == unitCaster then
+                return true
+            end
         end
     end
 

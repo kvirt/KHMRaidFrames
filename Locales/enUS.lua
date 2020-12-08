@@ -126,4 +126,12 @@ L["Class Colored Names"] = true
 L["Class Colored Names desc"] = "Player names colored by their classes \nReload needed to apply default settings"
 L["Enable Masque Support"] = true
 L["Enable Masque Support Desc"] = "Experimental, might have a big impact on your FPS"
-L["Show\\Hide Test Frames desc"] = true
+L["Show\\Hide Test Frames desc"] = "Test frames made for easy setup of you buffs\\debuffs. Does not support glow, masque, etc"
+L["Masque Reskin"] = true
+L["AdditionalTrackingHelpText"] = "You can filter auras by unit e.g.:"..
+                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFplayer|r,"..
+                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFtarget|r,"..
+                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFboss|r"
+L["Export Profile"] = true
+L["Import Profile"] = true
+L["Are You sure?"] = true
