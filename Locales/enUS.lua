@@ -129,9 +129,7 @@ L["Enable Masque Support Desc"] = "Experimental, might have a big impact on your
 L["Show\\Hide Test Frames desc"] = "Test frames made for easy setup of you buffs\\debuffs. Does not support glow, masque, etc"
 L["Masque Reskin"] = true
 L["AdditionalTrackingHelpText"] = "You can filter auras by unit e.g.:"..
-                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFplayer|r,"..
-                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFtarget|r,"..
-                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFboss|r"
+                                    "\n    Rejuvenation|cFFC80000::|r|cFFFFFFFFplayer|r"
 L["Export Profile"] = true
 L["Import Profile"] = true
 L["Are You sure?"] = true

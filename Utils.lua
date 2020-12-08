@@ -366,36 +366,40 @@ function KHMRaidFrames.ExportProfileToString()
 end
 
 function KHMRaidFrames.ExportCurrentProfile(text)
-  if not KHMRaidFrames.ProfileFrame then
-    local f = CreateFrame("Frame", "KHMRaidFramesProfileFrame", UIParent, "UIPanelDialogTemplate")
-    f:ClearAllPoints()
-    f:SetPoint("CENTER")
-    f:SetSize(700, 300)
-    f:SetClampedToScreen(true)
+    if not KHMRaidFrames.ProfileFrame then
+        local f = CreateFrame("Frame", "KHMRaidFramesProfileFrame", UIParent, "UIPanelDialogTemplate")
+        f:ClearAllPoints()
+        f:SetPoint("CENTER")
+        f:SetSize(700, 300)
+        f:SetClampedToScreen(true)
 
-    local sf = CreateFrame("ScrollFrame", "KHMRaidFramesScrollFrame", f, "UIPanelScrollFrameTemplate")
-    sf:SetPoint("LEFT", 16, 0)
-    sf:SetPoint("RIGHT", -32, 0)
-    sf:SetPoint("TOP", 0, -32)
+        local sf = CreateFrame("ScrollFrame", "KHMRaidFramesScrollFrame", f, "UIPanelScrollFrameTemplate")
+        sf:SetPoint("LEFT", 16, 0)
+        sf:SetPoint("RIGHT", -32, 0)
+        sf:SetPoint("TOP", 0, -32)
 
-    local eb = CreateFrame("EditBox", "KHMRaidFramesEditBox", KHMRaidFramesScrollFrame)
-    eb:SetSize(sf:GetSize())
-    eb:SetMultiLine(true)
-    eb:SetAutoFocus(true)
-    eb:SetFontObject("ChatFontNormal")
-    eb:SetScript("OnEscapePressed", function() f:Hide() end)
-    sf:SetScrollChild(eb)
+        local eb = CreateFrame("EditBox", "KHMRaidFramesEditBox", KHMRaidFramesScrollFrame)
+        eb:SetSize(sf:GetSize())
+        eb:SetMultiLine(true)
+        eb:SetAutoFocus(true)
+        eb:SetFontObject("ChatFontNormal")
+        eb:SetScript("OnEscapePressed", function() f:Hide() end)
+        sf:SetScrollChild(eb)
 
-    KHMRaidFrames.ProfileFrame = f
-  end
+        KHMRaidFrames.ProfileFrame = f
+    end
 
-  KHMRaidFramesEditBox:SetText(text)
-  KHMRaidFramesEditBox:HighlightText()
-  KHMRaidFrames.ProfileFrame:Show()
+    KHMRaidFramesEditBox:SetText(text)
+    KHMRaidFramesEditBox:HighlightText()
+    KHMRaidFrames.ProfileFrame:Show()
 end
 
 function KHMRaidFrames.ImportCurrentProfile(text)
-  local db = KHMRaidFrames.DecompressData(text)
+    local db = KHMRaidFrames.DecompressData(text)
 
-  KHMRaidFrames.db.profile = db
+    local dbTo = KHMRaidFrames.db.profile
+
+    for k, v in pairs(db) do
+        dbTo[k] = v
+    end
 end

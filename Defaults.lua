@@ -181,13 +181,13 @@ function KHMRaidFrames:Defaults()
     return defaults_settings
 end
 
-function KHMRaidFrames:RestoreDefaults(groupType, frameType)
+function KHMRaidFrames:RestoreDefaults(groupType, frameType, subType)
     if InCombatLockdown() then
         print("Can not refresh settings while in combat")
         return
     end
 
-    local defaults_settings = self:Defaults()["profile"][groupType][frameType]
+    local defaults_settings = subType and self:Defaults()["profile"][groupType][frameType][subType]
 
     for k, v in pairs(defaults_settings) do
         self.db.profile[groupType][frameType][k] = v
@@ -290,7 +290,8 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
         self:SetUpCenterStatusIcon(frame, groupType)
     end
 
-    frame.healthBar:SetStatusBarTexture(self.textures[db.frames.texture], "BORDER")
+    local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
+    frame.healthBar:SetStatusBarTexture(texture, "BORDER")
 
     return deferred
 end

@@ -404,7 +404,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 12,
                 disabled = function() return not db.name.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "name")
                 end,
             },
         },
@@ -561,7 +561,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 10,
                 disabled = function() return not db.statusText.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "statusText")
                 end,
             },
         },
@@ -739,7 +739,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 12,
                 disabled = function() return not db.roleIcon.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "roleIcon")
                 end,
             },
         },
@@ -901,7 +901,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 11,
                 disabled = function() return not db.readyCheckIcon.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "readyCheckIcon")
                 end,
             },
         },
@@ -1111,7 +1111,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 14,
                 disabled = function() return not db.centerStatusIcon.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "centerStatusIcon")
                 end,
             },
         },

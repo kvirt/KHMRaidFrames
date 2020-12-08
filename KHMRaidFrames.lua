@@ -198,7 +198,14 @@ function KHMRaidFrames:SetUpSoloFrame()
 end
 
 function KHMRaidFrames:SetUpName(frame, groupType)
-    if not self.db.profile[groupType].nameAndIcons.name.enabled then return end
+    if not self.db.profile[groupType].nameAndIcons.name.enabled then
+        if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
+            frame.name:ClearAllPoints()
+            frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -3)
+            frame.name:SetJustifyH("LEFT")
+        end
+        return
+    end
     if not frame.unit then return end
 
     local db = self.db.profile[groupType].nameAndIcons.name
@@ -207,8 +214,10 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     local flags = db.flag ~= "None" and db.flag or ""
 
+    local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
+
     name:SetFont(
-        self.fonts[db.font],
+        font,
         size,
         flags
     )
@@ -261,8 +270,10 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local flags = db.flag ~= "None" and db.flag or ""
 
+    local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.statusText.font]
+
     statusText:SetFont(
-        self.fonts[db.font],
+        font,
         size,
         flags
     )
