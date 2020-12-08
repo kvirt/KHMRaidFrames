@@ -157,7 +157,7 @@ function KHMRaidFrames:CompactUnitFrame_Util_ShouldDisplayDebuff(...)
         return false
     end
 
-    if self:AdditionalAura(name, debuffType, spellId) then
+    if self:AdditionalAura(name, debuffType, spellId, unitCaster) then
         return true
     end
 
@@ -176,7 +176,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilShouldDisplayBuff(...)
         return false
     end
 
-    if self:AdditionalAura(name, debuffType, spellId) then
+    if self:AdditionalAura(name, debuffType, spellId, unitCaster) then
         return true
     end
 

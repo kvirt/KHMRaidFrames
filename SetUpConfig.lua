@@ -26,6 +26,12 @@ local grow_positions = {
     ["TOP"] = L["TOP"],
 }
 
+local flags = {
+    ["None"] = L["None"],
+    ["OUTLINE"] = L["OUTLINE"],
+    ["THICKOUTLINE"] = L["THICKOUTLINE"],
+    ["MONOCHROME"] = L["MONOCHROME"],
+}
 
 function KHMRaidFrames:SetupOptions()
     local options = {
@@ -125,7 +131,7 @@ function KHMRaidFrames:SetupOptions()
 
     options.args.virtualFrames = {
         name = L["Show\\Hide Test Frames"],
-        desc = "",
+        desc = L["Show\\Hide Test Frames desc"],
         width = "double",
         type = "execute",
         order = 4,
@@ -227,7 +233,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             ["Enable"] = {
                 name = L["Enable"],
                 desc = "",
-                width = "normal",
+                width = "double",
                 type = "toggle",
                 order = 1,
                 confirm = true,
@@ -243,7 +249,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             ["Font"] = {
                 name = L["Font"],
                 desc = "",
-                width = "double",
+                width = "normal",
                 type = "select",
                 values = function(info, val) return self.sortedFonts end,
                 order = 2,
@@ -263,6 +269,20 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                     return db.name.font
                 end
             },
+            ["Flags"] = {
+                name = L["Flags"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = flags,
+                order = 3,
+                disabled = function() return not db.name.enabled end,
+                set = function(info,val)
+                    db.name.flag = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return db.name.flag end
+            },
             ["size"] = {
                 name = L["Size"],
                 desc = "",
@@ -271,7 +291,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = 1,
                 max = 100,
                 step = 1,
-                order = 3,
+                order = 4,
                 disabled = function() return not db.name.enabled end,
                 set = function(info,val)
                     db.name.size = val
@@ -285,7 +305,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "normal",
                 type = "select",
                 values = positionsText,
-                order = 4,
+                order = 5,
                 confirm = true,
                 confirmText = L["UI will be reloaded to apply settings"],
                 disabled = function() return not db.name.enabled end,
@@ -304,7 +324,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = -200,
                 max = 200,
                 step = 1,
-                order = 5,
+                order = 6,
                 disabled = function() return not db.name.enabled end,
                 set = function(info,val)
                     db.name.xOffset = val
@@ -320,7 +340,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = -200,
                 max = 200,
                 step = 1,
-                order = 6,
+                order = 7,
                 disabled = function() return not db.name.enabled end,
                 set = function(info,val)
                     db.name.yOffset = val
@@ -333,7 +353,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 desc = "",
                 width = "normal",
                 type = "toggle",
-                order = 7,
+                order = 8,
                 disabled = function() return not db.name.enabled end,
                 set = function(info,val)
                     db.name.showServer = val
@@ -345,10 +365,10 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             },
             ["Class Colored Names"] = {
                 name = L["Class Colored Names"],
-                desc = "",
+                desc = L["Class Colored Names desc"],
                 width = "normal",
                 type = "toggle",
-                order = 8,
+                order = 9,
                 disabled = function() return not db.name.enabled end,
                 set = function(info,val)
                     db.name.classColoredNames = val
@@ -357,24 +377,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 get = function(info)
                     return db.name.classColoredNames
                 end
-            },
-            ["Flags"] = {
-                name = L["Flags"],
-                desc = "",
-                width = "normal",
-                type = "multiselect",
-                values = {
-                    ["OUTLINE"] = L["OUTLINE"],
-                    ["THICKOUTLINE"] = L["THICKOUTLINE"],
-                    ["MONOCHROME"] = L["MONOCHROME"],
-                },
-                order = 9,
-                disabled = function() return not db.name.enabled end,
-                set = function(info,key,val)
-                    db.name.flags[key] = val
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info, value) return db.name.flags[value] end
             },
             [frameType.."Skip"] = {
                 type = "header",
@@ -402,7 +404,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 12,
                 disabled = function() return not db.name.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "name")
                 end,
             },
         },
@@ -418,7 +420,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             ["Enable"] = {
                 name = L["Enable"],
                 desc = "",
-                width = "normal",
+                width = "double",
                 type = "toggle",
                 order = 1,
                 confirm = true,
@@ -434,7 +436,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             ["Font"] = {
                 name = L["Font"],
                 desc = "",
-                width = "double",
+                width = "normal",
                 type = "select",
                 values = function(info, val) return self.sortedFonts end,
                 order = 2,
@@ -454,6 +456,20 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                     return db.statusText.font
                 end
             },
+            ["Flags"] = {
+                name = L["Flags"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = flags,
+                order = 3,
+                disabled = function() return not db.statusText.enabled end,
+                set = function(info,val)
+                    db.statusText.flag = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return db.statusText.flag end
+            },
             ["size"] = {
                 name = L["Size"],
                 desc = "",
@@ -462,7 +478,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = 1,
                 max = 100,
                 step = 1,
-                order = 3,
+                order = 4,
                 disabled = function() return not db.statusText.enabled end,
                 set = function(info,val)
                     db.statusText.size = val
@@ -476,7 +492,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 width = "normal",
                 type = "select",
                 values = positionsText,
-                order = 4,
+                order = 5,
                 disabled = function() return not db.statusText.enabled end,
                 confirm = true,
                 confirmText = L["UI will be reloaded to apply settings"],
@@ -495,7 +511,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = -200,
                 max = 200,
                 step = 1,
-                order = 5,
+                order = 6,
                 disabled = function() return not db.statusText.enabled end,
                 set = function(info,val)
                     db.statusText.xOffset = val
@@ -511,31 +527,13 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 min = -200,
                 max = 200,
                 step = 1,
-                order = 6,
+                order = 7,
                 disabled = function() return not db.statusText.enabled end,
                 set = function(info,val)
                     db.statusText.yOffset = val
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info) return db.statusText.yOffset end
-            },
-            ["Flags"] = {
-                name = L["Flags"],
-                desc = "",
-                width = "normal",
-                type = "multiselect",
-                values = {
-                    ["OUTLINE"] = L["OUTLINE"],
-                    ["THICKOUTLINE"] = L["THICKOUTLINE"],
-                    ["MONOCHROME"] = L["MONOCHROME"],
-                },
-                order = 7,
-                disabled = function() return not db.statusText.enabled end,
-                set = function(info,key,val)
-                    db.statusText.flags[key] = val
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info, value) return db.statusText.flags[value] end
             },
             [frameType.."Skip"] = {
                 type = "header",
@@ -563,7 +561,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 10,
                 disabled = function() return not db.statusText.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "statusText")
                 end,
             },
         },
@@ -642,7 +640,8 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             },
             [frameType.."Skip1"] = {
                 type = "execute",
-                name = L["Custom Texture"],
+                name = L["Custom Textures"],
+                desc = L["Custom Textures desc"],
                 order = 5,
                 disabled = function() return not db.roleIcon.enabled end,
                 width = "full",
@@ -740,7 +739,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 12,
                 disabled = function() return not db.roleIcon.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "roleIcon")
                 end,
             },
         },
@@ -819,7 +818,8 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             },
             [frameType.."Skip1"] = {
                 type = "execute",
-                name = L["Custom Texture"],
+                name = L["Custom Textures"],
+                desc = L["Custom Textures desc"],
                 order = 5,
                 disabled = function() return not db.readyCheckIcon.enabled end,
                 width = "full",
@@ -901,7 +901,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 11,
                 disabled = function() return not db.readyCheckIcon.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "readyCheckIcon")
                 end,
             },
         },
@@ -980,7 +980,8 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
             },
             [frameType.."Skip1"] = {
                 type = "execute",
-                name = L["Custom Texture"],
+                name = L["Custom Textures"],
+                desc = L["Custom Textures desc"],
                 order = 5,
                 disabled = function() return not db.centerStatusIcon.enabled end,
                 width = "full",
@@ -1110,7 +1111,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(frameType, db, groupType)
                 order = 14,
                 disabled = function() return not db.centerStatusIcon.enabled end,
                 func = function(info,val)
-                    self:RestoreDefaults(groupType, frameType)
+                    self:RestoreDefaults(groupType, frameType, "centerStatusIcon")
                 end,
             },
         },
@@ -1352,13 +1353,13 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
             desc = L["Track Auras that are not shown by default by Blizzard"],
-            usage = self:TrackingHelpText(),
+            usage = self.AdditionalTrackingHelpText(),
             width = "full",
             type = "input",
             multiline = 10,
-            order = 8,
+            order = 10,
             set = function(info,val)
-                db.tracking = self:SanitizeStrings(val)
+                db.tracking = self.SanitizeStringsByUnit(val)
                 db.trackingStr = val
 
                 self:SafeRefresh(groupType)
@@ -1367,17 +1368,17 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
                 return db.trackingStr
             end
         },
-        [frameType.."Skip"] = {
+        [frameType.."Skip2"] = {
             type = "header",
             name = "",
-            order = 9,
+            order = 11,
         },
         ["Copy"] = {
             name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 10,
+            order = 12,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)][frameType])
@@ -1389,7 +1390,7 @@ function KHMRaidFrames:SetupFrameOptions(frameType, db, groupType)
             width = "double",
             type = "execute",
             confirm = true,
-            order = 11,
+            order = 13,
             func = function(info,val)
                 self:RestoreDefaults(groupType, frameType)
             end,

@@ -198,21 +198,26 @@ function KHMRaidFrames:SetUpSoloFrame()
 end
 
 function KHMRaidFrames:SetUpName(frame, groupType)
-    if not self.db.profile[groupType].nameAndIcons.name.enabled then return end
+    if not self.db.profile[groupType].nameAndIcons.name.enabled then
+        if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
+            frame.name:ClearAllPoints()
+            frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -3)
+            frame.name:SetJustifyH("LEFT")
+        end
+        return
+    end
     if not frame.unit then return end
 
     local db = self.db.profile[groupType].nameAndIcons.name
     local name = frame.name
     local size = db.size * self.componentScale
 
-    local flags = ""
+    local flags = db.flag ~= "None" and db.flag or ""
 
-    for k, v in pairs(db.flags) do
-        if v then flags = flags..k..", " end
-    end
+    local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
 
     name:SetFont(
-        self.fonts[db.font],
+        font,
         size,
         flags
     )
@@ -263,19 +268,17 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     local statusText = frame.statusText
     local size = db.size * self.componentScale
 
-    local flags = ""
+    local flags = db.flag ~= "None" and db.flag or ""
 
-    for k, v in pairs(db.flags) do
-        if v then flags = flags..k..", " end
-    end
-
-    statusText:ClearAllPoints()
+    local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.statusText.font]
 
     statusText:SetFont(
-        self.fonts[db.font],
+        font,
         size,
         flags
     )
+
+    statusText:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT")
     xOffset = xOffset + db.xOffset

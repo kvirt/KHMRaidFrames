@@ -1,6 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
-local LCG = LibStub("LibCustomGlow-1.0")
 
 
 function KHMRaidFrames.GetGlowOptions(key)
@@ -16,8 +15,6 @@ function KHMRaidFrames.GetGlowOptions(key)
                 yOffset = 0,
                 border = false,
             },
-            start = LCG.PixelGlow_Start,
-            stop = LCG.PixelGlow_Stop,
         },
         auto = {
             options = {
@@ -28,16 +25,12 @@ function KHMRaidFrames.GetGlowOptions(key)
                 xOffset = 0,
                 yOffset = 0,
             },
-            start = LCG.AutoCastGlow_Start,
-            stop = LCG.AutoCastGlow_Stop,
         },
         button = {
             options = {
                 color = {0.95, 0.95, 0.32, 1},
                 frequency = 0.125,
             },
-            start = LCG.ButtonGlow_Start,
-            stop = LCG.ButtonGlow_Stop,
         },
     }
     if key and options[key] then return options[key] else return options end
