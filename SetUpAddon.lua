@@ -95,6 +95,8 @@ function KHMRaidFrames:Setup()
 
     self:RegisterChatCommand("кд", function() ReloadUI() end)
 
+    self:RegisterChatCommand("rl", function() ReloadUI() end)
+
     self:SetInternalVariables()
 
 end
