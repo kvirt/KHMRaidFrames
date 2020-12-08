@@ -1,5 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
+local LCG = LibStub("LibCustomGlow-1.0")
 
 
 function KHMRaidFrames.GetGlowOptions(key)
@@ -452,7 +453,13 @@ function KHMRaidFrames:RestartOptionsGlows(frameType, glowType)
 
     for frame, color in pairs(self.glowingFrames[glowType][frameType]) do
         for _, _glowType in ipairs{"pixel", "auto", "button"} do
-            self.GetGlowOptions(_glowType).stop(frame, frameType or "")
+            if _glowType == "button" then
+                LCG.ButtonGlow_Stop(frame, frameType or "")
+            elseif _glowType == "pixel" then
+                LCG.PixelGlow_Stop(frame, frameType or "")
+            elseif _glowType == "auto" then
+                LCG.AutoCastGlow_Stop(frame, frameType or "")
+            end
 
             self.glowingFrames[glowType][frameType][frame] = nil
         end

@@ -28,7 +28,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             width = "normal",
             type = "range",
             min = 0,
-            max = self.maxFrames,
+            max = 10,
             step = 1,
             order = 1,
             set = function(info,val)
@@ -58,7 +58,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             width = "normal",
             type = "range",
             min = 1,
-            max = self.maxFrames,
+            max = 10,
             step = 1,
             order = 2,
             set = function(info,val)
@@ -194,7 +194,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             width = "normal",
             type = "range",
             min = 0,
-            max = self.maxFrames,
+            max = 10,
             step = 1,
             order = 1,
             set = function(info,val)
@@ -224,7 +224,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             width = "normal",
             type = "range",
             min = 1,
-            max = self.maxFrames,
+            max = 10,
             step = 1,
             order = 2,
             set = function(info,val)

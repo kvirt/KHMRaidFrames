@@ -27,6 +27,7 @@ function KHMRaidFrames:SetupProfiles(options)
         width = "full",
         type = "input",
         multiline = 10,
+        confirm = true,
         confirmText = L["Are You sure?"],
         order = 99,
         set = function(info,val)
