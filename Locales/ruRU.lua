@@ -130,3 +130,4 @@ L["AdditionalTrackingHelpText"] = "Вы можете отфильтровать 
 L["Export Profile"] = "Экспорт Профиля"
 L["Import Profile"] = "Импорт Профиля"
 L["Are You sure?"] = "Вы уверены?"
+L["Transparency"] = "Прозрачность"

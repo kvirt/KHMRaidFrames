@@ -133,3 +133,4 @@ L["AdditionalTrackingHelpText"] = "You can filter auras by unit e.g.:"..
 L["Export Profile"] = true
 L["Import Profile"] = true
 L["Are You sure?"] = true
+L["Transparency"] = true

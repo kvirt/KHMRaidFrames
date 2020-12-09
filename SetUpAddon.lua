@@ -46,6 +46,8 @@ function KHMRaidFrames:SetInternalVariables()
         },
     }
 
+    self.curProfile = nil
+
     if self.db.profile.Masque then
         local Masque = LibStub("Masque", true)
 
@@ -207,7 +209,6 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     )
 
     self:SafeRefresh()
-    self.PrintV(self.db.profile, "db")
 end
 
 function KHMRaidFrames:HookNameAndIcons()
@@ -283,12 +284,18 @@ end
 function KHMRaidFrames:GetRaidProfileSettings(profile)
     if InCombatLockdown() then return end
 
-    local settings = GetRaidProfileFlattenedOptions(profile or GetActiveRaidProfile())
+    profile = profile or GetActiveRaidProfile()
+    local settings = GetRaidProfileFlattenedOptions(profile)
 
     if not settings then return end
 
     self.horizontalGroups = settings.horizontalGroups
     self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
+
+    if self.keepGroupsTogether ~= settings.keepGroupsTogether then
+        self.processedFrames = {}
+    end
+
     self.keepGroupsTogether = settings.keepGroupsTogether
     self.displayBorder = settings.displayBorder
     self.frameWidth = settings.frameWidth
@@ -298,6 +305,11 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
+
+    if self.curProfile ~= profile then
+        self.curProfile = profile
+        self.processedFrames = {}
+    end
 end
 
 function KHMRaidFrames:OnOptionShow()

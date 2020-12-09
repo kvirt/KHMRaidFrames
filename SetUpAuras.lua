@@ -125,12 +125,27 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             end,
             get = function(info) return db.growDirection end
         },
+        ["alpha"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.1,
+            order = 4,
+            set = function(info,val)
+                db.alpha = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) return db.alpha end
+        },
         ["Reskin"] = {
             name = L["Masque Reskin"],
             desc = "",
             width = "normal",
             type = "execute",
-            order = 4,
+            order = 5,
             hidden = function() return not self.Masque end,
             func = function(info,val)
                 self.Masque.buffFrames:ReSkin()
@@ -139,7 +154,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
-            order = 5,
+            order = 6,
         },
         ["exclude"] = {
             name = L["Exclude"],
@@ -148,7 +163,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             width = "full",
             type = "input",
             multiline = 5,
-            order = 6,
+            order = 7,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -164,7 +179,7 @@ function KHMRaidFrames:SetupBuffFrames(db, groupType)
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 7,
+            order = 8,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].buffFrames)
@@ -291,12 +306,27 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             end,
             get = function(info) return db.growDirection end
         },
+        ["alpha"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.1,
+            order = 4,
+            set = function(info,val)
+                db.alpha = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) return db.alpha end
+        },
         ["Reskin"] = {
             name = L["Masque Reskin"],
             desc = "",
             width = "normal",
             type = "execute",
-            order = 4,
+            order = 5,
             hidden = function() return not self.Masque end,
             func = function(info,val)
                 self.Masque.debuffFrames:ReSkin()
@@ -305,14 +335,14 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["Skip2"] = {
             type = "header",
             name = L["Big Debuffs"],
-            order = 5,
+            order = 6,
         },
         ["Show Big Debuffs"] = {
             name = L["Show Big Debuffs"],
             desc = "",
             width = "normal",
             type = "toggle",
-            order = 6,
+            order = 7,
             set = function(info,val)
                 db.showBigDebuffs = val
                 self:SafeRefresh(groupType)
@@ -326,7 +356,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             desc = L["Align Big Debuffs Desc"],
             width = "normal",
             type = "toggle",
-            order = 7,
+            order = 8,
             disabled = function(info)
                 return not db.showBigDebuffs
             end,
@@ -346,7 +376,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             min = 1,
             max = 100,
             step = 1,
-            order = 8,
+            order = 9,
             disabled = function(info)
                 return not db.showBigDebuffs or db.smartAnchoring
             end,
@@ -359,7 +389,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
-            order = 9,
+            order = 10,
         },
         ["exclude"] = {
             name = L["Exclude"],
@@ -368,7 +398,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             width = "full",
             type = "input",
             multiline = 5,
-            order = 10,
+            order = 11,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -384,7 +414,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 10,
+            order = 12,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].debuffFrames)
@@ -395,7 +425,7 @@ function KHMRaidFrames:SetupDebuffFrames(db, groupType)
             desc = "",
             width = "double",
             type = "execute",
-            order = 11,
+            order = 13,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "debuffFrames")
@@ -511,10 +541,25 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             end,
             get = function(info) return db.growDirection end
         },
+        ["alpha"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.1,
+            order = 4,
+            set = function(info,val)
+                db.alpha = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) return db.alpha end
+        },
         ["Skip3"] = {
             type = "header",
             name = L["Block List"],
-            order = 4,
+            order = 5,
         },
         ["exclude"] = {
             name = L["Exclude"],
@@ -523,7 +568,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             width = "full",
             type = "input",
             multiline = 5,
-            order = 5,
+            order = 6,
             set = function(info,val)
                 db.exclude = self:SanitizeStrings(val)
                 db.excludeStr = val
@@ -539,7 +584,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 6,
+            order = 7,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(db, self.db.profile[self.ReverseGroupType(groupType)].dispelDebuffFrames)
@@ -550,7 +595,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(db, groupType)
             desc = "",
             width = "double",
             type = "execute",
-            order = 7,
+            order = 8,
             confirm = true,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "dispelDebuffFrames")

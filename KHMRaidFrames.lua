@@ -83,6 +83,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         )
 
         typedframe:SetSize(size, size)
+        typedframe:SetAlpha(db.alpha)
 
         if self.db.profile[groupType].frames.clickThrough then
             typedframe:EnableMouse(false)
@@ -91,6 +92,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         end
 
         if self.Masque and self.Masque[subFrameType] and typedframe:GetName() then
+            self.Masque[subFrameType]:RemoveButton(typedframe)
             self.Masque[subFrameType]:AddButton(typedframe)
         end
 

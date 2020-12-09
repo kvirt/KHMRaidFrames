@@ -36,6 +36,7 @@ function KHMRaidFrames:Defaults()
                 yOffset = 0,
                 exclude = {},
                 excludeStr = "",
+                alpha = 1.0,
             },
             debuffFrames = {
                 num = 3,
@@ -51,6 +52,7 @@ function KHMRaidFrames:Defaults()
                 bigDebuffSize = 11 + 9,
                 showBigDebuffs = true,
                 smartAnchoring = true,
+                alpha = 1.0,
             },
             buffFrames = {
                 num = 3,
@@ -63,6 +65,7 @@ function KHMRaidFrames:Defaults()
                 yOffset = 0,
                 exclude = {},
                 excludeStr = "",
+                alpha = 1.0,
             },
             raidIcon = {
                 enabled = true,
