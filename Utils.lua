@@ -276,6 +276,8 @@ function KHMRaidFrames:ExcludeAuras(name, debuffType, spellId)
 end
 
 function KHMRaidFrames:CustomizeOptions()
+    if not self.isOpen then return end
+
     local virtualFramesButton = self.dialog.general.obj.children and self.dialog.general.obj.children[1]
 
     if virtualFramesButton then
@@ -283,23 +285,38 @@ function KHMRaidFrames:CustomizeOptions()
         virtualFramesButton:SetPoint("TOPRIGHT", self.dialog.general.obj.label:GetParent(), "TOPRIGHT", -10, -15)
     end
 
+    local index = KHMRaidFrames_SyncProfiles and 3 or 2
     local groupTypelabel = self.dialog.general.obj.children
-    and self.dialog.general.obj.children[2]
-    and self.dialog.general.obj.children[2].children
-    and self.dialog.general.obj.children[2].children[1]
-    and self.dialog.general.obj.children[2].children[1].label
+    and self.dialog.general.obj.children[index]
+    and self.dialog.general.obj.children[index].children
+    and self.dialog.general.obj.children[index].children[1]
+    and self.dialog.general.obj.children[index].children[1].label
 
     if groupTypelabel then
         local label = L["You are in |cFFC80000<text>|r"]:gsub("<text>", IsInRaid() and L["Raid"] or L["Party"])
         groupTypelabel:SetText(label)
     end
+
+    if KHMRaidFrames_SyncProfiles then
+        local label = L["Profile: |cFFC80000<text>|r"]:gsub("<text>", self.db:GetCurrentProfile())
+        local profileLabel = self.dialog.general.obj.children
+        and self.dialog.general.obj.children[2]
+        and self.dialog.general.obj.children[2].label
+
+        if profileLabel then
+            profileLabel:SetText(label)
+        end
+    end
 end
 
 function KHMRaidFrames:ConfigOptionsOpen()
+    local index = KHMRaidFrames_SyncProfiles and 3 or 2
     local tabsP = self.dialog.general.obj.children
-    and self.dialog.general.obj.children[2]
-    and self.dialog.general.obj.children[2]
+    and self.dialog.general.obj.children[index]
+
     tabsP:SelectTab(IsInRaid() and "raid" or "party")
+
+    C_Timer.NewTicker(5, function() self:CustomizeOptions() end)
 end
 
 function KHMRaidFrames.PrintV(obj, name)
@@ -315,7 +332,6 @@ function KHMRaidFrames.CompressData(data)
     local LibAceSerializer = LibStub:GetLibrary("AceSerializer-3.0")
 
     if LibDeflate and LibAceSerializer then
-        KHMRaidFrames.PrintV(data, "db")
         local dataSerialized = LibAceSerializer:Serialize(data)
         if dataSerialized then
             local dataCompressed = LibDeflate:CompressDeflate(dataSerialized, {level = 9})
@@ -402,4 +418,8 @@ function KHMRaidFrames.ImportCurrentProfile(text)
     for k, v in pairs(db) do
         dbTo[k] = v
     end
+end
+
+function KHMRaidFrames.SkipFrame(frame)
+    return not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d")
 end

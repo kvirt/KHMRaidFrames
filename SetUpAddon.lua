@@ -76,11 +76,13 @@ function KHMRaidFrames:Setup()
 
     self.config = LibStub("AceConfigRegistry-3.0")
     self.config:RegisterOptionsTable("KHMRaidFrames", self:SetupOptions())
-    self.config:RegisterOptionsTable("KHM Profiles", self:SetupProfiles(profiles))
+    self.config:RegisterOptionsTable("KHM Profiles", profiles)
+    self.config:RegisterOptionsTable("KHM Profile Stuff", self:SetupProfiles())
 
     self.dialog = LibStub("AceConfigDialog-3.0")
     self.dialog.general = self.dialog:AddToBlizOptions("KHMRaidFrames", L["KHMRaidFrames"])
     self.dialog.profiles = self.dialog:AddToBlizOptions("KHM Profiles", L["Profiles"], "KHMRaidFrames")
+    self.dialog.stuff = self.dialog:AddToBlizOptions("KHM Profile Stuff", L["KHM Profile Stuff"], "KHMRaidFrames")
 
     self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
     self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
@@ -100,24 +102,23 @@ function KHMRaidFrames:Setup()
     self:RegisterChatCommand("rl", function() ReloadUI() end)
 
     self:SetInternalVariables()
-
 end
 
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
-    self.db.RegisterCallback(
-        self, "OnProfileChanged",
-        function(...) StaticPopup_Show(self.reloadConfirmation)
-    end)
-    self.db.RegisterCallback(
-        self, "OnProfileCopied",
-        function(...) StaticPopup_Show(self.reloadConfirmation)
-    end)
-    self.db.RegisterCallback(
-        self, "OnProfileReset",
-        function(...) StaticPopup_Show(self.reloadConfirmation)
-    end)
+    -- self.db.RegisterCallback(
+    --     self, "OnProfileChanged",
+    --     function(...) self:SafeRefresh()
+    -- end)
+    -- self.db.RegisterCallback(
+    --     self, "OnProfileCopied",
+    --     function(...) self:SafeRefresh()
+    -- end)
+    -- self.db.RegisterCallback(
+    --     self, "OnProfileReset",
+    --     function(...) self:SafeRefresh()
+    -- end)
 
     local deferrFrame = CreateFrame("Frame")
     deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -161,7 +162,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
         self:SecureHook(
             "CompactUnitFrame_UpdateHealPrediction",
             function(frame)
-                if not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
+                if not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
 
                 self:SetUpAbsorb(frame)
             end
@@ -177,7 +178,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook(
         "CompactUnitFrame_UpdateAuras",
         function(frame)
-            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+            if self.SkipFrame(frame) then return end
 
             self:UpdateAuras(frame)
         end
@@ -215,44 +216,44 @@ function KHMRaidFrames:HookNameAndIcons()
     local dbParty = self.db.profile.party.nameAndIcons
     local dbRaid = self.db.profile.raid.nameAndIcons
 
-    if dbParty.name.enabled or dbRaid.name.enabled then
+    if (dbParty.name.enabled or dbRaid.name.enabled) and not self:IsHooked("CompactUnitFrame_UpdateName") then
         self:SecureHook(
             "CompactUnitFrame_UpdateName",
             function(frame)
-                if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+                if self.SkipFrame(frame) then return end
 
                 self:SetUpName(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
 
-    if dbParty.roleIcon.enabled or dbRaid.roleIcon.enabled then
+    if (dbParty.roleIcon.enabled or dbRaid.roleIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
         self:SecureHook(
             "CompactUnitFrame_UpdateRoleIcon",
             function(frame)
-            if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+                if self.SkipFrame(frame) then return end
 
             self:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party")
          end
         )
     end
 
-    if dbParty.readyCheckIcon.enabled or dbRaid.readyCheckIcon.enabled then
+    if (dbParty.readyCheckIcon.enabled or dbRaid.readyCheckIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateReadyCheck") then
         self:SecureHook(
             "CompactUnitFrame_UpdateReadyCheck",
             function(frame)
-                if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+                if self.SkipFrame(frame) then return end
 
                 self:SetUpReadyCheckIconInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
 
-    if dbParty.centerStatusIcon.enabled or dbRaid.centerStatusIcon.enabled then
+    if (dbParty.centerStatusIcon.enabled or dbRaid.centerStatusIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateCenterStatusIcon") then
         self:SecureHook(
             "CompactUnitFrame_UpdateCenterStatusIcon",
             function(frame)
-                if not frame:GetName() or frame:GetName():find("^NamePlate%d") then return end
+                if self.SkipFrame(frame) then return end
 
                 self:SetUpCenterStatusIconInternal(frame, IsInRaid() and "raid" or "party")
             end
@@ -306,9 +307,22 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
 
-    if self.curProfile ~= profile then
+    if self.curProfile == nil then
+        self.curProfile = profile
+    elseif self.curProfile ~= profile and profile then
         self.curProfile = profile
         self.processedFrames = {}
+
+        if KHMRaidFrames_SyncProfiles then
+            local dbProfiles = self.db:GetProfiles()
+
+            for _, v in ipairs(dbProfiles) do
+                if profile == v then
+                    self.db:SetProfile(profile)
+                    self:CustomizeOptions()
+                end
+            end
+        end
     end
 end
 

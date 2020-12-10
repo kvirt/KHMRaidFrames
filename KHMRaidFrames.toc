@@ -4,6 +4,7 @@
 ## Version: 1.1.0
 ## Author: kvirtx
 ## SavedVariables: KHMRaidFramesDB
+## SavedVariablesPerCharacter: KHMRaidFrames_SyncProfiles
 
 Libs\embeds.xml
 Locales\Locales.xml

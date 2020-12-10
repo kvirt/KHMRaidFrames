@@ -163,8 +163,6 @@ function KHMRaidFrames:GlowSubTypes(glowType)
 end
 
 function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
-    local db = self.db.profile.glows[glowType][frameType]
-
     local frameName = glowType..frameType
 
     local options = {
@@ -175,12 +173,12 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             type = "toggle",
             order = 1,
             set = function(info,val)
-                db.enabled = val
+                self.db.profile.glows[glowType][frameType].enabled = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info)
                 self:HideVirtual()
-                return db.enabled
+                return self.db.profile.glows[glowType][frameType].enabled
             end
         },
         ["useDefaultsColors"..frameName] = {
@@ -190,13 +188,13 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             type = "toggle",
             order = 2,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             set = function(info,val)
-                db.useDefaultsColors = val
+                self.db.profile.glows[glowType][frameType].useDefaultsColors = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.useDefaultsColors end
+            get = function(info) return self.db.profile.glows[glowType][frameType].useDefaultsColors end
         },
         ["glowType"..frameName] = {
             name = L["Glow Type"],
@@ -205,7 +203,7 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             type = "select",
             order = 2,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             values = function(info, val)
                 return {
@@ -215,10 +213,10 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 }
             end,
             set = function(info,val)
-                db.type = val
+                self.db.profile.glows[glowType][frameType].type = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.type end
+            get = function(info) return self.db.profile.glows[glowType][frameType].type end
         },
         ["color"..frameName] = {
             name = L["Color"],
@@ -228,14 +226,14 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             order = 2,
             hasAlpha = true,
             disabled = function(info)
-                return not db.enabled or db.useDefaultsColors
+                return not self.db.profile.glows[glowType][frameType].enabled or self.db.profile.glows[glowType][frameType].useDefaultsColors
             end,
             set = function(info, r, g, b, a)
-                db.options[db.type].options.color = {r, g, b, a}
+                self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.color = {r, g, b, a}
                 self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info)
-                local color = db.options[db.type].options.color
+                local color = self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.color
                 return color[1], color[2], color[3], color[4]
             end
         },
@@ -249,13 +247,13 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             step = 0.01,
             order = 2,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             set = function(info,val)
-                db.options[db.type].options.frequency = val
+                self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.frequency = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.options[db.type].options.frequency end
+            get = function(info) return self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.frequency end
         },
         [frameName.."Skip"] = {
             type = "header",
@@ -272,17 +270,17 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             step = 1,
             order = 4,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(self.db.profile.glows[glowType][frameType].type)
                 if options.options["xOffset"] ~= nil then return false else return true end
             end,
             set = function(info,val)
-                db.options[db.type].options.xOffset = val
+                self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.xOffset = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.options[db.type].options.xOffset end
+            get = function(info) return self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.xOffset end
         },
        ["yOffset"..frameName] = {
             name = L["Y Offset"],
@@ -294,17 +292,17 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             step = 1,
             order = 5,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(self.db.profile.glows[glowType][frameType].type)
                 if options.options["yOffset"] ~= nil then return false else return true end
             end,
             set = function(info,val)
-                db.options[db.type].options.yOffset = val
+                self.db.profile.glows[glowType][frameType].options[db.type].options.yOffset = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.options[db.type].options.yOffset end
+            get = function(info) return self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.yOffset end
         },
         ["num"..frameName] = {
             name = L["Num"],
@@ -316,17 +314,17 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             step = 1,
             order = 6,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(self.db.profile.glows[glowType][frameType].type)
                 if options.options["N"] ~= nil then return false else return true end
             end,
             set = function(info,val)
-                db.options[db.type].options.N = val
+                self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.N = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.options[db.type].options.N end
+            get = function(info) return self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.N end
         },
         ["th"..frameName] = {
             name = L["Thickness"],
@@ -338,17 +336,17 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             step = 0.1,
             order = 7,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(self.db.profile.glows[glowType][frameType].type)
                 if options.options["th"] ~= nil then return false else return true end
             end,
             set = function(info,val)
-                db.options[db.type].options.th = val
+                self.db.profile.glows[glowType][frameType].options[db.type].options.th = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.options[db.type].options.th end
+            get = function(info) return self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.th end
         },
         ["border"..frameName] = {
             name = L["Border"],
@@ -357,24 +355,24 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
             type = "toggle",
             order = 8,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(self.db.profile.glows[glowType][frameType].type)
                 if options.options["border"] ~= nil then return false else return true end
             end,
             set = function(info,val)
-                db.options[db.type].options.border = val
+                self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.border = val
                 self:RestartOptionsGlows(frameType, glowType)
             end,
-            get = function(info) return db.options[db.type].options.border end
+            get = function(info) return self.db.profile.glows[glowType][frameType].options[self.db.profile.glows[glowType][frameType].type].options.border end
         },
         [frameName.."Skip2"] = {
             type = "header",
             name = "",
             order = 9,
             hidden = function(info)
-                local options = self.GetGlowOptions(db.type)
+                local options = self.GetGlowOptions(self.db.profile.glows[glowType][frameType].type)
                 if options.options["N"] ~= nil then return false else return true end
             end,
         },
@@ -390,16 +388,16 @@ function KHMRaidFrames:SetupGlowOptions(frameType, glowType)
                 return frameType == "dispelDebuffFrames"
             end,
             disabled = function(info)
-                return not db.enabled
+                return not self.db.profile.glows[glowType][frameType].enabled
             end,
             set = function(info,val)
-                db.tracking = self:SanitizeStrings(val)
-                db.trackingStr = val
+                self.db.profile.glows[glowType][frameType].tracking = self:SanitizeStrings(val)
+                self.db.profile.glows[glowType][frameType].trackingStr = val
 
                 self:RestartOptionsGlows(frameType, glowType)
             end,
             get = function(info)
-                return db.trackingStr
+                return self.db.profile.glows[glowType][frameType].trackingStr
             end
         },
         [frameType.."Skip"] = {

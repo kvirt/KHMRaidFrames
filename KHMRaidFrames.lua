@@ -206,6 +206,12 @@ function KHMRaidFrames:SetUpName(frame, groupType)
             frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -3)
             frame.name:SetJustifyH("LEFT")
         end
+
+        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
+            frame.name:SetVertexColor(0.5, 0.5, 0.5)
+        else
+            frame.name:SetVertexColor(1.0, 1.0, 1.0)
+        end
         return
     end
     if not frame.unit then return end
@@ -243,6 +249,12 @@ function KHMRaidFrames:SetUpName(frame, groupType)
             local classColor = RAID_CLASS_COLORS[englishClass]
             name:SetTextColor(classColor.r, classColor.g, classColor.b)
         end
+    else
+        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
+            frame.name:SetVertexColor(0.5, 0.5, 0.5)
+        else
+            frame.name:SetVertexColor(1.0, 1.0, 1.0)
+        end
     end
 
     if _name then name:SetText(_name) end
@@ -261,6 +273,16 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, -3)
     name:SetJustifyH(db.hJustify)
+end
+
+function KHMRaidFrames.RevertNameColors()
+    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
+            frame.name:SetVertexColor(0.5, 0.5, 0.5)
+        else
+            frame.name:SetVertexColor(1.0, 1.0, 1.0)
+        end
+    end
 end
 
 function KHMRaidFrames:SetUpStatusText(frame, groupType)
@@ -357,6 +379,12 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     end
 end
 
+function KHMRaidFrames.RevertRoleIcon()
+    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+        KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
+    end
+end
+
 function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then return end
     if not frame.readyCheckIcon then return end
@@ -395,6 +423,12 @@ function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
     local readyCheckStatus = GetReadyCheckStatus(frame.unit)
     if db[readyCheckStatus] ~= "" then
         readyCheckIcon:SetTexture(db[readyCheckStatus])
+    end
+end
+
+function KHMRaidFrames.RevertReadyCheckIcon()
+    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+        KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
     end
 end
 
@@ -459,5 +493,11 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
                 centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
             end
         end
+    end
+end
+
+function KHMRaidFrames.RevertStatusIcon()
+    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+        KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
     end
 end

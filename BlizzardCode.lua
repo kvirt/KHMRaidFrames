@@ -1,5 +1,22 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
+local UnitIsTapDenied = UnitIsTapDenied
+local UnitPlayerControlled = UnitPlayerControlled
+local UnitInRaid = UnitInRaid
+local UnitHasVehicleUI = UnitHasVehicleUI
+local UnitInVehicle = UnitInVehicle
+local GetRaidRosterInfo = GetRaidRosterInfo
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+local GetTexCoordsForRoleSmallCircle = GetTexCoordsForRoleSmallCircle
+local GetReadyCheckTimeLeft = GetReadyCheckTimeLeft
+local GetReadyCheckStatus = GetReadyCheckStatus
+local READY_CHECK_WAITING_TEXTURE, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_NOT_READY_TEXTURE = READY_CHECK_WAITING_TEXTURE, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_NOT_READY_TEXTURE
+local UnitPhaseReason = UnitPhaseReason
+local Enum = Enum
+local C_IncomingSummon = C_IncomingSummon
+local UnitHasIncomingResurrection = UnitHasIncomingResurrection
+local UnitInOtherParty = UnitInOtherParty
+
 
 function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, filter, isBossAura, isBossBuff, ...)
     debuffFrame.debuffFramesGlowing = nil
@@ -444,4 +461,86 @@ function KHMRaidFrames:UpdateAuras(frame)
 
     self:StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
     self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
+end
+
+function KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame)
+    return frame.optionTable.greyOutWhenTapDenied and not UnitPlayerControlled(frame.unit) and UnitIsTapDenied(frame.unit);
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
+    if not frame.roleIcon or not frame.unit then
+        return
+    end
+
+    local size = frame.roleIcon:GetHeight()
+    local raidID = UnitInRaid(frame.unit)
+
+    if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
+        frame.roleIcon:SetTexture("Interface\\Vehicles\\UI-Vehicles-Raid-Icon")
+        frame.roleIcon:SetTexCoord(0, 1, 0, 1)
+        frame.roleIcon:SetSize(size, size)
+    elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
+        local role = select(10, GetRaidRosterInfo(raidID));
+        frame.roleIcon:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
+        frame.roleIcon:SetTexCoord(0, 1, 0, 1)
+        frame.roleIcon:SetSize(size, size)
+    else
+        local role = UnitGroupRolesAssigned(frame.unit)
+        if frame.optionTable.displayRoleIcon and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
+            frame.roleIcon:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
+            frame.roleIcon:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+            frame.roleIcon:SetSize(size, size)
+        else
+            frame.roleIcon:SetSize(1, size)
+        end
+    end
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
+    if not frame.readyCheckIcon or frame.readyCheckDecay and GetReadyCheckTimeLeft() <= 0 or not frame.unit then
+        return
+    end
+
+    local readyCheckStatus = GetReadyCheckStatus(frame.unit)
+    frame.readyCheckStatus = readyCheckStatus
+
+    if readyCheckStatus == "ready" then
+        frame.readyCheckIcon:SetTexture(READY_CHECK_READY_TEXTURE)
+    elseif readyCheckStatus == "notready" then
+        frame.readyCheckIcon:SetTexture(READY_CHECK_NOT_READY_TEXTURE)
+    elseif readyCheckStatus == "waiting" then
+        frame.readyCheckIcon:SetTexture(READY_CHECK_WAITING_TEXTURE)
+    end
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
+    if not frame.unit or not frame.centerStatusIcon then return end
+
+    if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) then
+        frame.centerStatusIcon.texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
+        frame.centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
+    elseif frame.optionTable.displayIncomingResurrect and UnitHasIncomingResurrection(frame.unit) then
+        frame.centerStatusIcon.texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
+        frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+    elseif frame.optionTable.displayIncomingSummon and C_IncomingSummon.HasIncomingSummon(frame.unit) then
+        local status = C_IncomingSummon.IncomingSummonStatus(frame.unit)
+        if status == Enum.SummonStatus.Pending then
+            frame.centerStatusIcon.texture:SetAtlas("Raid-Icon-SummonPending")
+            frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        elseif status == Enum.SummonStatus.Accepted then
+            frame.centerStatusIcon.texture:SetAtlas("Raid-Icon-SummonAccepted")
+            frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        elseif status == Enum.SummonStatus.Declined then
+            frame.centerStatusIcon.texture:SetAtlas("Raid-Icon-SummonDeclined")
+            frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        end
+    else
+        if frame.inDistance and frame.optionTable.displayInOtherPhase then
+            local phaseReason = UnitPhaseReason(frame.unit)
+            if phaseReason then
+                frame.centerStatusIcon.texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
+                frame.centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
+            end
+        end
+    end
 end
