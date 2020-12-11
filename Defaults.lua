@@ -1,4 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
+local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
 local _G, tinsert, CompactRaidFrameContainer = _G, tinsert, CompactRaidFrameContainer
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
@@ -18,7 +19,7 @@ function KHMRaidFrames:Defaults()
     local commons = {
             frames = {
                 hideGroupTitles = false,
-                texture = "Blizzard Raid Bar",
+                texture = SharedMedia.DefaultMedia.statusbar or "Blizzard Raid Bar",
                 clickThrough = false,
                 enhancedAbsorbs = false,
                 showPartySolo = false,
@@ -76,7 +77,7 @@ function KHMRaidFrames:Defaults()
             },
             nameAndIcons = {
                 name = {
-                    font = "Friz Quadrata TT",
+                    font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT",
                     size = 6,
                     flag = "None",
                     hJustify = "LEFT",
@@ -87,7 +88,7 @@ function KHMRaidFrames:Defaults()
                     enabled = false,
                 },
                 statusText = {
-                    font = "Friz Quadrata TT",
+                    font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT",
                     size = 12,
                     flag = "None",
                     hJustify = "CENTER",
@@ -105,6 +106,12 @@ function KHMRaidFrames:Defaults()
                     vehicle = "",
                     toggle = false,
                     enabled = false,
+                    colors = {
+                        healer = {1, 1, 1, 1},
+                        damager = {1, 1, 1, 1},
+                        tank = {1, 1, 1, 1},
+                        vehicle = {1, 1, 1, 1},
+                    },
                 },
                 readyCheckIcon  = {
                     size = 15 ,
@@ -115,6 +122,11 @@ function KHMRaidFrames:Defaults()
                     waiting = "",
                     toggle = false,
                     enabled = false,
+                    colors = {
+                        ready = {1, 1, 1, 1},
+                        notready = {1, 1, 1, 1},
+                        waiting = {1, 1, 1, 1},
+                    },
                 },
                 centerStatusIcon = {
                     size = 22,
@@ -128,6 +140,14 @@ function KHMRaidFrames:Defaults()
                     inOtherPhase = "",
                     toggle = false,
                     enabled = false,
+                    colors = {
+                        inOtherGroup = {1, 1, 1, 1},
+                        hasIncomingResurrection = {1, 1, 1, 1},
+                        hasIncomingSummonPending = {1, 1, 1, 1},
+                        hasIncomingSummonAccepted = {1, 1, 1, 1},
+                        hasIncomingSummonDeclined = {1, 1, 1, 1},
+                        inOtherPhase = {1, 1, 1, 1},
+                    },
                 },
             },
     }

@@ -273,10 +273,12 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         if self.db.profile[groupType].nameAndIcons.name.font == font then return i end
                     end
 
-                    self.db.profile[groupType].nameAndIcons.name.font = "Friz Quadrata TT"
-                    self:SafeRefresh(groupType)
+                    for i, font in ipairs(self.sortedFonts) do
+                        if self:Defaults().profile[groupType].nameAndIcons.name.font == font then return i end
+                    end
 
-                    return self.db.profile[groupType].nameAndIcons.name.font
+                    --fallback hack
+                    return 7
                 end
             },
             ["Flags"] = {
@@ -471,10 +473,13 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         if self.db.profile[groupType].nameAndIcons.statusText.font == font then return i end
                     end
 
-                    self.db.profile[groupType].nameAndIcons.statusText.font = "Friz Quadrata TT"
-                    self:SafeRefresh(groupType)
 
-                    return self.db.profile[groupType].nameAndIcons.statusText.font
+                    for i, font in ipairs(self.sortedFonts) do
+                        if self:Defaults().profile[groupType].nameAndIcons.statusText.font == font then return i end
+                    end
+
+                    --fallback hack
+                    return 7
                 end
             },
             ["Flags"] = {
@@ -679,7 +684,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             ["healer"] = {
                 name = L["Healer"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
                 order = 6,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
@@ -697,12 +702,31 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.healer end
             },
+            ["color healer"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 7,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.roleIcon.colors.healer = {r, g, b, a}
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.healer
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["damager"] = {
                 name = L["Damager"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 7,
+                order = 8,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
@@ -718,12 +742,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.damager end
             },
+            ["color damager"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 9,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.roleIcon.colors.damager = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.damager
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["tank"] = {
                 name = L["Tank"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 8,
+                order = 10,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
@@ -739,12 +783,31 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.tank end
             },
+            ["color tank"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 11,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.roleIcon.colors.tank = {r, g, b, a}
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.tank
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["vehicle"] = {
                 name = L["Vehicle"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 9,
+                order = 12,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
@@ -760,17 +823,36 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.vehicle end
             },
+            ["color vehicle"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 13,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.roleIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.roleIcon.colors.vehicle = {r, g, b, a}
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.vehicle
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["Skip2"] = {
                 type = "header",
                 name = "",
-                order = 10,
+                order = 14,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 11,
+                order = 15,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 confirm = true,
                 func = function(info,val)
@@ -783,7 +865,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "execute",
                 confirm = true,
-                order = 12,
+                order = 16,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 func = function(info,val)
                     self:RestoreDefaults(groupType,"nameAndIcons", "roleIcon")
@@ -883,7 +965,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             ["ready"] = {
                 name = L["Ready"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
                 order = 6,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
@@ -901,12 +983,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.ready end
             },
+            ["color ready"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 7,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.ready = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.ready
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["notready"] = {
                 name = L["Not Ready"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 7,
+                order = 8,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.toggle
@@ -922,12 +1024,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.notready end
             },
+            ["color notready"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 9,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.notready = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.notready
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["waiting"] = {
                 name = L["Waiting"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 8,
+                order = 10,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.toggle
@@ -943,17 +1065,37 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.waiting end
             },
+            ["color waiting"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 11,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.waiting = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.waiting
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["Skip2"] = {
                 type = "header",
                 name = "",
-                order = 9,
+                order = 12,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 10,
+                order = 13,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 confirm = true,
                 func = function(info,val)
@@ -966,7 +1108,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "execute",
                 confirm = true,
-                order = 11,
+                order = 14,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 func = function(info,val)
                     self:RestoreDefaults(groupType, "nameAndIcons", "readyCheckIcon")
@@ -1066,7 +1208,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             ["inOtherGroup "] = {
                 name = L["In Other Group"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
                 order = 6,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
@@ -1084,12 +1226,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherGroup end
             },
+            ["color inOtherGroup"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 7,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherGroup = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherGroup
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["hasIncomingResurrection"] = {
                 name = L["Has Icoming Ressurection"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 7,
+                order = 8,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
@@ -1105,12 +1267,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingResurrection end
             },
+            ["color hasIncomingResurrection"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 9,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingResurrection = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingResurrection
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["hasIncomingSummonPending"] = {
                 name = L["Incoming Summon Pending"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 8,
+                order = 10,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
@@ -1126,12 +1308,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonPending end
             },
+            ["color hasIncomingSummonPending"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 11,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonPending = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonPending
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["hasIncomingSummonAccepted"] = {
                 name = L["Incoming Summon Accepted"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 9,
+                order = 12,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
@@ -1147,12 +1349,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonAccepted end
             },
+            ["color hasIncomingSummonAccepted"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 13,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonAccepted = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonAccepted
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
              ["hasIncomingSummonDeclined"] = {
                 name = L["Incoming Summon Declined"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 10,
+                order = 14,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
@@ -1168,12 +1390,32 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonDeclined end
             },
+            ["color hasIncomingSummonDeclined"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 15,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonDeclined = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonDeclined
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
              ["inOtherPhase"] = {
                 name = L["In Other Phase"],
                 desc = L["Custom Texture Options"],
-                width = "full",
+                width = 1.5,
                 type = "input",
-                order = 11,
+                order = 16,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 hidden = function(info)
                     return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
@@ -1189,17 +1431,37 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherPhase end
             },
+            ["color inOtherPhase"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 17,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                hidden = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.toggle
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherPhase = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherPhase
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
             ["Skip2"] = {
                 type = "header",
                 name = "",
-                order = 12,
+                order = 18,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 13,
+                order = 19,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 confirm = true,
                 func = function(info,val)
@@ -1212,7 +1474,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "execute",
                 confirm = true,
-                order = 14,
+                order = 20,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 func = function(info,val)
                     self:RestoreDefaults(groupType, "nameAndIcons", "centerStatusIcon")
@@ -1359,10 +1621,12 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                     if self.db.profile[groupType].frames.texture == texture then return i end
                 end
 
-                self.db.profile[groupType].frames.texture = "Blizzard Raid Bar"
-                self:SafeRefresh(groupType)
+                for i, texture in ipairs(self.sortedTextures) do
+                    if self:Defaults().profile[groupType].frames.texture == texture then return i end
+                end
 
-                return self.db.profile[groupType].frames.texture
+                --fallback hack
+                return 3
             end
         },
         ["Masque Support"] = {

@@ -494,6 +494,8 @@ function KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
             frame.roleIcon:SetSize(1, size)
         end
     end
+
+    frame.roleIcon:SetVertexColor(1, 1, 1, 1)
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
@@ -511,6 +513,8 @@ function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
     elseif readyCheckStatus == "waiting" then
         frame.readyCheckIcon:SetTexture(READY_CHECK_WAITING_TEXTURE)
     end
+
+    frame.readyCheckIcon:SetVertexColor(1, 1, 1, 1)
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
@@ -543,4 +547,6 @@ function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
             end
         end
     end
+
+    frame.centerStatusIcon:SetVertexColor(1, 1, 1, 1)
 end

@@ -3,6 +3,7 @@ addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "Ac
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
 
+local upack = unpack
 local _G = _G
 local GetReadyCheckStatus = GetReadyCheckStatus
 local UnitInRaid = UnitInRaid
@@ -356,32 +357,32 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     local roleIcon = frame.roleIcon
 
     local raidID = UnitInRaid(frame.unit)
+    local _role
 
     if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
-        if db.vehicle ~= "" then
-            roleIcon:SetTexture(db.vehicle)
-            roleIcon:SetTexCoord(0, 1, 0, 1)
-        end
+        _role = "vehicle"
     elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
         local role = select(10, GetRaidRosterInfo(raidID))
-        if db[role:lower()] ~= "" then
-            roleIcon:SetTexture(db[role:lower()])
-            roleIcon:SetTexCoord(0, 1, 0, 1)
-        end
+        _role = role:lower()
     else
         local role = UnitGroupRolesAssigned(frame.unit)
         if frame.optionTable.displayRoleIcon and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
-            if db[role:lower()] ~= "" then
-                roleIcon:SetTexture(db[role:lower()])
-                roleIcon:SetTexCoord(0, 1, 0, 1)
-            end
+            _role = role:lower()
         end
+    end
+
+    if _role and db[_role:lower()] ~= "" then
+        roleIcon:SetTexture(db[_role])
+        roleIcon:SetTexCoord(0, 1, 0, 1)
+        roleIcon:SetVertexColor(unpack(db.colors[_role]))
     end
 end
 
 function KHMRaidFrames.RevertRoleIcon()
-    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
-        KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
+    local groupType = IsInRaid() and "raid" or "party"
+
+    for frame in KHMRaidFrames:IterateCompactFrames(groupType) do
+        KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame, groupType)
     end
 end
 
@@ -421,8 +422,10 @@ function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
     local readyCheckIcon = frame.readyCheckIcon
 
     local readyCheckStatus = GetReadyCheckStatus(frame.unit)
-    if db[readyCheckStatus] ~= "" then
+
+    if readyCheckStatus and db[readyCheckStatus] ~= "" then
         readyCheckIcon:SetTexture(db[readyCheckStatus])
+        readyCheckIcon:SetVertexColor(unpack(db.colors[readyCheckStatus]))
     end
 end
 
@@ -470,20 +473,25 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
     if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) and db.inOtherGroup ~= "" then
         centerStatusIcon.texture:SetTexture(db.inOtherGroup)
         centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
+        centerStatusIcon.texture:SetVertexColor(unpack(db.colors.inOtherGroup))
     elseif frame.optionTable.displayIncomingResurrect and UnitHasIncomingResurrection(frame.unit) and db.hasIncomingResurrection ~= "" then
         centerStatusIcon.texture:SetTexture(db.hasIncomingResurrection)
         centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+        centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingResurrection))
     elseif frame.optionTable.displayIncomingSummon and C_IncomingSummon.HasIncomingSummon(frame.unit) then
         local status = C_IncomingSummon.IncomingSummonStatus(frame.unit)
         if status == Enum.SummonStatus.Pending and db.hasIncomingSummonPending ~= "" then
             centerStatusIcon.texture:SetTexture(db.hasIncomingSummonPending)
             centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+            centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingSummonPending))
         elseif status == Enum.SummonStatus.Accepted and db.hasIncomingSummonAccepted ~= "" then
             centerStatusIcon.texture:SetTexture(db.hasIncomingSummonAccepted)
             centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+            centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingSummonAccepted))
         elseif status == Enum.SummonStatus.Declined and db.hasIncomingSummonDeclined ~= "" then
             centerStatusIcon.texture:SetTexture(db.hasIncomingSummonDeclined)
             centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
+            centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingSummonDeclined))
         end
     else
         if frame.inDistance and frame.optionTable.displayInOtherPhase and db.inOtherPhase ~= "" then
@@ -491,6 +499,7 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
             if phaseReason then
                 centerStatusIcon.texture:SetTexture(db.inOtherPhase)
                 centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
+                centerStatusIcon.texture:SetVertexColor(unpack(db.colors.inOtherPhase))
             end
         end
     end
