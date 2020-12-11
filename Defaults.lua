@@ -248,7 +248,7 @@ function KHMRaidFrames:CUFDefaults(groupType)
         end
     end
 
-    for frame in self:IterateCompactFrames(groupType) do
+    for frame in self.IterateCompactFrames(groupType) do
         if self.processedFrames[frame] == nil then
             deferred = self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 

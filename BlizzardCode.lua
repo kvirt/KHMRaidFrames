@@ -548,5 +548,5 @@ function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
         end
     end
 
-    frame.centerStatusIcon:SetVertexColor(1, 1, 1, 1)
+    frame.centerStatusIcon.texture:SetVertexColor(1, 1, 1, 1)
 end

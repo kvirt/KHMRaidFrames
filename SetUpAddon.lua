@@ -274,7 +274,7 @@ function KHMRaidFrames:RefreshConfig(groupType)
         self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)
     end
 
-    for frame in self:IterateCompactFrames(groupType) do
+    for frame in self.IterateCompactFrames(groupType) do
         self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
         self:SetUpAbsorb(frame)
     end
@@ -309,18 +309,32 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
 
     if self.curProfile == nil then
         self.curProfile = profile
+
+        if profile ~= self.db:GetCurrentProfile() then
+            self.SyncProfiles(profile)
+        end
     elseif self.curProfile ~= profile and profile then
         self.curProfile = profile
         self.processedFrames = {}
 
-        if KHMRaidFrames_SyncProfiles then
-            local dbProfiles = self.db:GetProfiles()
+        self.SyncProfiles(profile)
+    end
+end
 
-            for _, v in ipairs(dbProfiles) do
-                if profile == v then
-                    self.db:SetProfile(profile)
-                    self:CustomizeOptions()
-                end
+function KHMRaidFrames.SyncProfiles(profile)
+    if KHMRaidFrames_SyncProfiles then
+        local dbProfiles = KHMRaidFrames.db:GetProfiles()
+
+        for _, v in ipairs(dbProfiles) do
+            if profile == v then
+                KHMRaidFrames.db:SetProfile(profile)
+
+                KHMRaidFrames.RevertNameColors()
+                KHMRaidFrames.RevertRoleIcon()
+                KHMRaidFrames.RevertReadyCheckIcon()
+                KHMRaidFrames.RevertStatusIcon()
+
+                KHMRaidFrames:CustomizeOptions()
             end
         end
     end

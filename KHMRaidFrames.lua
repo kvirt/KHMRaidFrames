@@ -41,12 +41,8 @@ local englishClasses = {
 }
 
 function KHMRaidFrames:UpdateRaidMark()
-    for frame in self:IterateCompactFrames("raid") do
-        self:SetUpRaidIcon(frame, "raid")
-    end
-
-    for frame in self:IterateCompactFrames("party") do
-        self:SetUpRaidIcon(frame, "party")
+    for frame in self.IterateCompactFrames() do
+        self:SetUpRaidIcon(frame)
     end
 end
 
@@ -101,10 +97,10 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
     end
 end
 
-function KHMRaidFrames:SetUpRaidIcon(frame, groupType)
+function KHMRaidFrames:SetUpRaidIcon(frame)
     if not frame.unit then return end
 
-    local db = self.db.profile[groupType]
+    local db = self.db.profile[IsInRaid() and "raid" or "party"]
 
     if not frame.raidIcon then
         frame.raidIcon = frame:CreateTexture(nil, "OVERLAY")
@@ -277,7 +273,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 end
 
 function KHMRaidFrames.RevertNameColors()
-    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+    for frame in KHMRaidFrames.IterateCompactFrames() do
         if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
             frame.name:SetVertexColor(0.5, 0.5, 0.5)
         else
@@ -379,10 +375,8 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
 end
 
 function KHMRaidFrames.RevertRoleIcon()
-    local groupType = IsInRaid() and "raid" or "party"
-
-    for frame in KHMRaidFrames:IterateCompactFrames(groupType) do
-        KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame, groupType)
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
     end
 end
 
@@ -430,7 +424,7 @@ function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
 end
 
 function KHMRaidFrames.RevertReadyCheckIcon()
-    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+    for frame in KHMRaidFrames.IterateCompactFrames() do
         KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
     end
 end
@@ -506,7 +500,7 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
 end
 
 function KHMRaidFrames.RevertStatusIcon()
-    for frame in KHMRaidFrames:IterateCompactFrames(IsInRaid() and "raid" or "group") do
+    for frame in KHMRaidFrames.IterateCompactFrames() do
         KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
     end
 end

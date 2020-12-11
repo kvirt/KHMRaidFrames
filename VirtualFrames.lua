@@ -39,19 +39,10 @@ end
 function KHMRaidFrames:ShowVirtual()
     local frame
 
-    for _frame in self:IterateCompactFrames("raid") do
+    for _frame in self:IterateCompactFrames() do
         if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then
             frame = _frame
             break
-        end
-    end
-
-    if frame == nil then
-        for _frame in self:IterateCompactFrames("party") do
-            if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then
-                frame = _frame
-                break
-            end
         end
     end
 

@@ -34,53 +34,66 @@ function KHMRaidFrames.ReverseGroupType(groupType)
     return groupType == "party" and "raid" or "party"
 end
 
-function KHMRaidFrames:IterateCompactFrames(isInRaid)
+function KHMRaidFrames.IterateCompactFrames(groupType)
     local index = 0
-    local groupIndex = 0
-    local doneOld = (not self.displayPets and not self.displayMainTankAndAssist) and self.keepGroupsTogether
-    local doneNew = not self.keepGroupsTogether
-    local frame
+    local groupIndex = 1
+    local frame, doneRaid, doneParty, doneOldStyle
+
+    if groupType then
+        if groupType == "raid" then
+            doneParty = true
+        else
+            doneRaid = true
+        end
+    end
 
     return function()
-        while not doneNew do
+        while not doneRaid do
             index = index + 1
 
             if index > 5 then
                 index = 1
                 groupIndex = groupIndex + 1
-
-                if groupIndex == 9 then
-                    index = 0
-                    doneNew = true
-                end
             end
 
-            if isInRaid == "raid" then
-                frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
+            frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
+
+            if frame then
+                return frame
             else
-                if groupIndex == 2 then
+                if groupIndex >= 8 then
+                    doneRaid = true
                     index = 0
-                    doneNew = true
                     break
                 end
-
-                frame = _G["CompactPartyFrameMember"..index]
             end
-
-            if frame then return frame end
         end
 
-        while not doneOld do
+        while not doneParty do
             index = index + 1
 
-            local oldStyleframe =_G["CompactRaidFrame"..index]
+            frame = _G["CompactPartyFrameMember"..index]
 
-            if index == 40 then
-                doneOld = true
+            if frame then
+                return frame
+            else
                 index = 0
+                doneParty = true
+                break
             end
+        end
 
-            if oldStyleframe then return oldStyleframe end
+        while not doneOldStyle do
+            index = index + 1
+
+            frame = _G["CompactRaidFrame"..index]
+
+            if frame then
+                return frame
+            else
+                doneOldStyle = true
+                break
+            end
         end
     end
 end
