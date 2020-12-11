@@ -135,3 +135,6 @@ L["Sync Profiles"] = "|cFFffd100Синхронизировать Профили|
 L["Sync Profiles Desc"] = "Автоматически переключать профиль на соответствующй в настройках |cFFffd100Профили Рейда|r"
 L["KHM Profile Stuff"] = "Всякое с профилями"
 L["Profile: |cFFC80000<text>|r"] = "Профиль: |cFFC80000<text>|r"
+L["Abbreviate Large Numbers"] = "Сократить Большие Числа"
+L["Abbreviate Numbers"] = "Сократить Числа"
+L["Abbreviate"] = "Сократить Числа"

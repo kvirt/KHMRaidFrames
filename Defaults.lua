@@ -95,6 +95,7 @@ function KHMRaidFrames:Defaults()
                     xOffset = 0,
                     yOffset = 0,
                     enabled = false,
+                    abbreviateNumbers = "None",
                 },
                 roleIcon = {
                     size = 12,

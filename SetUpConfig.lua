@@ -33,6 +33,12 @@ local flags = {
     ["MONOCHROME"] = L["MONOCHROME"],
 }
 
+local abbreviateNumbers = {
+    ["Abbreviate Large Numbers"] = L["Abbreviate Large Numbers"],
+    ["Abbreviate Numbers"] = L["Abbreviate Numbers"],
+    ["None"] = L["None"],
+}
+
 function KHMRaidFrames:SetupOptions()
     local options = {
         name = L["KHMRaidFrames"],
@@ -561,17 +567,34 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.yOffset end
             },
+            ["Abbreviate"] = {
+                name = L["Abbreviate"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = abbreviateNumbers,
+                order = 8,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers = val
+
+                    self.RevertStatusText()
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers end
+            },
             ["Skip"] = {
                 type = "header",
                 name = "",
-                order = 8,
+                order = 9,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 9,
+                order = 10,
                 confirm = true,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 func = function(info,val)
@@ -584,7 +607,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "execute",
                 confirm = true,
-                order = 10,
+                order = 11,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 func = function(info,val)
                     self:RestoreDefaults(groupType, "nameAndIcons", "statusText")

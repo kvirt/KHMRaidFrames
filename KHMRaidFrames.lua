@@ -24,6 +24,8 @@ local IsInRaid = IsInRaid
 local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
 local C_Timer = C_Timer
 local GetUnitName = GetUnitName
+local AbbreviateLargeNumbers = AbbreviateLargeNumbers
+local AbbreviateNumbers = AbbreviateNumbers
 
 local englishClasses = {
     "WARRIOR",
@@ -39,6 +41,12 @@ local englishClasses = {
     "DRUID",
     "DEMONHUNTER",
 }
+
+local abbreviates = {
+    ["Abbreviate Large Numbers"] = AbbreviateLargeNumbers,
+    ["Abbreviate Numbers"] = AbbreviateNumbers,
+}
+
 
 function KHMRaidFrames:UpdateRaidMark()
     for frame in self.IterateCompactFrames() do
@@ -284,6 +292,8 @@ end
 
 function KHMRaidFrames:SetUpStatusText(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.statusText.enabled then return end
+    if not frame.statusText then return end
+    if not frame.optionTable.displayStatusText then return end
 
     local db = self.db.profile[groupType].nameAndIcons.statusText
     local statusText = frame.statusText
@@ -315,6 +325,35 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", xOffset, yOffset)
     statusText:SetJustifyH(db.hJustify)
+
+    self.SetUpStatusTextInternal(frame, groupType)
+end
+
+function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
+    if not frame.statusText then return end
+    if not frame.optionTable.displayStatusText then return end
+    if not KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText.enabled then return end
+    if frame.optionTable.healthText == "perc" then return end
+
+    local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText
+
+    if db.abbreviateNumbers == "None" then return end
+    local statusText = frame.statusText
+
+    local text = statusText:GetText()
+    text = tonumber(text)
+
+    if not text then return end
+
+    text = abbreviates[db.abbreviateNumbers] and abbreviates[db.abbreviateNumbers](text)
+
+    statusText:SetText(text)
+end
+
+function KHMRaidFrames.RevertStatusText()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
+    end
 end
 
 function KHMRaidFrames:SetUpRoleIcon(frame, groupType)

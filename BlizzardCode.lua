@@ -550,3 +550,25 @@ function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
 
     frame.centerStatusIcon.texture:SetVertexColor(1, 1, 1, 1)
 end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
+    if not frame.statusText then return end
+    if not frame.optionTable.displayStatusText then return end
+    if not frame.unit then return end
+
+    if not UnitIsConnected(frame.unit) then
+        frame.statusText:SetText(PLAYER_OFFLINE)
+    elseif UnitIsDeadOrGhost(frame.displayedUnit) then
+        frame.statusText:SetText(DEAD)
+    elseif frame.optionTable.healthText == "health" then
+        frame.statusText:SetText(UnitHealth(frame.displayedUnit))
+    elseif ( frame.optionTable.healthText == "losthealth" ) then
+        local healthLost = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit)
+        if healthLost > 0 then
+            frame.statusText:SetFormattedText(LOST_HEALTH, healthLost)
+        end
+    elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
+        local perc = math.ceil(100 * (UnitHealth(frame.displayedUnit)/UnitHealthMax(frame.displayedUnit)))
+        frame.statusText:SetFormattedText("%d%%", perc)
+    end
+end

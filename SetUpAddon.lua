@@ -227,6 +227,17 @@ function KHMRaidFrames:HookNameAndIcons()
         )
     end
 
+    if (dbParty.statusText.enabled or dbRaid.statusText.enabled) and not self:IsHooked("CompactUnitFrame_UpdateStatusText") then
+        self:SecureHook(
+            "CompactUnitFrame_UpdateStatusText",
+            function(frame)
+                if self.SkipFrame(frame) then return end
+
+                self.SetUpStatusTextInternal(frame, IsInRaid() and "raid" or "party")
+            end
+        )
+    end
+
     if (dbParty.roleIcon.enabled or dbRaid.roleIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
         self:SecureHook(
             "CompactUnitFrame_UpdateRoleIcon",
@@ -330,6 +341,7 @@ function KHMRaidFrames.SyncProfiles(profile)
                 KHMRaidFrames.db:SetProfile(profile)
 
                 KHMRaidFrames.RevertNameColors()
+                KHMRaidFrames.RevertStatusText()
                 KHMRaidFrames.RevertRoleIcon()
                 KHMRaidFrames.RevertReadyCheckIcon()
                 KHMRaidFrames.RevertStatusIcon()
