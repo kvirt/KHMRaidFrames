@@ -186,7 +186,16 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         childGroups = "tab",
         args = self:SetupFrameOptions(groupType),
     }
-    options.buffFrames = {
+
+    options.buffsAndDebuffs = {
+        type = "group",
+        order = 3,
+        name = L["buffsAndDebuffs"],
+        desc = "",
+        childGroups = "tree",
+        args = {},
+    }
+    options.buffsAndDebuffs.args.buffFrames = {
         type = "group",
         order = 3,
         name = L["Buffs"],
@@ -194,7 +203,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         childGroups = "tab",
         args = self:SetupBuffFrames(groupType),
     }
-    options.debuffFrames = {
+    options.buffsAndDebuffs.args.debuffFrames = {
         type = "group",
         order = 4,
         name = L["Debuffs"],
@@ -202,15 +211,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         childGroups = "tab",
         args = self:SetupDebuffFrames(groupType),
     }
-    options.raidIcon = {
-        type = "group",
-        order = 5,
-        name = L["Raid Icon"],
-        desc = L["Raid Icon options"],
-        childGroups = "tab",
-        args = self:SetupRaidIconOptions(groupType),
-    }
-    options.dispelDebuffFrames = {
+    options.buffsAndDebuffs.args.dispelDebuffFrames = {
         type = "group",
         order = 6,
         name = L["Dispell Debuffs"],
@@ -218,6 +219,7 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         childGroups = "tab",
         args = self:SetupDispelldebuffFrames(groupType),
     }
+
     options.nameAndIcons = {
         type = "group",
         order = 7,
@@ -1506,6 +1508,15 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
         },
     }
 
+    options.raidIcon = {
+        type = "group",
+        order = 6,
+        name = L["Raid Icon"],
+        desc = L["Raid Icon options"],
+        childGroups = "tab",
+        args = self:SetupRaidIconOptions(groupType),
+    }
+
     return options
 end
 
@@ -1514,7 +1525,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
         ["enabled"] = {
             name = L["Enable"],
             desc = "",
-            width = "normal",
+            width = "full",
             type = "toggle",
             order = 1,
             set = function(info,val)
@@ -1528,7 +1539,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
         ["size"] = {
             name = L["Size"],
             desc = "",
-            width = "double",
+            width = "normal",
             type = "range",
             min = 1,
             max = 100,
@@ -1543,6 +1554,21 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             end,
             get = function(info) return self.db.profile[groupType].raidIcon.size end
         },
+        ["alpha"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.1,
+            order = 3,
+            set = function(info,val)
+                self.db.profile[groupType].raidIcon.alpha = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info) return self.db.profile[groupType].raidIcon.alpha end
+        },
         ["xOffset"] = {
             name = L["X Offset"],
             desc = "",
@@ -1551,7 +1577,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 3,
+            order = 4,
             disabled = function(info)
                 return not self.db.profile[groupType].raidIcon.enabled
             end,
@@ -1569,7 +1595,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             min = -200,
             max = 200,
             step = 1,
-            order = 4,
+            order = 5,
             disabled = function(info)
                 return not self.db.profile[groupType].raidIcon.enabled
             end,
@@ -1585,7 +1611,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             width = "normal",
             type = "select",
             values = positions,
-            order = 5,
+            order = 6,
             disabled = function(info)
                 return not self.db.profile[groupType].raidIcon.enabled
             end,
@@ -1598,14 +1624,14 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
         ["Skip"] = {
             type = "header",
             name = "",
-            order = 6,
+            order = 7,
         },
         ["Copy"] = {
             name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 7,
+            order = 8,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(self.db.profile[groupType].raidIcon, self.db.profile[self.ReverseGroupType(groupType)].raidIcon)
@@ -1614,10 +1640,10 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
         ["Reset"] = {
             name = L["Reset to Default"],
             desc = "",
-            width = "double",
+            width = "normal",
             type = "execute",
             confirm = true,
-            order = 8,
+            order = 9,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "raidIcon")
             end,

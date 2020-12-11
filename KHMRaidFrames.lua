@@ -140,6 +140,8 @@ function KHMRaidFrames:SetUpRaidIcon(frame)
 
         frame.raidIcon:SetTexCoord(tCoordLeft, tCoordRight, tCoordTop, tCoordBottom)
 
+        frame.raidIcon:SetAlpha(db.raidIcon.alpha)
+
         frame.raidIcon:Show()
     else
         frame.raidIcon:Hide()
