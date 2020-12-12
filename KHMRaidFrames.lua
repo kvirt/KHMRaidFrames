@@ -3,7 +3,7 @@ addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "Ac
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
 
-local upack = unpack
+local unpack, select = unpack, select
 local _G = _G
 local GetReadyCheckStatus = GetReadyCheckStatus
 local UnitInRaid = UnitInRaid
@@ -26,6 +26,8 @@ local C_Timer = C_Timer
 local GetUnitName = GetUnitName
 local AbbreviateLargeNumbers = AbbreviateLargeNumbers
 local AbbreviateNumbers = AbbreviateNumbers
+local UnitHealth = UnitHealth
+local UnitHealthMax = UnitHealthMax
 
 local englishClasses = {
     "WARRIOR",
@@ -332,24 +334,48 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 end
 
 function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
+    if not frame.unit then return end
     if not frame.statusText then return end
     if not frame.optionTable.displayStatusText then return end
-    if not KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText.enabled then return end
-    if frame.optionTable.healthText == "perc" then return end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText
 
-    if db.abbreviateNumbers == "None" then return end
+    if not db.enabled or (db.abbreviateNumbers == "None" and not db.notShowStatuses) then return end
+
     local statusText = frame.statusText
+    local text
 
-    local text = statusText:GetText()
-    text = tonumber(text)
+    if not UnitIsConnected(frame.unit) and not db.notShowStatuses then
+        text = PLAYER_OFFLINE
+    elseif UnitIsDeadOrGhost(frame.displayedUnit) and not db.notShowStatuses then
+        text = DEAD
+    elseif frame.optionTable.healthText == "health" then
+        text = UnitHealth(frame.displayedUnit)
+    elseif frame.optionTable.healthText == "losthealth" then
+        local healthLost = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit)
+        if healthLost > 0 then
+            text = healthLost
+        end
+    elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
+        local perc = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
+        text = perc
+    end
 
-    if not text then return end
+    local health = tonumber(text)
 
-    text = abbreviates[db.abbreviateNumbers] and abbreviates[db.abbreviateNumbers](text)
+    if not health then
+        statusText:SetText(text)
+    else
+        health = abbreviates[db.abbreviateNumbers] and abbreviates[db.abbreviateNumbers](health)
 
-    statusText:SetText(text)
+        if frame.optionTable.healthText == "losthealth" then
+            statusText:SetFormattedText(LOST_HEALTH, health)
+        elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
+            statusText:SetFormattedText("%d%%", health)
+        else
+            statusText:SetText(health)
+        end
+    end
 end
 
 function KHMRaidFrames.RevertStatusText()
@@ -544,4 +570,62 @@ function KHMRaidFrames.RevertStatusIcon()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
     end
+end
+
+function KHMRaidFrames.UpdateLeaderIcon()
+    local groupType = IsInRaid() and "raid" or "party"
+
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
+    end
+end
+
+function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
+    if not frame or not frame.unit then return end
+
+    if not frame.leaderIcon then
+        frame.leaderIcon = frame:CreateTexture(nil, "OVERLAY")
+    end
+
+    if not KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon.enabled then
+        KHMRaidFrames.leaderIcon:Hide()
+        return
+    end
+
+    local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
+    local size = db.size * KHMRaidFrames.componentScale
+
+    local isLeader = UnitIsGroupLeader(frame.unit)
+
+    if not isLeader then
+        frame.leaderIcon:Hide()
+        return
+    end
+
+    frame.leaderIcon:ClearAllPoints()
+
+    local xOffset, yOffset = KHMRaidFrames:Offsets(db.anchorPoint)
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset
+
+    frame.leaderIcon:SetPoint(
+        db.anchorPoint,
+        frame,
+        db.anchorPoint,
+        xOffset,
+        yOffset
+    )
+
+    frame.leaderIcon:SetSize(size, size)
+    frame.leaderIcon:SetAlpha(db.alpha)
+
+    if db.icon ~= "" then
+        frame.leaderIcon:SetTexture(db.icon)
+        frame.leaderIcon:SetVertexColor(unpack(db.colors.icon))
+    else
+        frame.leaderIcon:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
+        frame.leaderIcon:SetVertexColor(1, 1, 1, 1)
+    end
+
+    frame.leaderIcon:Show()
 end

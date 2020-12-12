@@ -97,6 +97,7 @@ function KHMRaidFrames:Defaults()
                     yOffset = 0,
                     enabled = false,
                     abbreviateNumbers = "None",
+                    notShowStatuses = false,
                 },
                 roleIcon = {
                     size = 12,
@@ -149,6 +150,18 @@ function KHMRaidFrames:Defaults()
                         hasIncomingSummonAccepted = {1, 1, 1, 1},
                         hasIncomingSummonDeclined = {1, 1, 1, 1},
                         inOtherPhase = {1, 1, 1, 1},
+                    },
+                },
+                leaderIcon = {
+                    size = 10 ,
+                    xOffset = 0,
+                    yOffset = 0,
+                    anchorPoint = "TOPRIGHT",
+                    icon = "",
+                    enabled = false,
+                    alpha = 1.0,
+                    colors = {
+                        icon = {1, 1, 1, 1},
                     },
                 },
             },
@@ -313,6 +326,10 @@ function KHMRaidFrames:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
 
     if self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled then
         self:SetUpCenterStatusIcon(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.leaderIcon.enabled then
+        self.SetUpLeaderIcon(frame, groupType)
     end
 
     local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]

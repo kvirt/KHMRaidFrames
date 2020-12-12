@@ -586,17 +586,36 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers end
             },
+            ["notShowStatuses"] = {
+                name = L["Don\'t Show Status Text"],
+                desc = L["Don\'t Show Status Text Desc"],
+                width = "normal",
+                type = "toggle",
+                order = 9,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses = val
+
+                    if not val then
+                        self.RevertStatusText()
+                    end
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses
+                end,
+            },
             ["Skip"] = {
                 type = "header",
                 name = "",
-                order = 9,
+                order = 90,
             },
             ["Copy"] = {
                 name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
                 width = "normal",
                 type = "execute",
-                order = 10,
+                order = 91,
                 confirm = true,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 func = function(info,val)
@@ -609,7 +628,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "execute",
                 confirm = true,
-                order = 11,
+                order = 92,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 func = function(info,val)
                     self:RestoreDefaults(groupType, "nameAndIcons", "statusText")
@@ -1517,6 +1536,182 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
         args = self:SetupRaidIconOptions(groupType),
     }
 
+    options.leaderIcon = {
+        type = "group",
+        order = 7,
+        name = L["Leader Icon"],
+        desc = L["Leader Icon Options"],
+        childGroups = "tab",
+        args = {
+            ["Enable"] = {
+                name = L["Enable"],
+                desc = "",
+                width = "full",
+                type = "toggle",
+                order = 1,
+                confirm = function() return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                confirmText = L["UI will be reloaded to apply settings"],
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.enabled = val
+
+                    if not val then
+                        ReloadUI()
+                    else
+                        self:HookNameAndIcons()
+                        self:SafeRefresh(groupType)
+                    end
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled
+                end,
+            },
+            ["size"] = {
+                name = L["Size"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 1,
+                max = 100,
+                step = 1,
+                order = 2,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.size = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.size end
+            },
+            ["alpha"] = {
+                name = L["Transparency"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.1,
+                order = 3,
+                disabled = function(info)
+                    return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled
+                end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.alpha = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.alpha end
+            },
+            ["xOffset"] = {
+                name = L["X Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 4,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.xOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.xOffset end
+            },
+            ["yOffset"] = {
+                name = L["Y Offset"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = -200,
+                max = 200,
+                step = 1,
+                order = 5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.yOffset = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.yOffset end
+            },
+            ["AnchorPoint"] = {
+                name = L["Anchor Point"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = positions,
+                order = 6,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.anchorPoint = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.anchorPoint end
+            },
+            ["icon"] = {
+                name = L["Leader Icon Texture"],
+                desc = L["Custom Texture Options"],
+                width = 1.5,
+                type = "input",
+                order = 7,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.healer = val
+
+                    if val == "" then
+                        self.RevertRoleIcon()
+                    end
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.healer end
+            },
+            ["color icon"] = {
+                name = "",
+                desc = "",
+                width = "half",
+                type = "color",
+                order = 8,
+                hasAlpha = true,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.leaderIcon.colors.icon = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.leaderIcon.colors.icon
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
+            ["Skip2"] = {
+                type = "header",
+                name = "",
+                order = 90,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 91,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                confirm = true,
+                func = function(info,val)
+                    self:CopySettings(self.db.profile[groupType].nameAndIcons.leaderIcon, self.db.profile[self.ReverseGroupType(groupType)].nameAndIcons.leaderIcon)
+                end,
+            },
+            ["Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "normal",
+                type = "execute",
+                confirm = true,
+                order = 92,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
+                func = function(info,val)
+                    self:RestoreDefaults(groupType,"nameAndIcons", "leaderIcon")
+                end,
+            },
+        },
+    }
+
     return options
 end
 
@@ -1563,6 +1758,9 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             max = 1.0,
             step = 0.1,
             order = 3,
+            disabled = function(info)
+                return not self.db.profile[groupType].raidIcon.enabled
+            end,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.alpha = val
                 self:SafeRefresh(groupType)

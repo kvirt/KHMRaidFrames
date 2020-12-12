@@ -143,9 +143,13 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
             elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
                 self:HideAll()
                 self.deffered = true
-            elseif event == "RAID_TARGET_UPDATE" or event == "PLAYER_ROLES_ASSIGNED" then
+            elseif event == "RAID_TARGET_UPDATE" then
                 self:UpdateRaidMark(groupType)
                 self:CustomizeOptions()
+            elseif event == "PLAYER_ROLES_ASSIGNED" then
+                self:UpdateRaidMark(groupType)
+                self:CustomizeOptions()
+                self.UpdateLeaderIcon()
             end
         end
     )

@@ -4,19 +4,19 @@ local UnitIsPlayer, CreateFrame, UIParent = UnitIsPlayer, CreateFrame, UIParent
 
 
 function KHMRaidFrames:GetVirtualFrames()
-    local frame
+    local frame, texture, text
 
     for frameType in self.IterateSubFrameTypes() do
         for i=1, self.maxFrames do
             frame = CreateFrame("Button", nil, UIParent)
             self.virtual.frames[frameType..i] = frame
 
-            local texture = frame:CreateTexture(nil, "BACKGROUND")
+            texture = frame:CreateTexture(nil, "BACKGROUND")
             texture:SetAllPoints(frame)
 
             frame.texture = texture
 
-            local text = frame:CreateFontString(frame, "OVERLAY", "GameTooltipText")
+            text = frame:CreateFontString(frame, "OVERLAY", "GameTooltipText")
             text:SetFont("Fonts\\FRIZQT__.TTF", 11, "THICKOUTLINE, MONOCHROME")
             text:SetPoint("CENTER", 0, 0)
             text:SetText(i)
