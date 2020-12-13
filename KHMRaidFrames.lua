@@ -588,7 +588,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
     end
 
     if not KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon.enabled then
-        KHMRaidFrames.leaderIcon:Hide()
+        frame.leaderIcon:Hide()
         return
     end
 
