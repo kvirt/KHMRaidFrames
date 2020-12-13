@@ -768,6 +768,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.healer = {r, g, b, a}
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.healer
@@ -849,6 +850,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.tank = {r, g, b, a}
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.tank
@@ -889,6 +891,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.vehicle = {r, g, b, a}
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.vehicle
@@ -1549,17 +1552,8 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "full",
                 type = "toggle",
                 order = 1,
-                confirm = function() return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.enabled = val
-
-                    if not val then
-                        ReloadUI()
-                    else
-                        self:HookNameAndIcons()
-                        self:SafeRefresh(groupType)
-                    end
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled
@@ -1654,10 +1648,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.healer = val
-
-                    if val == "" then
-                        self.RevertRoleIcon()
-                    end
 
                     self:SafeRefresh(groupType)
                 end,

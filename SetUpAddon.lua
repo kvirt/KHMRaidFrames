@@ -107,18 +107,18 @@ end
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
-    -- self.db.RegisterCallback(
-    --     self, "OnProfileChanged",
-    --     function(...) self:SafeRefresh()
-    -- end)
-    -- self.db.RegisterCallback(
-    --     self, "OnProfileCopied",
-    --     function(...) self:SafeRefresh()
-    -- end)
-    -- self.db.RegisterCallback(
-    --     self, "OnProfileReset",
-    --     function(...) self:SafeRefresh()
-    -- end)
+     self.db.RegisterCallback(
+         self, "OnProfileChanged",
+         function(...) self:SafeRefresh()
+     end)
+     self.db.RegisterCallback(
+         self, "OnProfileCopied",
+         function(...) self:SafeRefresh()
+     end)
+     self.db.RegisterCallback(
+         self, "OnProfileReset",
+         function(...) self:SafeRefresh()
+     end)
 
     local deferrFrame = CreateFrame("Frame")
     deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")

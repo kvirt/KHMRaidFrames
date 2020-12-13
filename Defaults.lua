@@ -69,7 +69,7 @@ function KHMRaidFrames:Defaults()
                 alpha = 1.0,
             },
             raidIcon = {
-                enabled = true,
+                enabled = false,
                 size = 15,
                 xOffset = 0,
                 yOffset = 0,
