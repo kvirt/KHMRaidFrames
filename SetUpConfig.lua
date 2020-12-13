@@ -637,9 +637,18 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
         },
     }
 
-    options.roleIcon = {
+    options.raidIcon = {
         type = "group",
         order = 3,
+        name = L["Raid Icon"],
+        desc = L["Raid Icon options"],
+        childGroups = "tab",
+        args = self:SetupRaidIconOptions(groupType),
+    }
+
+    options.roleIcon = {
+        type = "group",
+        order = 4,
         name = L["Role Icon"],
         desc = L["Role Icon Options"],
         childGroups = "tab",
@@ -920,7 +929,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
     options.readyCheckIcon = {
         type = "group",
-        order = 4,
+        order = 5,
         name = L["Ready Check Icon"],
         desc = L["Ready Check Icon Options"],
         childGroups = "tab",
@@ -1163,7 +1172,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
     options.centerStatusIcon = {
         type = "group",
-        order = 5,
+        order = 6,
         name = L["Center Status Icon"],
         desc = L["Center Status Icon Options"],
         childGroups = "tab",
@@ -1525,15 +1534,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
             },
         },
-    }
-
-    options.raidIcon = {
-        type = "group",
-        order = 6,
-        name = L["Raid Icon"],
-        desc = L["Raid Icon options"],
-        childGroups = "tab",
-        args = self:SetupRaidIconOptions(groupType),
     }
 
     options.leaderIcon = {

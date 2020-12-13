@@ -624,7 +624,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
         frame.leaderIcon:SetVertexColor(unpack(db.colors.icon))
     else
         frame.leaderIcon:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
-        frame.leaderIcon:SetVertexColor(1, 1, 1, 1)
+        frame.leaderIcon:SetVertexColor(1, 1, 1)
     end
 
     frame.leaderIcon:Show()
