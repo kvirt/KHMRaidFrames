@@ -19,7 +19,7 @@ function KHMRaidFrames:Defaults()
     local commons = {
             frames = {
                 hideGroupTitles = false,
-                texture = SharedMedia.DefaultMedia.statusbar or "Blizzard Raid Bar",
+                texture = "Blizzard Raid Bar",
                 clickThrough = false,
                 enhancedAbsorbs = false,
                 showPartySolo = false,
@@ -96,8 +96,12 @@ function KHMRaidFrames:Defaults()
                     xOffset = 0,
                     yOffset = 0,
                     enabled = false,
-                    abbreviateNumbers = "None",
+                    abbreviateNumbers = false,
+                    precision = 0,
                     notShowStatuses = false,
+                    showPercents = false,
+                    color = {1, 1, 1, 1},
+                    classColoredText = false,
                 },
                 roleIcon = {
                     size = 12,

@@ -33,11 +33,7 @@ local flags = {
     ["MONOCHROME"] = L["MONOCHROME"],
 }
 
-local abbreviateNumbers = {
-    ["Abbreviate Large Numbers"] = L["Abbreviate Large Numbers"],
-    ["Abbreviate Numbers"] = L["Abbreviate Numbers"],
-    ["None"] = L["None"],
-}
+local precisions = {"12345", "1234.5", "123.45", "12.345"}
 
 function KHMRaidFrames:SetupOptions()
     local options = {
@@ -569,13 +565,56 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.yOffset end
             },
+            ["color"] = {
+                name = "",
+                desc = "",
+                width = "normal",
+                type = "color",
+                order = 8,
+                hasAlpha = true,
+                disabled = function()
+                    return not self.db.profile[groupType].nameAndIcons.statusText.enabled or self.db.profile[groupType].nameAndIcons.statusText.classColoredText
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].nameAndIcons.statusText.color = {r, g, b, a}
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].nameAndIcons.statusText.color
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
+            ["Class Colored Text"] = {
+                name = L["Class Colored Text"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 9,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.statusText.classColoredText = val
+
+                    if not val then
+                        self.RevertNameColors()
+                    end
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.statusText.classColoredText
+                end
+            },
+            ["Skip Formatting"] = {
+                type = "header",
+                name = L["Formatting"],
+                order = 10,
+            },
             ["Abbreviate"] = {
                 name = L["Abbreviate"],
                 desc = "",
                 width = "normal",
-                type = "select",
-                values = abbreviateNumbers,
-                order = 8,
+                type = "toggle",
+                order = 11,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers = val
@@ -586,12 +625,47 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers end
             },
+            ["Precision"] = {
+                name = L["Precision"],
+                desc = "",
+                width = "normal",
+                type = "select",
+                values = precisions,
+                order = 12,
+                disabled = function()
+                    return not self.db.profile[groupType].nameAndIcons.statusText.enabled or not self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers
+                end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.statusText.precision = val - 1
+
+                    self.RevertStatusText()
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.precision + 1 end
+            },
+            ["Show Percents"] = {
+                name = L["Show Percents"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 13,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.statusText.showPercents = val
+
+                    self.RevertStatusText()
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.showPercents end
+            },
             ["notShowStatuses"] = {
                 name = L["Don\'t Show Status Text"],
                 desc = L["Don\'t Show Status Text Desc"],
                 width = "normal",
                 type = "toggle",
-                order = 9,
+                order = 14,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses = val
 

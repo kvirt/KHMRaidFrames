@@ -436,3 +436,19 @@ end
 function KHMRaidFrames.SkipFrame(frame)
     return not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d")
 end
+
+local function Round(num, numDecimalPlaces, litera)
+  return string.format("%." .. (numDecimalPlaces or 0) .. "f"..litera, num)
+end
+
+function KHMRaidFrames.Abbreviate(num, groupType)
+    local precision = KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText.precision
+
+    if num < 1000 then
+        return num
+    elseif num < 1000000 then
+        return Round(num / 1000, precision, "K")
+    else
+        return Round(num / 1000000, precision, "M")
+    end
+end

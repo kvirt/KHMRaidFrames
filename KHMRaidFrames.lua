@@ -44,12 +44,6 @@ local englishClasses = {
     "DEMONHUNTER",
 }
 
-local abbreviates = {
-    ["Abbreviate Large Numbers"] = AbbreviateLargeNumbers,
-    ["Abbreviate Numbers"] = AbbreviateNumbers,
-}
-
-
 function KHMRaidFrames:UpdateRaidMark()
     for frame in self.IterateCompactFrames() do
         self:SetUpRaidIcon(frame)
@@ -340,40 +334,50 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText
 
-    if not db.enabled or (db.abbreviateNumbers == "None" and not db.notShowStatuses) then return end
+    if not db.enabled then return end
 
     local statusText = frame.statusText
     local text
 
-    if not UnitIsConnected(frame.unit) and not db.notShowStatuses then
-        text = PLAYER_OFFLINE
-    elseif UnitIsDeadOrGhost(frame.displayedUnit) and not db.notShowStatuses then
-        text = DEAD
-    elseif frame.optionTable.healthText == "health" then
-        text = UnitHealth(frame.displayedUnit)
-    elseif frame.optionTable.healthText == "losthealth" then
-        local healthLost = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit)
-        if healthLost > 0 then
-            text = healthLost
+    if db.notShowStatuses or db.abbreviateNumbers or db.showPercents then
+        if not db.notShowStatuses then
+            if not UnitIsConnected(frame.unit) and not db.notShowStatuses then
+                text = PLAYER_OFFLINE
+            elseif UnitIsDeadOrGhost(frame.displayedUnit) and not db.notShowStatuses then
+                text = DEAD
+            end
         end
-    elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
-        local perc = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
-        text = perc
+
+        if text then
+            statusText:SetText(health)
+        else
+            local health = UnitHealth(frame.displayedUnit)
+
+            if db.abbreviateNumbers then
+                health = KHMRaidFrames.Abbreviate(health, groupType)
+            end
+
+            if db.showPercents then
+                health = health.." - "..math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit))).."%"
+            end
+
+            statusText:SetText(health)
+        end
     end
 
-    local health = tonumber(text)
+    if db.classColoredText then
+        local _, _, id = UnitClass(frame.unit)
 
-    if not health then
-        statusText:SetText(text)
+        if id then
+            local englishClass = englishClasses[id]
+            local classColor = RAID_CLASS_COLORS[englishClass]
+            statusText:SetTextColor(classColor.r, classColor.g, classColor.b)
+        end
     else
-        health = abbreviates[db.abbreviateNumbers] and abbreviates[db.abbreviateNumbers](health)
-
-        if frame.optionTable.healthText == "losthealth" then
-            statusText:SetFormattedText(LOST_HEALTH, health)
-        elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
-            statusText:SetFormattedText("%d%%", health)
+        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
+            statusText:SetVertexColor(0.5, 0.5, 0.5)
         else
-            statusText:SetText(health)
+            statusText:SetVertexColor(unpack(db.color))
         end
     end
 end

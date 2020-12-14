@@ -147,3 +147,7 @@ L["Don\'t Show Status Text Desc"] = ""
 L["Leader Icon"] = true
 L["Leader Icon Options"] = true
 L["Leader Icon Texture"] = true
+L["Precision"] = true
+L["Show Percents"] = true
+L["Formatting"] = true
+L["Class Colored Text"] = true
