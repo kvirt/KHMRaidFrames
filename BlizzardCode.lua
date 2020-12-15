@@ -95,13 +95,13 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     if db.auraGlow.debuffFrames.enabled then
         if self:TrackAuras(name, debuffType, spellId, db.auraGlow.debuffFrames.tracking) then
             local color = db.auraGlow.debuffFrames.useDefaultsColors and db.auraGlow.defaultColors[debuffType]
-            self:StartGlow(debuffFrame, db.auraGlow.debuffFrames, color, "debuffFrames", "auraGlow")
+            self.StartGlow(debuffFrame, db.auraGlow.debuffFrames, color, "debuffFrames", "auraGlow")
             debuffFrame.debuffFramesGlowing = debuffType
         end
     end
 
     if not debuffFrame.debuffFramesGlowing then
-        self:StopGlow(debuffFrame, db.auraGlow.debuffFrames, "debuffFrames", "auraGlow")
+        self.StopGlow(debuffFrame, db.auraGlow.debuffFrames, "debuffFrames", "auraGlow")
     end
 
     local parent = debuffFrame:GetParent()
@@ -149,13 +149,13 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetBuff(buffFrame, index, ...)
     if db.auraGlow.buffFrames.enabled then
         if self:TrackAuras(name, debuffType, spellId, db.auraGlow.buffFrames.tracking) then
             local color = db.auraGlow.buffFrames.useDefaultsColors and db.auraGlow.defaultColors[debuffType]
-            self:StartGlow(buffFrame, db.auraGlow.buffFrames, color, "buffFrames", "auraGlow")
+            self.StartGlow(buffFrame, db.auraGlow.buffFrames, color, "buffFrames", "auraGlow")
             buffFrame.buffFramesGlowing = debuffType
         end
     end
 
     if not buffFrame.buffFramesGlowing then
-        self:StopGlow(buffFrame, db.auraGlow.buffFrames, "buffFrames", "auraGlow")
+        self.StopGlow(buffFrame, db.auraGlow.buffFrames, "buffFrames", "auraGlow")
     end
 
     local parent = buffFrame:GetParent()
@@ -212,7 +212,7 @@ function KHMRaidFrames:CompactUnitFrame_HideAllBuffs(frame, startingIndex, db)
     if frame.buffFrames then
         for i=startingIndex or 1, #frame.buffFrames do
             frame.buffFrames[i]:Hide()
-            self:StopGlow(frame.buffFrames[i], db.buffFrames, "buffFrames", "auraGlow")
+            self.StopGlow(frame.buffFrames[i], db.buffFrames, "buffFrames", "auraGlow")
         end
     end
 end
@@ -221,7 +221,7 @@ function KHMRaidFrames:CompactUnitFrame_HideAllDebuffs(frame, startingIndex, db)
     if frame.debuffFrames then
         for i=startingIndex or 1, #frame.debuffFrames do
             frame.debuffFrames[i]:Hide()
-            self:StopGlow(frame.debuffFrames[i], db.debuffFrames, "debuffFrames", "auraGlow")
+            self.StopGlow(frame.debuffFrames[i], db.debuffFrames, "debuffFrames", "auraGlow")
         end
     end
 end
@@ -260,7 +260,9 @@ end
 
 local dispellableDebuffTypes = { Magic = true, Curse = true, Disease = true, Poison = true}
 
-function KHMRaidFrames:UpdateAuras(frame)
+function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
+    if self.SkipFrame(frame) then return end
+
     frame.buffFramesGlowing = {}
     frame.debuffFramesGlowing = {}
 
@@ -441,8 +443,8 @@ function KHMRaidFrames:UpdateAuras(frame)
 
             if self:TrackAuras(name, debuffType, spellId, self.db.profile.glows.frameGlow.buffFrames.tracking) then
                 local color = db.buffFrames.useDefaultsColors and db.defaultColors[debuffType]
-                self:StartGlow(frame, db.buffFrames, color, "buffFrames", "frameGlow")
-                self:StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
+                self.StartGlow(frame, db.buffFrames, color, "buffFrames", "frameGlow")
+                self.StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
                 return
             end
         end
@@ -454,19 +456,19 @@ function KHMRaidFrames:UpdateAuras(frame)
 
             if self:TrackAuras(name, debuffType, spellId, self.db.profile.glows.frameGlow.debuffFrames.tracking) then
                 local color = db.debuffFrames.useDefaultsColors and db.defaultColors[debuffType]
-                self:StartGlow(frame, db.debuffFrames, color, "debuffFrames", "frameGlow")
-                self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
+                self.StartGlow(frame, db.debuffFrames, color, "debuffFrames", "frameGlow")
+                self.StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
                 return
             end
         end
     end
 
-    self:StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
-    self:StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
+    self.StopGlow(frame, db.debuffFrames, "debuffFrames", "frameGlow")
+    self.StopGlow(frame, db.buffFrames, "buffFrames", "frameGlow")
 end
 
 function KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame)
-    return frame.optionTable.greyOutWhenTapDenied and not UnitPlayerControlled(frame.unit) and UnitIsTapDenied(frame.unit);
+    return frame.optionTable.greyOutWhenTapDenied and not UnitPlayerControlled(frame.unit) and UnitIsTapDenied(frame.unit)
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)

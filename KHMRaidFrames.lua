@@ -3,7 +3,9 @@ addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "Ac
 
 local KHMRaidFrames = addonTable.KHMRaidFrames
 
-local unpack, select = unpack, select
+local LCG = LibStub("LibCustomGlow-1.0")
+
+local unpack, select, tonumber = unpack, select, tonumber
 local _G = _G
 local GetReadyCheckStatus = GetReadyCheckStatus
 local UnitInRaid = UnitInRaid
@@ -29,123 +31,104 @@ local AbbreviateNumbers = AbbreviateNumbers
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
 
-local englishClasses = {
-    "WARRIOR",
-    "PALADIN",
-    "HUNTER",
-    "ROGUE",
-    "PRIEST",
-    "DEATHKNIGHT",
-    "SHAMAN",
-    "MAGE",
-    "WARLOCK",
-    "MONK",
-    "DRUID",
-    "DEMONHUNTER",
-}
 
-function KHMRaidFrames:UpdateRaidMark()
-    for frame in self.IterateCompactFrames() do
-        self:SetUpRaidIcon(frame)
+-- MAIN FUNCTIONS FOR LAYOUT
+function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
+    local deferred
+    local groupType = IsInRaid() and "raid" or "party"
+    local isInCombatLockDown = InCombatLockdown()
+
+    for group in self.IterateCompactGroups(groupType) do
+        if self.processedFrames[group] == nil then
+            deferred = self:LayoutGroup(group, groupType, isInCombatLockDown)
+
+            if deferred == false then
+                self.processedFrames[group] = true
+            end
+        end
     end
+
+    for frame in self.IterateCompactFrames(groupType) do
+        if self.processedFrames[frame] == nil then
+            deferred = self:LayoutFrame(frame, groupType, isInCombatLockDown)
+
+            if deferred == false then
+                self.processedFrames[frame] = true
+            end
+        end
+    end
+
+    self:SetUpSoloFrame()
 end
 
-function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, subFrameType)
-    local frameNum = 1
-    local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
-    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and self.componentScale or 1)
+function KHMRaidFrames:LayoutGroup(frame, groupType, isInCombatLockDown)
+    local db = self.db.profile[groupType]
 
-    while frameNum <= #typedframes do
-        typedframe = typedframes[frameNum]
-        typedframe:ClearAllPoints()
-
-        if frameNum == 1 then
-            anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
-        elseif frameNum % (db.numInRow) == 1 then
-            anchor1, relativeFrame, anchor2 = self.rowsPositions[db.rowsGrowDirection][1], typedframes[frameNum - db.numInRow], self.rowsPositions[db.rowsGrowDirection][2]
-        else
-            anchor1, relativeFrame, anchor2 = self.mirrorPositions[db.growDirection][1], typedframes[frameNum - 1], self.mirrorPositions[db.growDirection][2]
-        end
-
-        if frameNum == 1 then
-            xOffset, yOffset = self:Offsets(anchor1)
-            xOffset = xOffset + db.xOffset
-            yOffset = yOffset + db.yOffset
-        else
-            xOffset, yOffset = 0, 0
-        end
-
-        typedframe:SetPoint(
-            anchor1,
-            relativeFrame,
-            anchor2,
-            xOffset,
-            yOffset
-        )
-
-        typedframe:SetSize(size, size)
-        typedframe:SetAlpha(db.alpha)
-
-        if self.db.profile[groupType].frames.clickThrough then
-            typedframe:EnableMouse(false)
-        else
-            typedframe:EnableMouse(true)
-        end
-
-        if self.Masque and self.Masque[subFrameType] and typedframe:GetName() then
-            self.Masque[subFrameType]:RemoveButton(typedframe)
-            self.Masque[subFrameType]:AddButton(typedframe)
-        end
-
-        frameNum = frameNum + 1
-    end
-end
-
-function KHMRaidFrames:SetUpRaidIcon(frame)
-    if not frame.unit then return end
-
-    local db = self.db.profile[IsInRaid() and "raid" or "party"]
-
-    if not frame.raidIcon then
-        frame.raidIcon = frame:CreateTexture(nil, "OVERLAY")
-    end
-
-    if not db.raidIcon.enabled then
-        frame.raidIcon:Hide()
-        return
-    end
-
-    local index = GetRaidTargetIndex(frame.unit)
-
-    if index == "NONE" then
-        index = 0
+    if db.frames.hideGroupTitles then
+        frame.title:Hide()
     else
-        index = tonumber(index)
+        frame.title:Show()
     end
 
-    if index and index >= 1 and index <= 8 then
-        local options = UnitPopupButtons["RAID_TARGET_"..index]
-        local texture, tCoordLeft, tCoordRight, tCoordTop, tCoordBottom = options.icon, options.tCoordLeft, options.tCoordRight, options.tCoordTop, options.tCoordBottom
-
-        frame.raidIcon:ClearAllPoints()
-
-        frame.raidIcon:SetPoint(db.raidIcon.anchorPoint, frame, db.raidIcon.anchorPoint, db.raidIcon.xOffset, db.raidIcon.yOffset)
-        frame.raidIcon:SetSize(db.raidIcon.size * self.componentScale, db.raidIcon.size * self.componentScale)
-
-        frame.raidIcon:SetTexture(texture)
-
-        frame.raidIcon:SetTexCoord(tCoordLeft, tCoordRight, tCoordTop, tCoordBottom)
-
-        frame.raidIcon:SetAlpha(db.raidIcon.alpha)
-
-        frame.raidIcon:Show()
-    else
-        frame.raidIcon:Hide()
-    end
 end
 
-function KHMRaidFrames:SetUpAbsorb(frame)
-    if not frame then return end
+function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
+    local db = self.db.profile[groupType]
+    local deferred = false
+
+    if not isInCombatLockDown then
+        self:AddSubFrames(frame, groupType)
+    else
+        deferred = true
+    end
+
+    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
+    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
+
+    if db.showBigDebuffs and db.smartAnchoring then
+        self:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
+    end
+
+    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
+
+    self:SetUpRaidIcon(frame, groupType)
+
+    if self.db.profile[groupType].nameAndIcons.name.enabled then
+        self:SetUpName(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.statusText.enabled then
+        self:SetUpStatusText(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
+        self:SetUpRoleIcon(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then
+        self:SetUpReadyCheckIcon(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled then
+        self:SetUpCenterStatusIcon(frame, groupType)
+    end
+
+    if self.db.profile[groupType].nameAndIcons.leaderIcon.enabled then
+        self.SetUpLeaderIcon(frame, groupType)
+    end
+
+    self:CompactUnitFrame_UpdateHealPrediction(frame)
+
+    local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
+    frame.healthBar:SetStatusBarTexture(texture, "BORDER")
+
+    return deferred
+end
+--
+
+-- ABSORB PREDICTION
+function KHMRaidFrames:CompactUnitFrame_UpdateHealPrediction(frame)
+    if not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
 
     if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end
 
@@ -191,7 +174,9 @@ function KHMRaidFrames:SetUpAbsorb(frame)
         absorbOverlay:Show()
     end
 end
+--
 
+-- SOLO FRAME WITHOUT PARTY
 function KHMRaidFrames:SetUpSoloFrame()
     if self.db.profile.party.frames.showPartySolo then
         if not self.ticker or self.ticker:IsCancelled() then
@@ -201,7 +186,12 @@ function KHMRaidFrames:SetUpSoloFrame()
         self.ticker:Cancel()
     end
 end
+--
 
+
+-- NAME STATUS AND ICONS RELATED FUNCTIONS --
+
+-- NAME
 function KHMRaidFrames:SetUpName(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.name.enabled then
         if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
@@ -245,11 +235,9 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     end
 
     if db.classColoredNames then
-        local _, _, id = UnitClass(frame.unit)
+        local classColor = KHMRaidFrames.ColorByClass(frame.unit)
 
-        if id then
-            local englishClass = englishClasses[id]
-            local classColor = RAID_CLASS_COLORS[englishClass]
+        if classColor then
             name:SetTextColor(classColor.r, classColor.g, classColor.b)
         end
     else
@@ -288,6 +276,7 @@ function KHMRaidFrames.RevertNameColors()
     end
 end
 
+-- STATUS TEXT
 function KHMRaidFrames:SetUpStatusText(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.statusText.enabled then return end
     if not frame.statusText then return end
@@ -366,11 +355,9 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     end
 
     if db.classColoredText then
-        local _, _, id = UnitClass(frame.unit)
+        local classColor = KHMRaidFrames.ColorByClass(frame.unit)
 
-        if id then
-            local englishClass = englishClasses[id]
-            local classColor = RAID_CLASS_COLORS[englishClass]
+        if classColor then
             statusText:SetTextColor(classColor.r, classColor.g, classColor.b)
         end
     else
@@ -388,6 +375,57 @@ function KHMRaidFrames.RevertStatusText()
     end
 end
 
+-- RAID TARGET ICON (STAR, SQUARE, etc)
+function KHMRaidFrames:UpdateRaidMark()
+    for frame in self.IterateCompactFrames() do
+        self:SetUpRaidIcon(frame)
+    end
+end
+
+function KHMRaidFrames:SetUpRaidIcon(frame)
+    if not frame.unit then return end
+
+    local db = self.db.profile[IsInRaid() and "raid" or "party"]
+
+    if not frame.raidIcon then
+        frame.raidIcon = frame:CreateTexture(nil, "OVERLAY")
+    end
+
+    if not db.raidIcon.enabled then
+        frame.raidIcon:Hide()
+        return
+    end
+
+    local index = GetRaidTargetIndex(frame.unit)
+
+    if index == "NONE" then
+        index = 0
+    else
+        index = tonumber(index)
+    end
+
+    if index and index >= 1 and index <= 8 then
+        local options = UnitPopupButtons["RAID_TARGET_"..index]
+        local texture, tCoordLeft, tCoordRight, tCoordTop, tCoordBottom = options.icon, options.tCoordLeft, options.tCoordRight, options.tCoordTop, options.tCoordBottom
+
+        frame.raidIcon:ClearAllPoints()
+
+        frame.raidIcon:SetPoint(db.raidIcon.anchorPoint, frame, db.raidIcon.anchorPoint, db.raidIcon.xOffset, db.raidIcon.yOffset)
+        frame.raidIcon:SetSize(db.raidIcon.size * self.componentScale, db.raidIcon.size * self.componentScale)
+
+        frame.raidIcon:SetTexture(texture)
+
+        frame.raidIcon:SetTexCoord(tCoordLeft, tCoordRight, tCoordTop, tCoordBottom)
+
+        frame.raidIcon:SetAlpha(db.raidIcon.alpha)
+
+        frame.raidIcon:Show()
+    else
+        frame.raidIcon:Hide()
+    end
+end
+
+-- ROLE ICON
 function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.roleIcon.enabled then return end
     if not frame.roleIcon then return end
@@ -451,6 +489,8 @@ function KHMRaidFrames.RevertRoleIcon()
     end
 end
 
+
+-- READY CHECK ICON
 function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then return end
     if not frame.readyCheckIcon then return end
@@ -500,6 +540,7 @@ function KHMRaidFrames.RevertReadyCheckIcon()
     end
 end
 
+-- CENTER STATUS ICON
 function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled then return end
     if not frame.centerStatusIcon then return end
@@ -576,6 +617,8 @@ function KHMRaidFrames.RevertStatusIcon()
     end
 end
 
+
+-- LEADER ICON
 function KHMRaidFrames.UpdateLeaderIcon()
     local groupType = IsInRaid() and "raid" or "party"
 
@@ -633,3 +676,35 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
 
     frame.leaderIcon:Show()
 end
+--
+
+-- GLOWS START/STOP
+function KHMRaidFrames.StartGlow(frame, db, color, key, gType)
+    local glowType = db.type
+    local glowOptions = db.options[glowType]
+    local options = glowOptions.options
+    local color = color or options.color
+
+    if glowType == "button" then
+        LCG.ButtonGlow_Start(frame, color, options.frequency)
+    elseif glowType == "pixel" then
+        LCG.PixelGlow_Start(frame, color, options.N, options.frequency, options.length, options.th, options.xOffset, options.yOffset, options.border, key or "")
+    elseif glowType == "auto" then
+        LCG.AutoCastGlow_Start(frame, color, options.N, options.frequency, options.scale, options.xOffset, options.yOffset, key or "")
+    end
+
+    KHMRaidFrames.glowingFrames[gType][key][frame] = color
+end
+
+function KHMRaidFrames.StopGlow(frame, db, key, gType)
+    if db.type == "button" then
+        LCG.ButtonGlow_Stop(frame, key or "")
+    elseif db.type == "pixel" then
+        LCG.PixelGlow_Stop(frame, key or "")
+    elseif db.type == "auto" then
+        LCG.AutoCastGlow_Stop(frame, key or "")
+    end
+
+    KHMRaidFrames.glowingFrames[gType][key][frame] = nil
+end
+--

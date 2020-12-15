@@ -138,6 +138,9 @@ L["Profile: |cFFC80000<text>|r"] = "Профиль: |cFFC80000<text>|r"
 L["Abbreviate Large Numbers"] = "Сократить Большие Числа"
 L["Abbreviate Numbers"] = "Сократить Числа"
 L["Abbreviate"] = "Форматировать Числа"
+L["Abbreviate Desc"] = "100 -> 100"..
+                        "\n1000 -> 1K"..
+                        "\n1000000 -> 1M"
 L["buffsAndDebuffs"] = "Баффы и Дебаффы"
 L["Don\'t Show Status Text"] = "Не показывать статусы"
 L["Don\'t Show Status Text Desc"] = "Не показывать статусы(мертв, оффлайн)"

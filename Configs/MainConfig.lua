@@ -611,7 +611,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             },
             ["Abbreviate"] = {
                 name = L["Abbreviate"],
-                desc = "",
+                desc = L["Abbreviate Desc"],
                 width = "normal",
                 type = "toggle",
                 order = 11,

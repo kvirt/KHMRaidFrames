@@ -141,6 +141,9 @@ L["Profile: |cFFC80000<text>|r"] = true
 L["Abbreviate Large Numbers"] = true
 L["Abbreviate Numbers"] = true
 L["Abbreviate"] = true
+L["Abbreviate Desc"] = "100 -> 100"..
+                        "\n1000 -> 1K"..
+                        "\n1000000 -> 1M"
 L["buffsAndDebuffs"] = "Buffs and Debuffs"
 L["Don\'t Show Status Text"] = true
 L["Don\'t Show Status Text Desc"] = ""
