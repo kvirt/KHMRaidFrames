@@ -40,7 +40,7 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
 
     for group in self.IterateCompactGroups(groupType) do
         if self.processedFrames[group] == nil then
-            deferred = self:LayoutGroup(group, groupType, isInCombatLockDown)
+            deferred = self:LayoutGroup(group, groupType)
 
             if deferred == false then
                 self.processedFrames[group] = true
@@ -61,7 +61,7 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
     self:SetUpSoloFrame()
 end
 
-function KHMRaidFrames:LayoutGroup(frame, groupType, isInCombatLockDown)
+function KHMRaidFrames:LayoutGroup(frame, groupType)
     local db = self.db.profile[groupType]
 
     if db.frames.hideGroupTitles then
@@ -198,31 +198,14 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     local db = self.db.profile[groupType].nameAndIcons.name
 
     if not db.enabled then
-        if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
-            frame.name:ClearAllPoints()
-            frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -3)
-            frame.name:SetJustifyH("LEFT")
-        end
-
-        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
-            frame.name:SetVertexColor(0.5, 0.5, 0.5)
-        else
-            frame.name:SetVertexColor(1.0, 1.0, 1.0)
-        end
-
-        if not ShouldShowName(frame) then
-            frame.name:Hide()
-        else
-            frame.name:Show()
-        end
-
         return
     end
+
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     if not frame.unit then return end
 
     local name = frame.name
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     local flags = db.flag ~= "None" and db.flag or ""
 
@@ -281,18 +264,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, -3)
     name:SetJustifyH(db.hJustify)
 
-
     name:Show()
-end
-
-function KHMRaidFrames.RevertNameColors()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
-            frame.name:SetVertexColor(0.5, 0.5, 0.5)
-        else
-            frame.name:SetVertexColor(1.0, 1.0, 1.0)
-        end
-    end
 end
 
 -- STATUS TEXT
@@ -388,12 +360,6 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     end
 end
 
-function KHMRaidFrames.RevertStatusText()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
-    end
-end
-
 -- RAID TARGET ICON (STAR, SQUARE, etc)
 function KHMRaidFrames:UpdateRaidMark()
     for frame in self.IterateCompactFrames() do
@@ -484,8 +450,6 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     if db.hide then
         roleIcon:Hide()
         return
-    else
-        roleIcon:Show()
     end
 
     local raidID = UnitInRaid(frame.unit)
@@ -507,15 +471,9 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
         roleIcon:SetTexture(db[_role])
         roleIcon:SetTexCoord(0, 1, 0, 1)
         roleIcon:SetVertexColor(unpack(db.colors[_role]))
+        roleIcon:Show()
     end
 end
-
-function KHMRaidFrames.RevertRoleIcon()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
-    end
-end
-
 
 -- READY CHECK ICON
 function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
@@ -553,17 +511,16 @@ function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
     local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
     local readyCheckIcon = frame.readyCheckIcon
 
+    if db.hide then
+        readyCheckIcon:Hide()
+    end
+
     local readyCheckStatus = GetReadyCheckStatus(frame.unit)
 
     if readyCheckStatus and db[readyCheckStatus] ~= "" then
         readyCheckIcon:SetTexture(db[readyCheckStatus])
         readyCheckIcon:SetVertexColor(unpack(db.colors[readyCheckStatus]))
-    end
-end
-
-function KHMRaidFrames.RevertReadyCheckIcon()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
+        readyCheckIcon:Show()
     end
 end
 
@@ -574,7 +531,7 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
     local centerStatusIcon = frame.centerStatusIcon
-    local size = db.size
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     centerStatusIcon:ClearAllPoints()
 
@@ -606,32 +563,35 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
     if db.hide then
         centerStatusIcon:Hide()
         return
-    else
-        centerStatusIcon:Show()
     end
 
     if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) and db.inOtherGroup ~= "" then
         centerStatusIcon.texture:SetTexture(db.inOtherGroup)
         centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
         centerStatusIcon.texture:SetVertexColor(unpack(db.colors.inOtherGroup))
+        centerStatusIcon:Show()
     elseif frame.optionTable.displayIncomingResurrect and UnitHasIncomingResurrection(frame.unit) and db.hasIncomingResurrection ~= "" then
         centerStatusIcon.texture:SetTexture(db.hasIncomingResurrection)
         centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
         centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingResurrection))
+        centerStatusIcon:Show()
     elseif frame.optionTable.displayIncomingSummon and C_IncomingSummon.HasIncomingSummon(frame.unit) then
         local status = C_IncomingSummon.IncomingSummonStatus(frame.unit)
         if status == Enum.SummonStatus.Pending and db.hasIncomingSummonPending ~= "" then
             centerStatusIcon.texture:SetTexture(db.hasIncomingSummonPending)
             centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
             centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingSummonPending))
+            centerStatusIcon:Show()
         elseif status == Enum.SummonStatus.Accepted and db.hasIncomingSummonAccepted ~= "" then
             centerStatusIcon.texture:SetTexture(db.hasIncomingSummonAccepted)
             centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
             centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingSummonAccepted))
+            centerStatusIcon:Show()
         elseif status == Enum.SummonStatus.Declined and db.hasIncomingSummonDeclined ~= "" then
             centerStatusIcon.texture:SetTexture(db.hasIncomingSummonDeclined)
             centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
             centerStatusIcon.texture:SetVertexColor(unpack(db.colors.hasIncomingSummonDeclined))
+            centerStatusIcon:Show()
         end
     else
         if frame.inDistance and frame.optionTable.displayInOtherPhase and db.inOtherPhase ~= "" then
@@ -640,17 +600,11 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
                 centerStatusIcon.texture:SetTexture(db.inOtherPhase)
                 centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
                 centerStatusIcon.texture:SetVertexColor(unpack(db.colors.inOtherPhase))
+                centerStatusIcon:Show()
             end
         end
     end
 end
-
-function KHMRaidFrames.RevertStatusIcon()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
-    end
-end
-
 
 -- LEADER ICON
 function KHMRaidFrames.UpdateLeaderIcon()

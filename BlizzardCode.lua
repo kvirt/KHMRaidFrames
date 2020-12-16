@@ -476,30 +476,34 @@ function KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
         return
     end
 
-    local size = frame.roleIcon:GetHeight()
-    local raidID = UnitInRaid(frame.unit)
+    frame.roleIcon:ClearAllPoints()
+    frame.roleIcon:SetPoint("TOPLEFT", 3, -2)
+    frame.roleIcon:SetSize(12, 12)
 
-    if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
-        frame.roleIcon:SetTexture("Interface\\Vehicles\\UI-Vehicles-Raid-Icon")
-        frame.roleIcon:SetTexCoord(0, 1, 0, 1)
-        frame.roleIcon:SetSize(size, size)
-    elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
-        local role = select(10, GetRaidRosterInfo(raidID));
-        frame.roleIcon:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
-        frame.roleIcon:SetTexCoord(0, 1, 0, 1)
-        frame.roleIcon:SetSize(size, size)
-    else
-        local role = UnitGroupRolesAssigned(frame.unit)
-        if frame.optionTable.displayRoleIcon and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
-            frame.roleIcon:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
-            frame.roleIcon:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
-            frame.roleIcon:SetSize(size, size)
-        else
-            frame.roleIcon:SetSize(1, size)
-        end
-    end
+    KHMRaidFrames.CompactUnitFrame_UpdateRoleIconTexture(frame)
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateRoleIconTexture(frame)
+    CompactUnitFrame_UpdateRoleIcon(frame)
 
     frame.roleIcon:SetVertexColor(1, 1, 1, 1)
+end
+
+function KHMRaidFrames.RevertRoleIcon()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
+        end
+    end
+end
+
+
+function KHMRaidFrames.RevertRoleIconTexture()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateRoleIconTexture(frame)
+        end
+    end
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
@@ -507,52 +511,67 @@ function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
         return
     end
 
-    local readyCheckStatus = GetReadyCheckStatus(frame.unit)
-    frame.readyCheckStatus = readyCheckStatus
+    local readyCheckSize = 15 * KHMRaidFrames.componentScale
+    frame.readyCheckIcon:ClearAllPoints();
+    frame.readyCheckIcon:SetPoint("BOTTOM", frame, "BOTTOM", 0, KHMRaidFrames.frameHeight / 3 - 4)
+    frame.readyCheckIcon:SetSize(readyCheckSize, readyCheckSize)
 
-    if readyCheckStatus == "ready" then
-        frame.readyCheckIcon:SetTexture(READY_CHECK_READY_TEXTURE)
-    elseif readyCheckStatus == "notready" then
-        frame.readyCheckIcon:SetTexture(READY_CHECK_NOT_READY_TEXTURE)
-    elseif readyCheckStatus == "waiting" then
-        frame.readyCheckIcon:SetTexture(READY_CHECK_WAITING_TEXTURE)
-    end
+    KHMRaidFrames.CompactUnitFrame_UpdateReadyCheckTexture(frame)
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheckTexture(frame)
+    CompactUnitFrame_UpdateReadyCheck(frame)
 
     frame.readyCheckIcon:SetVertexColor(1, 1, 1, 1)
+end
+
+function KHMRaidFrames.RevertReadyCheckIcon()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
+        end
+    end
+end
+
+function KHMRaidFrames.RevertReadyCheckIconTexture()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateReadyCheckTexture(frame)
+        end
+    end
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
     if not frame.unit or not frame.centerStatusIcon then return end
 
-    if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) then
-        frame.centerStatusIcon.texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
-        frame.centerStatusIcon.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
-    elseif frame.optionTable.displayIncomingResurrect and UnitHasIncomingResurrection(frame.unit) then
-        frame.centerStatusIcon.texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
-        frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
-    elseif frame.optionTable.displayIncomingSummon and C_IncomingSummon.HasIncomingSummon(frame.unit) then
-        local status = C_IncomingSummon.IncomingSummonStatus(frame.unit)
-        if status == Enum.SummonStatus.Pending then
-            frame.centerStatusIcon.texture:SetAtlas("Raid-Icon-SummonPending")
-            frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
-        elseif status == Enum.SummonStatus.Accepted then
-            frame.centerStatusIcon.texture:SetAtlas("Raid-Icon-SummonAccepted")
-            frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
-        elseif status == Enum.SummonStatus.Declined then
-            frame.centerStatusIcon.texture:SetAtlas("Raid-Icon-SummonDeclined")
-            frame.centerStatusIcon.texture:SetTexCoord(0, 1, 0, 1)
-        end
-    else
-        if frame.inDistance and frame.optionTable.displayInOtherPhase then
-            local phaseReason = UnitPhaseReason(frame.unit)
-            if phaseReason then
-                frame.centerStatusIcon.texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
-                frame.centerStatusIcon.texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
-            end
-        end
-    end
+    local size = 11 * KHMRaidFrames.componentScale * 2
+    frame.centerStatusIcon:ClearAllPoints()
+    frame.centerStatusIcon:SetPoint("CENTER", frame, "BOTTOM", 0, KHMRaidFrames.frameHeight / 3 + 2)
+    frame.centerStatusIcon:SetSize(size, size)
+
+    KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIconTexture(frame)
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIconTexture(frame)
+    CompactUnitFrame_UpdateCenterStatusIcon(frame)
 
     frame.centerStatusIcon.texture:SetVertexColor(1, 1, 1, 1)
+end
+
+function KHMRaidFrames.RevertStatusIcon()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
+        end
+    end
+end
+
+function KHMRaidFrames.RevertStatusIcoTexture()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIconTexture(frame)
+        end
+    end
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
@@ -560,19 +579,66 @@ function KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
     if not frame.optionTable.displayStatusText then return end
     if not frame.unit then return end
 
-    if not UnitIsConnected(frame.unit) then
-        frame.statusText:SetText(PLAYER_OFFLINE)
-    elseif UnitIsDeadOrGhost(frame.displayedUnit) then
-        frame.statusText:SetText(DEAD)
-    elseif frame.optionTable.healthText == "health" then
-        frame.statusText:SetText(UnitHealth(frame.displayedUnit))
-    elseif frame.optionTable.healthText == "losthealth" then
-        local healthLost = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit)
-        if healthLost > 0 then
-            frame.statusText:SetFormattedText(LOST_HEALTH, healthLost)
+    frame.statusText:ClearAllPoints()
+    frame.statusText:SetFont(KHMRaidFrames.fonts[KHMRaidFrames.font], 12 * KHMRaidFrames.componentScale)
+    frame.statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 3, KHMRaidFrames.frameHeight / 3 - 2)
+    frame.statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -3, KHMRaidFrames.frameHeight / 3 - 2)
+    frame.statusText:SetHeight(12 * KHMRaidFrames.componentScale);
+
+    CompactUnitFrame_UpdateStatusText(frame)
+
+    frame.statusText:SetVertexColor(0.5, 0.5, 0.5, 1)
+end
+
+function KHMRaidFrames.RevertStatusText()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
         end
-    elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
-        local perc = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
-        frame.statusText:SetFormattedText("%d%%", perc)
+    end
+end
+
+function KHMRaidFrames.RevertStatusTextFont()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            CompactUnitFrame_UpdateStatusText(frame)
+        end
+    end
+end
+
+function KHMRaidFrames.CompactUnitFrame_UpdateName(frame)
+    frame.name:SetFont(KHMRaidFrames.fonts[KHMRaidFrames.font], 11)
+
+    frame.name:ClearAllPoints()
+
+    if KHMRaidFrames.db.profile[IsInRaid() and "raid" or "party"].nameAndIcons.roleIcon.enabled then
+        frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -1)
+    else
+        frame.name:SetPoint("TOPLEFT", frame.roleIcon, "TOPRIGHT", 0, -1)
+    end
+
+    frame.name:SetHeight(11)
+    frame.name:SetPoint("TOPRIGHT", -3, -3)
+    frame.name:SetJustifyH("LEFT")
+    frame.name:SetVertexColor(1.0, 1.0, 1.0)
+
+    CompactUnitFrame_UpdateName(frame)
+end
+
+function KHMRaidFrames.RevertName()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            KHMRaidFrames.CompactUnitFrame_UpdateName(frame)
+        end
+    end
+end
+
+function KHMRaidFrames.RevertNameColors()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
+            frame.name:SetVertexColor(0.5, 0.5, 0.5)
+        else
+            frame.name:SetVertexColor(1.0, 1.0, 1.0)
+        end
     end
 end

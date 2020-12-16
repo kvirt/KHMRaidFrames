@@ -260,7 +260,7 @@ function KHMRaidFrames.SyncProfiles(profile)
             if profile == v then
                 KHMRaidFrames.db:SetProfile(profile)
 
-                KHMRaidFrames.RevertNameColors()
+                KHMRaidFrames.RevertName()
                 KHMRaidFrames.RevertStatusText()
                 KHMRaidFrames.RevertRoleIcon()
                 KHMRaidFrames.RevertReadyCheckIcon()
@@ -318,6 +318,7 @@ function KHMRaidFrames:Defaults()
     local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
     local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
+    KHMRaidFrames.font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT"
 
     local commons = {
             frames = {
@@ -382,8 +383,8 @@ function KHMRaidFrames:Defaults()
             },
             nameAndIcons = {
                 name = {
-                    font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT",
-                    size = 6,
+                    font = KHMRaidFrames.font,
+                    size = 11,
                     flag = "None",
                     hJustify = "LEFT",
                     xOffset = 0,
@@ -394,7 +395,7 @@ function KHMRaidFrames:Defaults()
                     hide = false,
                 },
                 statusText = {
-                    font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT",
+                    font = KHMRaidFrames.font,
                     size = 12,
                     flag = "None",
                     hJustify = "CENTER",
