@@ -328,6 +328,7 @@ function KHMRaidFrames:Defaults()
                 showPartySolo = false,
                 tracking = {},
                 trackingStr = "",
+                autoScaling = true,
             },
             dispelDebuffFrames = {
                 num = 3,
@@ -390,6 +391,7 @@ function KHMRaidFrames:Defaults()
                     showServer = true,
                     classColoredNames = false,
                     enabled = false,
+                    hide = false,
                 },
                 statusText = {
                     font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT",
@@ -422,6 +424,7 @@ function KHMRaidFrames:Defaults()
                         tank = {1, 1, 1, 1},
                         vehicle = {1, 1, 1, 1},
                     },
+                    hide = false,
                 },
                 readyCheckIcon  = {
                     size = 15 ,
@@ -437,6 +440,7 @@ function KHMRaidFrames:Defaults()
                         notready = {1, 1, 1, 1},
                         waiting = {1, 1, 1, 1},
                     },
+                    hide = false,
                 },
                 centerStatusIcon = {
                     size = 22,
@@ -458,6 +462,7 @@ function KHMRaidFrames:Defaults()
                         hasIncomingSummonDeclined = {1, 1, 1, 1},
                         inOtherPhase = {1, 1, 1, 1},
                     },
+                    hide = false,
                 },
                 leaderIcon = {
                     size = 10 ,

@@ -241,7 +241,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             ["Enable"] = {
                 name = L["Enable"],
                 desc = "",
-                width = "double",
+                width = "normal",
                 type = "toggle",
                 order = 1,
                 confirm = function() return self.db.profile[groupType].nameAndIcons.name.enabled end,
@@ -259,6 +259,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.name.enabled
                 end,
+            },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.name.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.name.hide
+                end
             },
             ["Font"] = {
                 name = L["Font"],
@@ -749,6 +764,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     return self.db.profile[groupType].nameAndIcons.roleIcon.enabled
                 end,
             },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.roleIcon.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.roleIcon.hide
+                end
+            },
             ["size"] = {
                 name = L["Size"],
                 desc = "",
@@ -1033,6 +1063,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     return self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled
                 end,
             },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide
+                end
+            },
             ["size"] = {
                 name = L["Size"],
                 desc = "",
@@ -1275,6 +1320,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled
                 end,
+            },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide
+                end
             },
             ["size"] = {
                 name = L["Size"],
@@ -1628,6 +1688,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 order = 1,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.enabled = val
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled
@@ -1974,10 +2035,10 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end
         },
         ["Skip1"] = {
-                type = "header",
-                name = "",
-                order = 4,
-            },
+            type = "header",
+            name = "",
+            order = 4,
+        },
         ["HideGroupTitles"] = {
             name = L["Hide Group Title"],
             desc = "",
@@ -2021,6 +2082,20 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.enhancedAbsorbs
+            end
+        },
+        ["Auto Scaling"] = {
+            name = L["Auto Scaling"],
+            desc = L["Auto Scaling Desc"],
+            width = "normal",
+            type = "toggle",
+            order = 8,
+            set = function(info,val)
+                self.db.profile[groupType].frames.autoScaling = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.autoScaling
             end
         },
         ["additionalTracking"] = {

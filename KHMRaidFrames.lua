@@ -193,7 +193,11 @@ end
 
 -- NAME
 function KHMRaidFrames:SetUpName(frame, groupType)
-    if not self.db.profile[groupType].nameAndIcons.name.enabled then
+    if not frame.name then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.name
+
+    if not db.enabled then
         if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
             frame.name:ClearAllPoints()
             frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -3)
@@ -205,17 +209,29 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         else
             frame.name:SetVertexColor(1.0, 1.0, 1.0)
         end
+
+        if not ShouldShowName(frame) then
+            frame.name:Hide()
+        else
+            frame.name:Show()
+        end
+
         return
     end
+
     if not frame.unit then return end
 
-    local db = self.db.profile[groupType].nameAndIcons.name
     local name = frame.name
-    local size = db.size * self.componentScale
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     local flags = db.flag ~= "None" and db.flag or ""
 
     local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
+
+    if not ShouldShowName(frame) or db.hide then
+        name:Hide()
+        return
+    end
 
     name:SetFont(
         font,
@@ -264,6 +280,9 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, -3)
     name:SetJustifyH(db.hJustify)
+
+
+    name:Show()
 end
 
 function KHMRaidFrames.RevertNameColors()
@@ -284,7 +303,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.statusText
     local statusText = frame.statusText
-    local size = db.size * self.componentScale
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     local flags = db.flag ~= "None" and db.flag or ""
 
@@ -407,11 +426,12 @@ function KHMRaidFrames:SetUpRaidIcon(frame)
     if index and index >= 1 and index <= 8 then
         local options = UnitPopupButtons["RAID_TARGET_"..index]
         local texture, tCoordLeft, tCoordRight, tCoordTop, tCoordBottom = options.icon, options.tCoordLeft, options.tCoordRight, options.tCoordTop, options.tCoordBottom
+        local size = db.raidIcon.size * (db.frames.autoScaling and self.componentScale or 1)
 
         frame.raidIcon:ClearAllPoints()
 
         frame.raidIcon:SetPoint(db.raidIcon.anchorPoint, frame, db.raidIcon.anchorPoint, db.raidIcon.xOffset, db.raidIcon.yOffset)
-        frame.raidIcon:SetSize(db.raidIcon.size * self.componentScale, db.raidIcon.size * self.componentScale)
+        frame.raidIcon:SetSize(size, size)
 
         frame.raidIcon:SetTexture(texture)
 
@@ -461,6 +481,13 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     local db = self.db.profile[groupType].nameAndIcons.roleIcon
     local roleIcon = frame.roleIcon
 
+    if db.hide then
+        roleIcon:Hide()
+        return
+    else
+        roleIcon:Show()
+    end
+
     local raidID = UnitInRaid(frame.unit)
     local _role
 
@@ -497,7 +524,7 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
     local readyCheckIcon = frame.readyCheckIcon
-    local size = db.size * self.componentScale
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     readyCheckIcon:ClearAllPoints()
 
@@ -547,7 +574,7 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
     local centerStatusIcon = frame.centerStatusIcon
-    local size = db.size * self.componentScale
+    local size = db.size
 
     centerStatusIcon:ClearAllPoints()
 
@@ -575,6 +602,13 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
     local centerStatusIcon = frame.centerStatusIcon
+
+    if db.hide then
+        centerStatusIcon:Hide()
+        return
+    else
+        centerStatusIcon:Show()
+    end
 
     if frame.optionTable.displayInOtherGroup and UnitInOtherParty(frame.unit) and db.inOtherGroup ~= "" then
         centerStatusIcon.texture:SetTexture(db.inOtherGroup)
@@ -640,7 +674,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
     end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
-    local size = db.size * KHMRaidFrames.componentScale
+    local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale or 1)
 
     local isLeader = UnitIsGroupLeader(frame.unit)
 

@@ -155,7 +155,7 @@ KHMRaidFrames.rowsGrows = {
 function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, subFrameType)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
-    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and self.componentScale or 1)
+    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1) or 1)
 
     while frameNum <= #typedframes do
         typedframe = typedframes[frameNum]
