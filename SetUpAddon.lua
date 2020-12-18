@@ -74,8 +74,6 @@ function KHMRaidFrames:SetInternalVariables()
         },
     }
 
-    self.curProfile = nil
-
     if self.db.profile.Masque then
         local Masque = LibStub("Masque", true)
 
@@ -114,13 +112,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     -- custom interface display
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
-    self:SecureHook(
-        "CompactUnitFrameProfiles_ApplyProfile",
-        function(profile)
-            self:GetRaidProfileSettings()
-            self:SafeRefresh()
-        end
-    )
+    self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
 
     self:SafeRefresh()
 end
@@ -129,10 +121,10 @@ function KHMRaidFrames:OnEvent(event, ...)
     local groupType = IsInRaid() and "raid" or "party"
 
     if event == "PLAYER_REGEN_ENABLED" then
-        self:GetRaidProfileSettings()
-        self:SafeRefresh()
-
         if self.deffered then
+            self:GetRaidProfileSettings()
+            self:SafeRefresh()
+
             InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
             InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
 
@@ -213,8 +205,23 @@ end
 --
 
 -- PROFILES
+function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
+    if self:GetRaidProfileSettings() then
+        self.deffered = true
+        return
+    end
+
+    self.processedFrames = {}
+
+    if self.db:GetCurrentProfile() ~= profile then
+        self.SyncProfiles(profile)
+    end
+
+    self:SafeRefresh()
+end
+
 function KHMRaidFrames:GetRaidProfileSettings(profile)
-    if InCombatLockdown() then return end
+    if InCombatLockdown() then return true end
 
     profile = profile or GetActiveRaidProfile()
     local settings = GetRaidProfileFlattenedOptions(profile)
@@ -237,19 +244,6 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
-
-    if self.curProfile == nil then
-        self.curProfile = profile
-
-        if profile ~= self.db:GetCurrentProfile() then
-            self.SyncProfiles(profile)
-        end
-    elseif self.curProfile ~= profile and profile then
-        self.curProfile = profile
-        self.processedFrames = {}
-
-        self.SyncProfiles(profile)
-    end
 end
 
 function KHMRaidFrames.SyncProfiles(profile)
@@ -265,8 +259,11 @@ function KHMRaidFrames.SyncProfiles(profile)
                 KHMRaidFrames.RevertRoleIcon()
                 KHMRaidFrames.RevertReadyCheckIcon()
                 KHMRaidFrames.RevertStatusIcon()
+                KHMRaidFrames.UpdateLeaderIcon()
+                KHMRaidFrames:UpdateRaidMark()
 
                 KHMRaidFrames:CustomizeOptions()
+                KHMRaidFrames:HookNameAndIcons()
             end
         end
     end

@@ -497,7 +497,6 @@ function KHMRaidFrames.RevertRoleIcon()
     end
 end
 
-
 function KHMRaidFrames.RevertRoleIconTexture()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         if frame.unit then
