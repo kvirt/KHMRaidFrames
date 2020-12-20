@@ -140,6 +140,7 @@ function KHMRaidFrames:OnEvent(event, ...)
         self:UpdateRaidMark(groupType)
         self:CustomizeOptions()
         self.UpdateLeaderIcon()
+        self.UpdateResourceBars()
     end
 end
 
@@ -327,6 +328,7 @@ function KHMRaidFrames:Defaults()
                 tracking = {},
                 trackingStr = "",
                 autoScaling = true,
+                showResourceOnlyForHealers = false,
             },
             dispelDebuffFrames = {
                 num = 3,

@@ -4,9 +4,6 @@ local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
 local _G, tostring, CreateFrame, IsInRaid, InCombatLockdown = _G, tostring, CreateFrame, IsInRaid, InCombatLockdown
 
-local CUF_AURA_BOTTOM_OFFSET = 2
-local powerBarHeight = 8
-
 local subFrameTypes = {"debuffFrames", "buffFrames", "dispelDebuffFrames"}
 
 local systemYellowCode = "|cFFffd100<text>|r"
@@ -36,6 +33,8 @@ local englishClasses = {
 
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
 KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH = 72
+KHMRaidFrames.CUF_AURA_BOTTOM_OFFSET = 2
+KHMRaidFrames.powerBarHeight = 8
 
 KHMRaidFrames.defuffsColors = {
     magic = {0.2, 0.6, 1.0, 1},
@@ -170,7 +169,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
         end
 
         if frameNum == 1 then
-            xOffset, yOffset = self:Offsets(anchor1)
+            xOffset, yOffset = self:Offsets(anchor1, frame, groupType)
             xOffset = xOffset + db.xOffset
             yOffset = yOffset + db.yOffset
         else
@@ -223,8 +222,18 @@ function KHMRaidFrames:RefreshConfig(groupType)
     self:SetUpSoloFrame()
 end
 
-function KHMRaidFrames:Offsets(anchor)
-    local powerBarUsedHeight = (self.displayPowerBar and powerBarHeight or 0) + CUF_AURA_BOTTOM_OFFSET
+function KHMRaidFrames:Offsets(anchor, frame, groupType)
+    local displayPowerBar
+
+    if not self.displayPowerBar then
+        displayPowerBar = false
+    elseif self.db.profile[groupType].frames.showResourceOnlyForHealers and frame.__role and frame.__role ~= "none" then
+        displayPowerBar = frame.__role == "healer"
+    else
+        displayPowerBar = true
+    end
+
+    local powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     local xOffset, yOffset = 0, 0
 
     if anchor == "LEFT" then
@@ -338,6 +347,7 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
     local size = db.size * self.componentScale
     local bigSize = size * 2
     local rowStart = 1
+    local groupType = IsInRaid() and "raid" or "party"
 
     while frameNum <= #typedframes do
         local rowLen = db.numInRow
@@ -384,7 +394,7 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
             end
 
             if frameNum == 1 then
-                xOffset, yOffset = self:Offsets(anchor1)
+                xOffset, yOffset = self:Offsets(anchor1, frame, groupType)
                 xOffset = xOffset + db.xOffset
                 yOffset = yOffset + db.yOffset
             else

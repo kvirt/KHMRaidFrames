@@ -82,6 +82,8 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         deferred = true
     end
 
+    self.UpdateResourceBar(frame, groupType)
+
     self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
     self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
 
@@ -249,19 +251,12 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     if _name then name:SetText(_name) end
 
-    local xOffset, yOffset = self:Offsets("TOPLEFT")
+    local xOffset, yOffset = self:Offsets("TOPLEFT", frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
-    name:SetPoint(
-        "TOPLEFT",
-        frame,
-        "TOPLEFT",
-        xOffset,
-        yOffset
-    )
-
-    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, -3)
+    name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
+    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", xOffset, yOffset)
     name:SetJustifyH(db.hJustify)
 
     name:Show()
@@ -289,7 +284,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     statusText:ClearAllPoints()
 
-    local xOffset, yOffset = self:Offsets("BOTTOMLEFT")
+    local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
 
@@ -422,7 +417,7 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
 
     roleIcon:ClearAllPoints()
 
-    local xOffset, yOffset = self:Offsets("TOPLEFT")
+    local xOffset, yOffset = self:Offsets("TOPLEFT", frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
@@ -468,6 +463,9 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     end
 
     if _role and db[_role:lower()] ~= "" then
+        --caching role for future
+        roleIcon.role = _role:lower()
+
         roleIcon:SetTexture(db[_role])
         roleIcon:SetTexCoord(0, 1, 0, 1)
         roleIcon:SetVertexColor(unpack(db.colors[_role]))
@@ -486,7 +484,7 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     readyCheckIcon:ClearAllPoints()
 
-    local xOffset, yOffset = self:Offsets("BOTTOM")
+    local xOffset, yOffset = self:Offsets("BOTTOM", frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
 
@@ -535,7 +533,7 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     centerStatusIcon:ClearAllPoints()
 
-    local xOffset, yOffset = self:Offsets("BOTTOM")
+    local xOffset, yOffset = self:Offsets("BOTTOM", frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
 
@@ -639,7 +637,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
 
     frame.leaderIcon:ClearAllPoints()
 
-    local xOffset, yOffset = KHMRaidFrames:Offsets(db.anchorPoint)
+    local xOffset, yOffset = KHMRaidFrames:Offsets(db.anchorPoint, frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
@@ -694,5 +692,49 @@ function KHMRaidFrames.StopGlow(frame, db, key, gType)
     end
 
     KHMRaidFrames.glowingFrames[gType][key][frame] = nil
+end
+--
+
+--RESOURСE BAR
+function KHMRaidFrames.UpdateResourceBar(frame, groupType)
+    local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
+
+    if not showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then return end
+
+    if not frame.unit then return end
+
+    local role = UnitGroupRolesAssigned(frame.unit)
+    role = role:lower()
+
+    frame.__role = role
+
+    if role ~= "healer" and role ~= "none" then
+        frame.healthBar:ClearAllPoints()
+        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
+        frame.powerBar:Hide()
+
+        if KHMRaidFrames.displayBorder then
+            frame.horizDivider:Hide()
+        end
+    else
+        local powerBarUsedHeight = KHMRaidFrames.powerBarHeight + KHMRaidFrames.CUF_AURA_BOTTOM_OFFSET
+        frame.healthBar:ClearAllPoints()
+        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + powerBarUsedHeight)
+        frame.powerBar:Show()
+
+        if KHMRaidFrames.displayBorder then
+            frame.horizDivider:Show()
+        end
+    end
+end
+
+function KHMRaidFrames.UpdateResourceBars()
+    local groupType = IsInRaid() and "raid" or "party"
+
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        KHMRaidFrames.UpdateResourceBar(frame, groupType)
+    end
 end
 --

@@ -2063,12 +2063,16 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "normal",
             type = "toggle",
             order = 7,
-            confirm = true,
+            confirm = function() return self.db.profile[groupType].frames.enhancedAbsorbs end,
             confirmText = L["UI will be reloaded to apply settings"],
             set = function(info,val)
                 self.db.profile[groupType].frames.enhancedAbsorbs = val
+
+                if not val then
+                    ReloadUI()
+                end
+
                 self:SafeRefresh(groupType)
-                ReloadUI()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.enhancedAbsorbs
@@ -2086,6 +2090,20 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.autoScaling
+            end
+        },
+        ["Show Resource Only For Healers"] = {
+            name = L["Show Resource Only For Healers"],
+            desc = L["Show Resource Only For Healers Desc"],
+            width = "normal",
+            type = "toggle",
+            order = 9,
+            set = function(info,val)
+                self.db.profile[groupType].frames.showResourceOnlyForHealers = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.showResourceOnlyForHealers
             end
         },
         ["additionalTracking"] = {
