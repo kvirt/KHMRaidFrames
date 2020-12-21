@@ -225,7 +225,7 @@ end
 function KHMRaidFrames:Offsets(anchor, frame, groupType)
     local displayPowerBar
 
-    if self.db.profile[groupType].frames.showResourceOnlyForHealers then
+    if self.db.profile[groupType].frames.showResourceOnlyForHealers and self.displayPowerBar then
         displayPowerBar = frame.unit and UnitGroupRolesAssigned(frame.unit) == "HEALER"
     else
         displayPowerBar = self.displayPowerBar

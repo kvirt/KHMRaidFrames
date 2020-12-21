@@ -698,7 +698,7 @@ end
 function KHMRaidFrames.UpdateResourceBar(frame, groupType)
     local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
 
-    if not showResourceOnlyForHealers then return end
+    if not showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then return end
 
     if not frame.unit then return end
 
@@ -708,6 +708,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType)
         frame.healthBar:ClearAllPoints()
         frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)
+
         frame.powerBar:Show()
 
         if KHMRaidFrames.displayBorder then
