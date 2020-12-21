@@ -333,7 +333,9 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
             end
 
             if db.showPercents then
-                health = health.." - "..math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit))).."%"
+                local percents = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
+                percents = (percents ~= math.huge and percents ~= -math.huge and percents) or 0
+                health = health.." - "..percents.."%"
             end
 
             statusText:SetText(health)
@@ -463,9 +465,6 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     end
 
     if _role and db[_role:lower()] ~= "" then
-        --caching role for future
-        roleIcon.role = _role:lower()
-
         roleIcon:SetTexture(db[_role])
         roleIcon:SetTexCoord(0, 1, 0, 1)
         roleIcon:SetVertexColor(unpack(db.colors[_role]))
@@ -699,16 +698,22 @@ end
 function KHMRaidFrames.UpdateResourceBar(frame, groupType)
     local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
 
-    if not showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then return end
+    if not showResourceOnlyForHealers then return end
 
     if not frame.unit then return end
 
     local role = UnitGroupRolesAssigned(frame.unit)
-    role = role:lower()
 
-    frame.__role = role
+    if role == "HEALER" then
+        frame.healthBar:ClearAllPoints()
+        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)
+        frame.powerBar:Show()
 
-    if role ~= "healer" and role ~= "none" then
+        if KHMRaidFrames.displayBorder then
+            frame.horizDivider:Show()
+        end
+    else
         frame.healthBar:ClearAllPoints()
         frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
@@ -717,15 +722,29 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType)
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Hide()
         end
-    else
-        local powerBarUsedHeight = KHMRaidFrames.powerBarHeight + KHMRaidFrames.CUF_AURA_BOTTOM_OFFSET
-        frame.healthBar:ClearAllPoints()
-        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
-        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + powerBarUsedHeight)
-        frame.powerBar:Show()
+    end
+end
 
-        if KHMRaidFrames.displayBorder then
-            frame.horizDivider:Show()
+function KHMRaidFrames.RevertResourceBar()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if KHMRaidFrames.displayPowerBar then
+            frame.healthBar:ClearAllPoints()
+            frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+            frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)
+            frame.powerBar:Show()
+
+            if KHMRaidFrames.displayBorder then
+                frame.horizDivider:Show()
+            end
+        else
+            frame.healthBar:ClearAllPoints()
+            frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+            frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
+            frame.powerBar:Hide()
+
+            if KHMRaidFrames.displayBorder then
+                frame.horizDivider:Hide()
+            end
         end
     end
 end
@@ -735,6 +754,16 @@ function KHMRaidFrames.UpdateResourceBars()
 
     for frame in KHMRaidFrames.IterateCompactFrames() do
         KHMRaidFrames.UpdateResourceBar(frame, groupType)
+
+        local db = KHMRaidFrames.db.profile[groupType]
+        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
+        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
+
+        if db.showBigDebuffs and db.smartAnchoring then
+            KHMRaidFrames:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
+        end
+
+        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
     end
 end
 --

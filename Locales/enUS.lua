@@ -159,4 +159,4 @@ L["Auto Scaling Desc"] = "Following elements are scaled by default: \n|cFFffd100
                         "Some addon provided elements are also scaled: \n|cFFffd100Raid Icon|r, \n|cFFffd100Leader Icon|r, \n|cFFffd100Name|r"
 L["Hide Element"] = true
 L["Show Resource Only For Healers"] = true
-L["Show Resource Only For Healers Desc"] = true
+L["Show Resource Only For Healers Desc"] = "Show Resource Only For Healers"

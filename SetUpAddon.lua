@@ -262,6 +262,7 @@ function KHMRaidFrames.SyncProfiles(profile)
                 KHMRaidFrames.RevertStatusIcon()
                 KHMRaidFrames.UpdateLeaderIcon()
                 KHMRaidFrames:UpdateRaidMark()
+                KHMRaidFrames.RevertResourceBar()
 
                 KHMRaidFrames:CustomizeOptions()
                 KHMRaidFrames:HookNameAndIcons()

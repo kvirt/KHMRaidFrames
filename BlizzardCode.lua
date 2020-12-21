@@ -480,6 +480,10 @@ function KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
     frame.roleIcon:SetPoint("TOPLEFT", 3, -2)
     frame.roleIcon:SetSize(12, 12)
 
+    if IsInGroup() then
+        frame.roleIcon:Show()
+    end
+
     KHMRaidFrames.CompactUnitFrame_UpdateRoleIconTexture(frame)
 end
 

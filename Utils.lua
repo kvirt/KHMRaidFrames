@@ -225,12 +225,10 @@ end
 function KHMRaidFrames:Offsets(anchor, frame, groupType)
     local displayPowerBar
 
-    if not self.displayPowerBar then
-        displayPowerBar = false
-    elseif self.db.profile[groupType].frames.showResourceOnlyForHealers and frame.__role and frame.__role ~= "none" then
-        displayPowerBar = frame.__role == "healer"
+    if self.db.profile[groupType].frames.showResourceOnlyForHealers then
+        displayPowerBar = frame.unit and UnitGroupRolesAssigned(frame.unit) == "HEALER"
     else
-        displayPowerBar = true
+        displayPowerBar = self.displayPowerBar
     end
 
     local powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET

@@ -155,5 +155,5 @@ L["Auto Scaling"] = "Автоматическое Масштабирование
 L["Auto Scaling Desc"] = "Стандартные фреймы по умолчанию масштабируют: \n|cFFffd100Баффы|r, \n|cFFffd100Дебаффы|r, \n|cFFffd100Иконка готовности|r, \n|cFFffd100Шрифт Здоровья(статусов)|r, \n|cFFffd100Иконка Статуса в Центре|r.\n\n"..
                         "Масштабируются в том числе и элементы аддона: \n|cFFffd100Рейдовая Иконка|r, \n|cFFffd100Иконка Лидера|r, \n|cFFffd100Имя|r"
 L["Hide Element"] = "Скрыть Элемент"
-L["Show Resource Only For Healers"] = "Показывать ресурс бар только для хилеров"
-L["Show Resource Only For Healers Desc"] = true
+L["Show Resource Only For Healers"] = "Показывать ресурс только для хилеров"
+L["Show Resource Only For Healers Desc"] = "Показывать ресурс только для хилеров"

@@ -767,6 +767,15 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.roleIcon.hide = val
+
+                    if not val then
+                        for frame in KHMRaidFrames.IterateCompactFrames() do
+                            if frame.roleIcon and IsInGroup() then
+                                frame.roleIcon:Show()
+                            end
+                        end
+                    end
+
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
@@ -1678,6 +1687,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 order = 1,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.enabled = val
+
+                    if not val then
+                        self.UpdateLeaderIcon()
+                    end
+
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
@@ -2100,6 +2114,11 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             order = 9,
             set = function(info,val)
                 self.db.profile[groupType].frames.showResourceOnlyForHealers = val
+
+                if not val then
+                    self.RevertResourceBar()
+                end
+
                 self:SafeRefresh(groupType)
             end,
             get = function(info)
