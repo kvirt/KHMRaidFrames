@@ -468,7 +468,7 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
         end
     end
 
-    if _role and db[_role:lower()] ~= "" then
+    if _role and db[_role:lower()] ~= "" and (_role == "tank" or _role == "healer" or _role == "damager") then
         roleIcon:SetTexture(db[_role])
         roleIcon:SetTexCoord(0, 1, 0, 1)
         roleIcon:SetVertexColor(unpack(db.colors[_role]))
@@ -769,6 +769,24 @@ function KHMRaidFrames.UpdateResourceBars()
         end
 
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
+    end
+end
+--
+
+
+-- FRAME ALPHA
+function KHMRaidFrames:CompactUnitFrame_UpdateInRange(frame)
+    if self.SkipFrame(frame) then return end
+
+    local groupType = IsInRaid() and "raid" or "party"
+    local alpha = self.db.profile[groupType].frames.alpha
+
+    local inRange, checkedRange = UnitInRange(frame.displayedUnit)
+
+    if checkedRange and not inRange then
+        frame:SetAlpha(alpha / 2)
+    else
+        frame:SetAlpha(alpha / 2)
     end
 end
 --
