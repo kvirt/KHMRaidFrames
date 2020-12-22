@@ -328,7 +328,7 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
         end
 
         if text then
-            statusText:SetText(health)
+            statusText:SetText(text)
         else
             local health = UnitHealth(frame.displayedUnit)
 
