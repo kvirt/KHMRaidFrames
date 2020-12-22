@@ -241,16 +241,14 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             ["Enable"] = {
                 name = L["Enable"],
                 desc = "",
-                width = "double",
+                width = "normal",
                 type = "toggle",
                 order = 1,
-                confirm = function() return self.db.profile[groupType].nameAndIcons.name.enabled end,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.enabled = val
 
                     if not val then
-                        ReloadUI()
+                        self.RevertName()
                     else
                         self:HookNameAndIcons()
                         self:SafeRefresh(groupType)
@@ -259,6 +257,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.name.enabled
                 end,
+            },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.name.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.name.hide
+                end
             },
             ["Font"] = {
                 name = L["Font"],
@@ -444,13 +457,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "double",
                 type = "toggle",
                 order = 1,
-                confirm = function() return self.db.profile[groupType].nameAndIcons.statusText.enabled end,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.enabled = val
 
                     if not val then
-                        ReloadUI()
+                        self.RevertStatusText()
                     else
                         self:HookNameAndIcons()
                         self:SafeRefresh(groupType)
@@ -611,7 +622,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
             },
             ["Abbreviate"] = {
                 name = L["Abbreviate"],
-                desc = "",
+                desc = L["Abbreviate Desc"],
                 width = "normal",
                 type = "toggle",
                 order = 11,
@@ -619,7 +630,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers = val
 
-                    self.RevertStatusText()
+                    self.RevertStatusTextFont()
 
                     self:SafeRefresh(groupType)
                 end,
@@ -638,7 +649,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.precision = val - 1
 
-                    self.RevertStatusText()
+                    self.RevertStatusTextFont()
 
                     self:SafeRefresh(groupType)
                 end,
@@ -654,7 +665,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.showPercents = val
 
-                    self.RevertStatusText()
+                    self.RevertStatusTextFont()
 
                     self:SafeRefresh(groupType)
                 end,
@@ -670,7 +681,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses = val
 
                     if not val then
-                        self.RevertStatusText()
+                        self.RevertStatusTextFont()
                     end
 
                     self:SafeRefresh(groupType)
@@ -733,13 +744,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "toggle",
                 order = 1,
-                confirm = function() return self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.roleIcon.enabled = val
 
                     if not val then
-                        ReloadUI()
+                        self.RevertRoleIcon()
                     else
                         self:HookNameAndIcons()
                         self:SafeRefresh(groupType)
@@ -748,6 +757,30 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.roleIcon.enabled
                 end,
+            },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.roleIcon.hide = val
+
+                    if not val then
+                        for frame in KHMRaidFrames.IterateCompactFrames() do
+                            if frame.roleIcon and IsInGroup() then
+                                frame.roleIcon:Show()
+                            end
+                        end
+                    end
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.roleIcon.hide
+                end
             },
             ["size"] = {
                 name = L["Size"],
@@ -822,7 +855,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.roleIcon.healer = val
 
                     if val == "" then
-                        self.RevertRoleIcon()
+                        self.RevertRoleIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -863,7 +896,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.roleIcon.damager = val
 
                     if val == "" then
-                        self.RevertRoleIcon()
+                        self.RevertRoleIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -904,7 +937,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.roleIcon.tank = val
 
                     if val == "" then
-                        self.RevertRoleIcon()
+                        self.RevertRoleIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -945,7 +978,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.roleIcon.vehicle = val
 
                     if val == "" then
-                        self.RevertRoleIcon()
+                        self.RevertRoleIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1017,13 +1050,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "toggle",
                 order = 1,
-                confirm = function() return self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled = val
 
                     if not val then
-                        ReloadUI()
+                        self.RevertReadyCheckIcon()
                     else
                         self:HookNameAndIcons()
                         self:SafeRefresh(groupType)
@@ -1032,6 +1063,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled
                 end,
+            },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide
+                end
             },
             ["size"] = {
                 name = L["Size"],
@@ -1106,7 +1152,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.ready = val
 
                     if val == "" then
-                        self.RevertReadyCheckIcon()
+                        self.RevertReadyCheckIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1147,7 +1193,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.notready = val
 
                     if val == "" then
-                        self.RevertReadyCheckIcon()
+                        self.RevertReadyCheckIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1188,7 +1234,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.waiting = val
 
                     if val == "" then
-                        self.RevertReadyCheckIcon()
+                        self.RevertReadyCheckIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1260,13 +1306,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "toggle",
                 order = 1,
-                confirm = function() return self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled = val
 
                     if not val then
-                        ReloadUI()
+                        self.RevertStatusIcon()
                     else
                         self:HookNameAndIcons()
                         self:SafeRefresh(groupType)
@@ -1275,6 +1319,21 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled
                 end,
+            },
+            ["Hide Element"] = {
+                name = L["Hide Element"],
+                desc = "",
+                width = "normal",
+                type = "toggle",
+                order = 1.5,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
+                set = function(info,val)
+                    self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide
+                end
             },
             ["size"] = {
                 name = L["Size"],
@@ -1349,7 +1408,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherGroup = val
 
                     if val == "" then
-                        self.RevertStatusIcon()
+                        self.RevertStatusIcoTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1390,7 +1449,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingResurrection = val
 
                     if val == "" then
-                        self.RevertStatusIcon()
+                        self.RevertStatusIcoTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1431,7 +1490,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonPending = val
 
                     if val == "" then
-                        self.RevertStatusIcon()
+                        self.RevertStatusIcoTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1472,7 +1531,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonAccepted = val
 
                     if val == "" then
-                        self.RevertStatusIcon()
+                        self.RevertStatusIcoTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1513,7 +1572,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonDeclined = val
 
                     if val == "" then
-                        self.RevertStatusIcon()
+                        self.RevertStatusIcoTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1554,7 +1613,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherPhase = val
 
                     if val == "" then
-                        self.RevertStatusIcon()
+                        self.RevertStatusIcoTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1628,6 +1687,12 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 order = 1,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.enabled = val
+
+                    if not val then
+                        self.UpdateLeaderIcon()
+                    end
+
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled
@@ -1974,10 +2039,10 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end
         },
         ["Skip1"] = {
-                type = "header",
-                name = "",
-                order = 4,
-            },
+            type = "header",
+            name = "",
+            order = 4,
+        },
         ["HideGroupTitles"] = {
             name = L["Hide Group Title"],
             desc = "",
@@ -2012,15 +2077,70 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "normal",
             type = "toggle",
             order = 7,
-            confirm = true,
+            confirm = function() return self.db.profile[groupType].frames.enhancedAbsorbs end,
             confirmText = L["UI will be reloaded to apply settings"],
             set = function(info,val)
                 self.db.profile[groupType].frames.enhancedAbsorbs = val
+
+                if not val then
+                    ReloadUI()
+                end
+
                 self:SafeRefresh(groupType)
-                ReloadUI()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.enhancedAbsorbs
+            end
+        },
+        ["Auto Scaling"] = {
+            name = L["Auto Scaling"],
+            desc = L["Auto Scaling Desc"],
+            width = "normal",
+            type = "toggle",
+            order = 8,
+            set = function(info,val)
+                self.db.profile[groupType].frames.autoScaling = val
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.autoScaling
+            end
+        },
+        ["Show Resource Only For Healers"] = {
+            name = L["Show Resource Only For Healers"],
+            desc = L["Show Resource Only For Healers Desc"],
+            width = "normal",
+            type = "toggle",
+            order = 9,
+            set = function(info,val)
+                self.db.profile[groupType].frames.showResourceOnlyForHealers = val
+
+                if not val then
+                    self.RevertResourceBar()
+                end
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.showResourceOnlyForHealers
+            end
+        },
+        ["Transparency"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 10,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alpha = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alpha
             end
         },
         ["additionalTracking"] = {
@@ -2030,7 +2150,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "full",
             type = "input",
             multiline = 10,
-            order = 10,
+            order = 11,
             set = function(info,val)
                 self.db.profile[groupType].frames.tracking = self.SanitizeStringsByUnit(val)
                 self.db.profile[groupType].frames.trackingStr = val
@@ -2044,14 +2164,14 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["Skip2"] = {
             type = "header",
             name = "",
-            order = 11,
+            order = 12,
         },
         ["Copy"] = {
             name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 12,
+            order = 13,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(self.db.profile[groupType].frames, self.db.profile[self.ReverseGroupType(groupType)].frames)
@@ -2063,7 +2183,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "double",
             type = "execute",
             confirm = true,
-            order = 13,
+            order = 14,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "frames")
             end,

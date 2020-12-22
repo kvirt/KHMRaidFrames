@@ -2,66 +2,10 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 
 local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
-KHMRaidFrames.reloadConfirmation = "KHMRaidFrames_PROFILE_RELOAD"
-StaticPopupDialogs[KHMRaidFrames.reloadConfirmation] = {
-    text = "Reload needed to apply settings",
-    button1 = YES,
-    button2 = NO,
-    OnAccept = function(self)
-        ReloadUI()
-    end,
-    OnCancel = function(self) end,
-    timeout = 0,
-    hideOnEscape = 1,
-}
 
-
+-- SETUP
 function KHMRaidFrames:OnInitialize()
      self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")
-end
-
-function KHMRaidFrames:SetInternalVariables()
-    self.componentScale = 1
-
-    self:GetRaidProfileSettings()
-
-    self.isOpen = false
-
-    self.maxFrames = 10
-    self.virtual = {
-        shown = false,
-        frames = {},
-        groupType = "raid",
-    }
-    self.aurasCache = {}
-    self.processedFrames = {}
-    self.glowingFrames = {
-        auraGlow = {
-            buffFrames = {},
-            debuffFrames = {},
-        },
-        frameGlow = {
-            buffFrames = {},
-            debuffFrames = {},
-        },
-    }
-
-    self.curProfile = nil
-
-    if self.db.profile.Masque then
-        local Masque = LibStub("Masque", true)
-
-        if Masque then
-            self.Masque = {}
-            self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
-            self.Masque.debuffFrames = Masque:Group("KHMRaidFrames", "Debuff Auras")
-        end
-    end
-
-    self:GetVirtualFrames()
-
-    self.textures, self.sortedTextures = self.GetTextures()
-    self.fonts, self.sortedFonts = self.GetFons()
 end
 
 function KHMRaidFrames:Setup()
@@ -104,116 +48,100 @@ function KHMRaidFrames:Setup()
     self:SetInternalVariables()
 end
 
+function KHMRaidFrames:SetInternalVariables()
+    self.componentScale = 1
+
+    self:GetRaidProfileSettings()
+
+    self.isOpen = false
+
+    self.maxFrames = 10
+    self.virtual = {
+        shown = false,
+        frames = {},
+        groupType = "raid",
+    }
+    self.aurasCache = {}
+    self.processedFrames = {}
+    self.glowingFrames = {
+        auraGlow = {
+            buffFrames = {},
+            debuffFrames = {},
+        },
+        frameGlow = {
+            buffFrames = {},
+            debuffFrames = {},
+        },
+    }
+
+    if self.db.profile.Masque then
+        local Masque = LibStub("Masque", true)
+
+        if Masque then
+            self.Masque = {}
+            self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
+            self.Masque.debuffFrames = Masque:Group("KHMRaidFrames", "Debuff Auras")
+        end
+    end
+
+    self:GetVirtualFrames()
+
+    self.textures, self.sortedTextures = self.GetTextures()
+    self.fonts, self.sortedFonts = self.GetFons()
+end
+--
+
+-- HOOKS
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
-     self.db.RegisterCallback(
-         self, "OnProfileChanged",
-         function(...) self:SafeRefresh()
-     end)
-     self.db.RegisterCallback(
-         self, "OnProfileCopied",
-         function(...) self:SafeRefresh()
-     end)
-     self.db.RegisterCallback(
-         self, "OnProfileReset",
-         function(...) self:SafeRefresh()
-     end)
+    self.db.RegisterCallback(self, "OnProfileChanged", function(...) self:SafeRefresh() end)
+    self.db.RegisterCallback(self, "OnProfileCopied", function(...) self:SafeRefresh() end)
+    self.db.RegisterCallback(self, "OnProfileReset", function(...) self:SafeRefresh() end)
 
-    local deferrFrame = CreateFrame("Frame")
-    deferrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-    deferrFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-    deferrFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
-    deferrFrame:RegisterEvent("RAID_TARGET_UPDATE")  -- raid target icon
-    deferrFrame:SetScript(
-        "OnEvent",
-        function(frame, event)
-            local groupType = IsInRaid() and "raid" or "party"
+    self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
+    self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
+    self:RegisterEvent("RAID_TARGET_UPDATE", "OnEvent")
 
-            if event == "PLAYER_REGEN_ENABLED" then
-                self:GetRaidProfileSettings()
-                self:SafeRefresh()
-
-                if self.deffered then
-                    InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-                    InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-
-                    self.deffered = false
-                end
-            elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
-                self:HideAll()
-                self.deffered = true
-            elseif event == "RAID_TARGET_UPDATE" then
-                self:UpdateRaidMark(groupType)
-                self:CustomizeOptions()
-            elseif event == "PLAYER_ROLES_ASSIGNED" then
-                self:UpdateRaidMark(groupType)
-                self:CustomizeOptions()
-                self.UpdateLeaderIcon()
-            end
-        end
-    )
-
-    self:SecureHook(
-        "CompactRaidFrameContainer_LayoutFrames",
-        function()
-            local groupType = IsInRaid() and "raid" or "party"
-            self:CUFDefaults(groupType)
-        end
-    )
-
-    if self.db.profile.raid.frames.enhancedAbsorbs or self.db.profile.party.frames.enhancedAbsorbs then
-        self:SecureHook(
-            "CompactUnitFrame_UpdateHealPrediction",
-            function(frame)
-                if not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
-
-                self:SetUpAbsorb(frame)
-            end
-        )
-    end
-
-     self:SecureHook(
-        self.dialog,
-        "FeedGroup",
-        function() self:CustomizeOptions() end
-    )
-
-    self:SecureHook(
-        "CompactUnitFrame_UpdateAuras",
-        function(frame)
-            if self.SkipFrame(frame) then return end
-
-            self:UpdateAuras(frame)
-        end
-    )
-
+    self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
+    self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
+    self:SecureHook("CompactUnitFrame_UpdateAuras")
     self:HookNameAndIcons()
 
-    self:SecureHook(
-        "CompactUnitFrameProfiles_ApplyProfile",
-        function(profile)
-            self:GetRaidProfileSettings()
-            self:SafeRefresh()
-        end
-    )
+    -- custom interface display
+    self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
-    self:SecureHook(
-        "SetCVar",
-        function(cvar, value)
-            local groupType = IsInRaid() and "raid" or "party"
-
-            if cvar == "useCompactPartyFrames" then
-                self.useCompactPartyFrames = value
-
-                if self.db then
-                    self:SafeRefresh(groupType)
-                end
-            end
-        end
-    )
+    self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
 
     self:SafeRefresh()
+end
+
+function KHMRaidFrames:OnEvent(event, ...)
+    local groupType = IsInRaid() and "raid" or "party"
+
+    if event == "PLAYER_REGEN_ENABLED" then
+        if self.deffered then
+            self:GetRaidProfileSettings()
+            self:SafeRefresh()
+
+            InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+            InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+
+            self.deffered = false
+        end
+    elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
+        self:HideAll()
+        self.deffered = true
+    elseif event == "RAID_TARGET_UPDATE" then
+        self:UpdateRaidMark(groupType)
+        self:CustomizeOptions()
+    elseif event == "PLAYER_ROLES_ASSIGNED" then
+        self:UpdateRaidMark(groupType)
+        self:CustomizeOptions()
+        self.UpdateLeaderIcon()
+        self.UpdateResourceBars()
+    end
 end
 
 function KHMRaidFrames:HookNameAndIcons()
@@ -275,30 +203,26 @@ function KHMRaidFrames:HookNameAndIcons()
         )
     end
 end
+--
 
-function KHMRaidFrames:RefreshConfig(groupType)
-    if groupType ~= (IsInRaid() and "raid" or "party") then return end
-
-    local isInCombatLockDown = InCombatLockdown()
-
-    self:SetUpVirtual("buffFrames", groupType, self.componentScale)
-    self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
-    self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
-
-    for group in self.IterateCompactGroups(groupType) do
-        self:DefaultGroupSetUp(group, groupType, isInCombatLockDown)
+-- PROFILES
+function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
+    if self:GetRaidProfileSettings() then
+        self.deffered = true
+        return
     end
 
-    for frame in self.IterateCompactFrames(groupType) do
-        self:DefaultFrameSetUp(frame, groupType, isInCombatLockDown)
-        self:SetUpAbsorb(frame)
+    self.processedFrames = {}
+
+    if self.db:GetCurrentProfile() ~= profile then
+        self.SyncProfiles(profile)
     end
 
-    self:SetUpSoloFrame()
+    self:SafeRefresh()
 end
 
 function KHMRaidFrames:GetRaidProfileSettings(profile)
-    if InCombatLockdown() then return end
+    if InCombatLockdown() then return true end
 
     profile = profile or GetActiveRaidProfile()
     local settings = GetRaidProfileFlattenedOptions(profile)
@@ -321,19 +245,6 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
-
-    if self.curProfile == nil then
-        self.curProfile = profile
-
-        if profile ~= self.db:GetCurrentProfile() then
-            self.SyncProfiles(profile)
-        end
-    elseif self.curProfile ~= profile and profile then
-        self.curProfile = profile
-        self.processedFrames = {}
-
-        self.SyncProfiles(profile)
-    end
 end
 
 function KHMRaidFrames.SyncProfiles(profile)
@@ -344,18 +255,24 @@ function KHMRaidFrames.SyncProfiles(profile)
             if profile == v then
                 KHMRaidFrames.db:SetProfile(profile)
 
-                KHMRaidFrames.RevertNameColors()
+                KHMRaidFrames.RevertName()
                 KHMRaidFrames.RevertStatusText()
                 KHMRaidFrames.RevertRoleIcon()
                 KHMRaidFrames.RevertReadyCheckIcon()
                 KHMRaidFrames.RevertStatusIcon()
+                KHMRaidFrames.UpdateLeaderIcon()
+                KHMRaidFrames:UpdateRaidMark()
+                KHMRaidFrames.RevertResourceBar()
 
                 KHMRaidFrames:CustomizeOptions()
+                KHMRaidFrames:HookNameAndIcons()
             end
         end
     end
 end
+--
 
+-- CONFIG PANEL CLOSE/OPEN
 function KHMRaidFrames:OnOptionShow()
     if InCombatLockdown() then
         self:HideAll()
@@ -393,3 +310,256 @@ end
 function KHMRaidFrames:HideAll()
     _G["InterfaceOptionsFrame"]:Hide()
 end
+--
+
+-- DEFAULTS RELATED FUNCTIONS
+function KHMRaidFrames:Defaults()
+    local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
+
+    local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
+    KHMRaidFrames.font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT"
+
+    local commons = {
+            frames = {
+                hideGroupTitles = false,
+                texture = "Blizzard Raid Bar",
+                clickThrough = false,
+                enhancedAbsorbs = false,
+                showPartySolo = false,
+                tracking = {},
+                trackingStr = "",
+                autoScaling = true,
+                showResourceOnlyForHealers = false,
+                alpha = 1.0,
+            },
+            dispelDebuffFrames = {
+                num = 3,
+                numInRow = 3,
+                rowsGrowDirection = "TOP",
+                anchorPoint = "TOPRIGHT",
+                growDirection = "LEFT",
+                size = 12,
+                xOffset = 0,
+                yOffset = 0,
+                exclude = {},
+                excludeStr = "",
+                alpha = 1.0,
+            },
+            debuffFrames = {
+                num = 3,
+                numInRow = 3,
+                rowsGrowDirection = "TOP",
+                anchorPoint = "BOTTOMLEFT",
+                growDirection = "RIGHT",
+                size = 11,
+                xOffset = 0,
+                yOffset = 0,
+                exclude = {},
+                excludeStr = "",
+                bigDebuffSize = 11 + 9,
+                showBigDebuffs = true,
+                smartAnchoring = true,
+                alpha = 1.0,
+            },
+            buffFrames = {
+                num = 3,
+                numInRow = 3,
+                rowsGrowDirection = "TOP",
+                anchorPoint = "BOTTOMRIGHT",
+                growDirection = "LEFT",
+                size = 11,
+                xOffset = 0,
+                yOffset = 0,
+                exclude = {},
+                excludeStr = "",
+                alpha = 1.0,
+            },
+            raidIcon = {
+                enabled = false,
+                size = 15,
+                xOffset = 0,
+                yOffset = 0,
+                anchorPoint = "TOP",
+                alpha = 1.0,
+            },
+            nameAndIcons = {
+                name = {
+                    font = KHMRaidFrames.font,
+                    size = 11,
+                    flag = "None",
+                    hJustify = "LEFT",
+                    xOffset = 0,
+                    yOffset = -1,
+                    showServer = true,
+                    classColoredNames = false,
+                    enabled = false,
+                    hide = false,
+                },
+                statusText = {
+                    font = KHMRaidFrames.font,
+                    size = 12,
+                    flag = "None",
+                    hJustify = "CENTER",
+                    xOffset = 0,
+                    yOffset = 0,
+                    enabled = false,
+                    abbreviateNumbers = false,
+                    precision = 0,
+                    notShowStatuses = false,
+                    showPercents = false,
+                    color = {1, 1, 1, 1},
+                    classColoredText = false,
+                },
+                roleIcon = {
+                    size = 12,
+                    xOffset = 0,
+                    yOffset = 0,
+                    healer = "",
+                    damager = "",
+                    tank = "",
+                    vehicle = "",
+                    toggle = false,
+                    enabled = false,
+                    colors = {
+                        healer = {1, 1, 1, 1},
+                        damager = {1, 1, 1, 1},
+                        tank = {1, 1, 1, 1},
+                        vehicle = {1, 1, 1, 1},
+                    },
+                    hide = false,
+                },
+                readyCheckIcon  = {
+                    size = 15 ,
+                    xOffset = 0,
+                    yOffset = 0,
+                    ready = "",
+                    notready = "",
+                    waiting = "",
+                    toggle = false,
+                    enabled = false,
+                    colors = {
+                        ready = {1, 1, 1, 1},
+                        notready = {1, 1, 1, 1},
+                        waiting = {1, 1, 1, 1},
+                    },
+                    hide = false,
+                },
+                centerStatusIcon = {
+                    size = 22,
+                    xOffset = 0,
+                    yOffset = 0,
+                    inOtherGroup = "",
+                    hasIncomingResurrection = "",
+                    hasIncomingSummonPending = "",
+                    hasIncomingSummonAccepted = "",
+                    hasIncomingSummonDeclined = "",
+                    inOtherPhase = "",
+                    toggle = false,
+                    enabled = false,
+                    colors = {
+                        inOtherGroup = {1, 1, 1, 1},
+                        hasIncomingResurrection = {1, 1, 1, 1},
+                        hasIncomingSummonPending = {1, 1, 1, 1},
+                        hasIncomingSummonAccepted = {1, 1, 1, 1},
+                        hasIncomingSummonDeclined = {1, 1, 1, 1},
+                        inOtherPhase = {1, 1, 1, 1},
+                    },
+                    hide = false,
+                },
+                leaderIcon = {
+                    size = 10 ,
+                    xOffset = 0,
+                    yOffset = 0,
+                    anchorPoint = "TOPRIGHT",
+                    icon = "",
+                    enabled = false,
+                    alpha = 1.0,
+                    colors = {
+                        icon = {1, 1, 1, 1},
+                    },
+                },
+            },
+    }
+    defaults_settings.profile.party = commons
+    defaults_settings.profile.raid = commons
+
+    defaults_settings.profile.glows = {
+        auraGlow = {
+            buffFrames = {
+                type = "pixel",
+                options = self.GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",
+                enabled = false,
+                useDefaultsColors = true,
+            },
+            debuffFrames = {
+                type = "pixel",
+                options = self.GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",
+                enabled = false,
+                useDefaultsColors = true,
+            },
+            defaultColors = self.defuffsColors,
+        },
+        frameGlow = {
+            buffFrames = {
+                type = "pixel",
+                options = self.GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",
+                enabled = false,
+                useDefaultsColors = true,
+            },
+            debuffFrames = {
+                type = "pixel",
+                options = self.GetGlowOptions(),
+                tracking = {},
+                trackingStr = "",
+                enabled = false,
+                useDefaultsColors = true,
+            },
+            defaultColors = self.defuffsColors,
+        },
+        glowBlockList = {
+            tracking = {},
+            trackingStr = "",
+        },
+    }
+
+    defaults_settings.profile.Masque = false
+
+    return defaults_settings
+end
+
+function KHMRaidFrames:RestoreDefaults(groupType, frameType, subType)
+    if InCombatLockdown() then
+        print("Can not refresh settings while in combat")
+        return
+    end
+
+    local defaults_settings = subType and self:Defaults()["profile"][groupType][frameType][subType]
+
+    for k, v in pairs(defaults_settings) do
+        self.db.profile[groupType][frameType][k] = v
+    end
+
+    self:SafeRefresh(groupType)
+end
+
+function KHMRaidFrames:CopySettings(dbFrom, dbTo)
+    if InCombatLockdown() then
+        print("Can not refresh settings while in combat")
+        return
+    end
+
+    for k, v in pairs(dbFrom) do
+        if dbTo[k] ~= nil then
+            dbTo[k] = v
+        end
+    end
+
+    self:SafeRefresh(groupType)
+end
+--

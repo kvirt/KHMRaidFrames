@@ -141,6 +141,9 @@ L["Profile: |cFFC80000<text>|r"] = true
 L["Abbreviate Large Numbers"] = true
 L["Abbreviate Numbers"] = true
 L["Abbreviate"] = true
+L["Abbreviate Desc"] = "100 -> 100"..
+                        "\n1000 -> 1K"..
+                        "\n1000000 -> 1M"
 L["buffsAndDebuffs"] = "Buffs and Debuffs"
 L["Don\'t Show Status Text"] = true
 L["Don\'t Show Status Text Desc"] = ""
@@ -151,3 +154,9 @@ L["Precision"] = true
 L["Show Percents"] = true
 L["Formatting"] = true
 L["Class Colored Text"] = true
+L["Auto Scaling"] = true
+L["Auto Scaling Desc"] = "Following elements are scaled by default: \n|cFFffd100Buffs|r, \n|cFFffd100Debuffs|r, \n|cFFffd100ReadyCheck Icon|r, \n|cFFffd100Status Text|r, \n|cFFffd100Center Status Icon|r.\n\n"..
+                        "Some addon provided elements are also scaled: \n|cFFffd100Raid Icon|r, \n|cFFffd100Leader Icon|r, \n|cFFffd100Name|r"
+L["Hide Element"] = true
+L["Show Resource Only For Healers"] = true
+L["Show Resource Only For Healers Desc"] = "\"Display Power Bars\" in raid profiles must be enabled"

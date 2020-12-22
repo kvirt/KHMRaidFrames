@@ -463,6 +463,6 @@ function KHMRaidFrames:RestartOptionsGlows(frameType, glowType)
         end
 
         local color = db.useDefaultsColors and color or db.options[db.type].color
-        self:StartGlow(frame, db, color, frameType, glowType)
+        self.StartGlow(frame, db, color, frameType, glowType)
     end
 end
