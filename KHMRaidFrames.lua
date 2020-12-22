@@ -124,6 +124,10 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
     frame.healthBar:SetStatusBarTexture(texture, "BORDER")
 
+    frame.healthBar:SetAlpha(db.frames.alpha)
+    frame.background:SetAlpha(db.frames.alpha)
+    frame.powerBar:SetAlpha(db.frames.alpha)
+
     return deferred
 end
 --

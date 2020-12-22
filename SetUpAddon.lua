@@ -330,6 +330,7 @@ function KHMRaidFrames:Defaults()
                 trackingStr = "",
                 autoScaling = true,
                 showResourceOnlyForHealers = false,
+                alpha = 1.0,
             },
             dispelDebuffFrames = {
                 num = 3,

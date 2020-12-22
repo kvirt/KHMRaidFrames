@@ -2125,6 +2125,24 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return self.db.profile[groupType].frames.showResourceOnlyForHealers
             end
         },
+        ["Transparency"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 10,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alpha = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alpha
+            end
+        },
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
             desc = L["Track Auras that are not shown by default by Blizzard"],
@@ -2132,7 +2150,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "full",
             type = "input",
             multiline = 10,
-            order = 10,
+            order = 11,
             set = function(info,val)
                 self.db.profile[groupType].frames.tracking = self.SanitizeStringsByUnit(val)
                 self.db.profile[groupType].frames.trackingStr = val
@@ -2146,14 +2164,14 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["Skip2"] = {
             type = "header",
             name = "",
-            order = 11,
+            order = 12,
         },
         ["Copy"] = {
             name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 12,
+            order = 13,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(self.db.profile[groupType].frames, self.db.profile[self.ReverseGroupType(groupType)].frames)
@@ -2165,7 +2183,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "double",
             type = "execute",
             confirm = true,
-            order = 13,
+            order = 14,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "frames")
             end,
