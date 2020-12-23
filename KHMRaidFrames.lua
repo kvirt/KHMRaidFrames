@@ -39,22 +39,12 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
     local isInCombatLockDown = InCombatLockdown()
 
     for group in self.IterateCompactGroups(groupType) do
-        if self.processedFrames[group] == nil then
-            deferred = self:LayoutGroup(group, groupType)
-
-            if deferred == false then
-                self.processedFrames[group] = true
-            end
-        end
+        self.processedFrames[group] = self:LayoutGroup(group, groupType)
     end
 
     for frame in self.IterateCompactFrames(groupType) do
-        if self.processedFrames[frame] == nil then
-            deferred = self:LayoutFrame(frame, groupType, isInCombatLockDown)
-
-            if deferred == false then
-                self.processedFrames[frame] = true
-            end
+        if self.processedFrames[frame] ~= true then
+            self.processedFrames[frame and frame:GetName()] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
         end
     end
 
@@ -82,7 +72,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         deferred = true
     end
 
-    self.UpdateResourceBar(frame, groupType)
+    self.UpdateResourceBar(frame, groupType, true)
 
     self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
     self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
@@ -457,21 +447,21 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     local _role
 
     if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
-        _role = "vehicle"
+        _role = "VEHICLE"
     elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
         local role = select(10, GetRaidRosterInfo(raidID))
-        _role = role:lower()
+        _role = role
     else
         local role = UnitGroupRolesAssigned(frame.unit)
         if frame.optionTable.displayRoleIcon and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
-            _role = role:lower()
+            _role = role
         end
     end
 
-    if _role and db[_role:lower()] ~= "" and (_role == "tank" or _role == "healer" or _role == "damager") then
-        roleIcon:SetTexture(db[_role])
+    if _role and db[_role:lower()] ~= "" and (_role == "TANK" or _role == "HEALER" or _role == "DAMAGER") then
+        roleIcon:SetTexture(db[_role:lower()])
         roleIcon:SetTexCoord(0, 1, 0, 1)
-        roleIcon:SetVertexColor(unpack(db.colors[_role]))
+        roleIcon:SetVertexColor(unpack(db.colors[_role:lower()]))
         roleIcon:Show()
     end
 end
@@ -699,7 +689,7 @@ end
 --
 
 --RESOURСE BAR
-function KHMRaidFrames.UpdateResourceBar(frame, groupType)
+function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
 
     if not showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then return end
@@ -707,6 +697,11 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType)
     if not frame.unit then return end
 
     local role = UnitGroupRolesAssigned(frame.unit)
+
+    local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
+
+    if role == prevRole then return end
+    KHMRaidFrames.rolesCache[frame:GetName()] = role
 
     if role == "HEALER" then
         frame.healthBar:ClearAllPoints()
@@ -727,6 +722,18 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType)
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Hide()
         end
+    end
+
+    if not refresh then
+        local db = KHMRaidFrames.db.profile[groupType]
+        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
+        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
+
+        if db.showBigDebuffs and db.smartAnchoring then
+            KHMRaidFrames:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
+        end
+
+        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
     end
 end
 
@@ -752,6 +759,8 @@ function KHMRaidFrames.RevertResourceBar()
             end
         end
     end
+
+    KHMRaidFrames.rolesCache = {}
 end
 
 function KHMRaidFrames.UpdateResourceBars()
@@ -759,34 +768,6 @@ function KHMRaidFrames.UpdateResourceBars()
 
     for frame in KHMRaidFrames.IterateCompactFrames() do
         KHMRaidFrames.UpdateResourceBar(frame, groupType)
-
-        local db = KHMRaidFrames.db.profile[groupType]
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
-
-        if db.showBigDebuffs and db.smartAnchoring then
-            KHMRaidFrames:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
-        end
-
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
-    end
-end
---
-
-
--- FRAME ALPHA
-function KHMRaidFrames:CompactUnitFrame_UpdateInRange(frame)
-    if self.SkipFrame(frame) then return end
-
-    local groupType = IsInRaid() and "raid" or "party"
-    local alpha = self.db.profile[groupType].frames.alpha
-
-    local inRange, checkedRange = UnitInRange(frame.displayedUnit)
-
-    if checkedRange and not inRange then
-        frame:SetAlpha(alpha / 2)
-    else
-        frame:SetAlpha(alpha / 2)
     end
 end
 --

@@ -74,6 +74,9 @@ function KHMRaidFrames:SetInternalVariables()
         },
     }
 
+    self.rolesCache = {}
+    self.iconRolesCache = {}
+
     if self.db.profile.Masque then
         local Masque = LibStub("Masque", true)
 
@@ -107,7 +110,6 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
-    --self:SecureHook("CompactUnitFrame_UpdateInRange")
 
     self:HookNameAndIcons()
 
