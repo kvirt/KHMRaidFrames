@@ -236,6 +236,8 @@ function KHMRaidFrames:SetUpNameInternal(frame, groupType)
         return
     end
 
+    if not frame.unit then return end
+
     local name = frame.name
 
     if not ShouldShowName(frame) or db.hide then
@@ -744,7 +746,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
         end
     end
 
-    if refresh then
+    if not refresh then
         local db = KHMRaidFrames.db.profile[groupType]
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")

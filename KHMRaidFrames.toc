@@ -1,7 +1,7 @@
 ## Interface: 90002
 ## Title: KHM Raid Frames
 ## Notes: Extended Standart Raid\Party Frames
-## Version: 1.2.41
+## Version: 1.2.42
 ## Author: kvirtx
 ## SavedVariables: KHMRaidFramesDB
 ## SavedVariablesPerCharacter: KHMRaidFrames_SyncProfiles
