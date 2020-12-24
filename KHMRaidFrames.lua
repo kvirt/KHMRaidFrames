@@ -746,7 +746,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
         end
     end
 
-    if not refresh then
+    if refresh then
         local db = KHMRaidFrames.db.profile[groupType]
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
