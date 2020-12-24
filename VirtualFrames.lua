@@ -39,7 +39,7 @@ end
 function KHMRaidFrames:ShowVirtual()
     local frame
 
-    for _frame in self:IterateCompactFrames() do
+    for _frame in self.IterateCompactFrames() do
         if _frame.displayedUnit and UnitIsPlayer(_frame.displayedUnit) then
             frame = _frame
             break

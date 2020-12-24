@@ -2112,7 +2112,11 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "normal",
             type = "toggle",
             order = 9,
+            confirm = function() return not self.displayPowerBar end,
+            confirmText = L["Show Resource Only For Healers Desc"],
             set = function(info,val)
+                if val and not self.displayPowerBar then val = false end
+
                 self.db.profile[groupType].frames.showResourceOnlyForHealers = val
 
                 if not val then

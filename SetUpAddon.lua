@@ -77,6 +77,12 @@ function KHMRaidFrames:SetInternalVariables()
     self.rolesCache = {}
     self.iconRolesCache = {}
 
+    -- throttling refreshes
+    self.refreshingSettings = false
+    self.reloadingSettings = false
+    self.profileThrottleSecs = 0.5
+    self.refreshThrottleSecs = 0.1
+
     if self.db.profile.Masque then
         local Masque = LibStub("Masque", true)
 
@@ -106,6 +112,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
     self:RegisterEvent("RAID_TARGET_UPDATE", "OnEvent")
+    self:RegisterEvent("PLAYER_TALENT_UPDATE", "OnEvent")
 
     self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
@@ -144,6 +151,8 @@ function KHMRaidFrames:OnEvent(event, ...)
         self:UpdateRaidMark(groupType)
         self:CustomizeOptions()
         self.UpdateLeaderIcon()
+        self.UpdateResourceBars()
+    elseif event == "PLAYER_TALENT_UPDATE" and not IsInGroup() then
         self.UpdateResourceBars()
     end
 end
@@ -222,7 +231,18 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
         self.SyncProfiles(profile)
     end
 
-    self:SafeRefresh()
+    if not self.reloadingSettings then
+        self.reloadingSettings = true
+        C_Timer.After(self.profileThrottleSecs, function()
+            self.ReloadSetting()
+        end)
+    end
+end
+
+function KHMRaidFrames.ReloadSetting()
+    KHMRaidFrames.RevertResourceBar()
+    KHMRaidFrames:SafeRefresh()
+    KHMRaidFrames.reloadingSettings = false
 end
 
 function KHMRaidFrames:GetRaidProfileSettings(profile)
@@ -259,6 +279,11 @@ function KHMRaidFrames.SyncProfiles(profile)
             if profile == v then
                 KHMRaidFrames.db:SetProfile(profile)
 
+                if not KHMRaidFrames.displayPowerBar then
+                    KHMRaidFrames.db.profile.raid.frames.showResourceOnlyForHealers = false
+                    KHMRaidFrames.db.profile.party.frames.showResourceOnlyForHealers = false
+                end
+
                 KHMRaidFrames.RevertName()
                 KHMRaidFrames.RevertStatusText()
                 KHMRaidFrames.RevertRoleIcon()
@@ -266,7 +291,6 @@ function KHMRaidFrames.SyncProfiles(profile)
                 KHMRaidFrames.RevertStatusIcon()
                 KHMRaidFrames.UpdateLeaderIcon()
                 KHMRaidFrames:UpdateRaidMark()
-                KHMRaidFrames.RevertResourceBar()
 
                 KHMRaidFrames:CustomizeOptions()
                 KHMRaidFrames:HookNameAndIcons()

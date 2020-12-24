@@ -434,16 +434,28 @@ function KHMRaidFrames.ColorByClass(unit)
 end
 
 function KHMRaidFrames:SafeRefresh(groupType)
+    if not self.refreshingSettings then
+        self.refreshingSettings = true
+        C_Timer.After(self.refreshThrottleSecs, function()
+            self:SafeRefreshInternal(groupType)
+        end)
+    end
+end
+
+function KHMRaidFrames:SafeRefreshInternal(groupType)
     groupType = groupType or (IsInRaid() and "raid" or "party")
 
     if InCombatLockdown() then
         self:Print("Can not refresh settings while in combat")
         self:HideAll()
         self.deffered = true
+        self.refreshingSettings = false
         return
     else
         self:RefreshConfig(groupType)
     end
+
+    self.refreshingSettings = false
 end
 
 function KHMRaidFrames.ReverseGroupType(groupType)

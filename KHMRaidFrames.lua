@@ -34,7 +34,10 @@ local UnitHealthMax = UnitHealthMax
 
 -- MAIN FUNCTIONS FOR LAYOUT
 function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
-    local deferred
+    if self.reloadingSettings then
+        return
+    end
+
     local groupType = IsInRaid() and "raid" or "party"
     local isInCombatLockDown = InCombatLockdown()
 
@@ -714,7 +717,7 @@ end
 function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
 
-    if not showResourceOnlyForHealers then return end
+    if not showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then return end
 
     if not frame.unit then return end
 
@@ -722,7 +725,12 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
 
     local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
-    if role == prevRole or role == "NONE" then return end
+    if role == "NONE" and not IsInGroup() then
+        role = select(5, GetSpecializationInfo(GetSpecialization()))
+    elseif role == prevRole or role == "NONE" then
+        return
+    end
+
     KHMRaidFrames.rolesCache[frame:GetName()] = role
 
     if role == "HEALER" then
