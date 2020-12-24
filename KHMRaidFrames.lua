@@ -202,8 +202,6 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
-    if not frame.unit then return end
-
     local name = frame.name
 
     local flags = db.flag ~= "None" and db.flag or ""
