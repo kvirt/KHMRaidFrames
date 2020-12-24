@@ -243,7 +243,7 @@ function KHMRaidFrames:SetUpNameInternal(frame, groupType)
 
     local name = frame.name
 
-    if not ShouldShowName(frame) or db.hide then
+    if db.hide then
         name:Hide()
         return
     end
@@ -300,19 +300,12 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     statusText:ClearAllPoints()
 
-    local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType)
-    xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
+    local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
+    local xOffset = xOffset + db.xOffset
+    local yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
 
-    statusText:SetPoint(
-        "BOTTOMLEFT",
-        frame,
-        "BOTTOMLEFT",
-        xOffset,
-        yOffset
-    )
-
-    statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", xOffset, yOffset)
+    statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
+    statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
     statusText:SetJustifyH(db.hJustify)
 
     self.SetUpStatusTextInternal(frame, groupType)
@@ -758,11 +751,6 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
         local db = KHMRaidFrames.db.profile[groupType]
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
-
-        if db.showBigDebuffs and db.smartAnchoring then
-            KHMRaidFrames:SmartAnchoring(frame, frame.debuffFrames, db.debuffFrames)
-        end
-
         KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
     end
 end

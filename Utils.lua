@@ -222,16 +222,21 @@ function KHMRaidFrames:RefreshConfig(groupType)
     self:SetUpSoloFrame()
 end
 
-function KHMRaidFrames:Offsets(anchor, frame, groupType)
-    local displayPowerBar
+function KHMRaidFrames:Offsets(anchor, frame, groupType, force)
+    local displayPowerBar, powerBarUsedHeight
 
-    if self.db.profile[groupType].frames.showResourceOnlyForHealers and self.displayPowerBar then
-        displayPowerBar = frame.unit and UnitGroupRolesAssigned(frame.unit) == "HEALER"
+    if not force then
+        if self.db.profile[groupType].frames.showResourceOnlyForHealers and self.displayPowerBar then
+            displayPowerBar = frame.unit and UnitGroupRolesAssigned(frame.unit) == "HEALER"
+        else
+            displayPowerBar = self.displayPowerBar
+        end
+
+        powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     else
-        displayPowerBar = self.displayPowerBar
+        powerBarUsedHeight = (self.displayPowerBar and self.powerBarHeigh or 0) + self.CUF_AURA_BOTTOM_OFFSET
     end
 
-    local powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     local xOffset, yOffset = 0, 0
 
     if anchor == "LEFT" then

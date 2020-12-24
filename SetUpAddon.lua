@@ -80,7 +80,7 @@ function KHMRaidFrames:SetInternalVariables()
     -- throttling refreshes
     self.refreshingSettings = false
     self.reloadingSettings = false
-    self.profileThrottleSecs = 0.5
+    self.profileThrottleSecs = 0.25
     self.refreshThrottleSecs = 0.1
 
     if self.db.profile.Masque then
