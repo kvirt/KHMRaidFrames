@@ -43,8 +43,11 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
     end
 
     for frame in self.IterateCompactFrames(groupType) do
-        if self.processedFrames[frame and frame:GetName()..groupType] ~= true then
-            self.processedFrames[frame and frame:GetName()..groupType] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
+        local name = frame and frame:GetName()
+        name = name and name..groupType
+
+        if name and self.processedFrames[name] ~= true then
+            self.processedFrames[name] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
         end
     end
 
@@ -206,11 +209,6 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     local flags = db.flag ~= "None" and db.flag or ""
 
     local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
-
-    if not ShouldShowName(frame) or db.hide then
-        name:Hide()
-        return
-    end
 
     name:SetFont(
         font,
@@ -459,7 +457,7 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     local db = self.db.profile[groupType].nameAndIcons.roleIcon
     local roleIcon = frame.roleIcon
 
-    if db.hide then
+    if db.hide or not roleIcon:IsVisible() then
         roleIcon:Hide()
         return
     end
@@ -716,7 +714,7 @@ end
 function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
 
-    if not showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then return end
+    if not showResourceOnlyForHealers then return end
 
     if not frame.unit then return end
 
