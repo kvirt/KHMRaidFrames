@@ -39,12 +39,12 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
     local isInCombatLockDown = InCombatLockdown()
 
     for group in self.IterateCompactGroups(groupType) do
-        self.processedFrames[group] = self:LayoutGroup(group, groupType)
+        self:LayoutGroup(group, groupType)
     end
 
     for frame in self.IterateCompactFrames(groupType) do
-        if self.processedFrames[frame] ~= true then
-            self.processedFrames[frame and frame:GetName()] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
+        if self.processedFrames[frame and frame:GetName()..groupType] ~= true then
+            self.processedFrames[frame and frame:GetName()..groupType] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
         end
     end
 
@@ -240,12 +240,13 @@ function KHMRaidFrames:SetUpNameInternal(frame, groupType)
         return
     end
 
+    local name = frame.name
+
     if not ShouldShowName(frame) or db.hide then
         name:Hide()
         return
     end
 
-    local name = frame.name
     local _name
 
     if db.showServer and frame.unit then
@@ -736,7 +737,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Show()
         end
-    else
+    elseif prevRole == "HEALER" or prevRole == nil then
         frame.healthBar:ClearAllPoints()
         frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
