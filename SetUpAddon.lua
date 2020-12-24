@@ -158,7 +158,7 @@ function KHMRaidFrames:HookNameAndIcons()
             function(frame)
                 if self.SkipFrame(frame) then return end
 
-                self:SetUpName(frame, IsInRaid() and "raid" or "party")
+                self:SetUpNameInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end

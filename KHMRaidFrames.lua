@@ -220,6 +220,34 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     name:ClearAllPoints()
 
+    local xOffset, yOffset = self:Offsets("TOPLEFT", frame, groupType)
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset
+
+    name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
+    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", xOffset, yOffset)
+    name:SetJustifyH(db.hJustify)
+
+    name:Show()
+
+    self:SetUpNameInternal(frame, groupType)
+end
+
+function KHMRaidFrames:SetUpNameInternal(frame, groupType)
+    if not frame.name then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.name
+
+    if not db.enabled then
+        return
+    end
+
+    if not ShouldShowName(frame) or db.hide then
+        name:Hide()
+        return
+    end
+
+    local name = frame.name
     local _name
 
     if db.showServer and frame.unit then
@@ -227,6 +255,10 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     else
         _name = GetUnitName(frame.unit, false)
         _name = _name and _name:gsub("%p", "")
+    end
+
+    if _name then
+        name:SetText(_name)
     end
 
     if db.classColoredNames then
@@ -242,18 +274,6 @@ function KHMRaidFrames:SetUpName(frame, groupType)
             frame.name:SetVertexColor(1.0, 1.0, 1.0)
         end
     end
-
-    if _name then name:SetText(_name) end
-
-    local xOffset, yOffset = self:Offsets("TOPLEFT", frame, groupType)
-    xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset
-
-    name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", xOffset, yOffset)
-    name:SetJustifyH(db.hJustify)
-
-    name:Show()
 end
 
 -- STATUS TEXT
@@ -444,24 +464,27 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
     end
 
     local raidID = UnitInRaid(frame.unit)
-    local _role
+    local role
 
     if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
-        _role = "VEHICLE"
+        role = "VEHICLE"
     elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
-        local role = select(10, GetRaidRosterInfo(raidID))
-        _role = role
+        role = select(10, GetRaidRosterInfo(raidID))
     else
-        local role = UnitGroupRolesAssigned(frame.unit)
-        if frame.optionTable.displayRoleIcon and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
-            _role = role
-        end
+        role = UnitGroupRolesAssigned(frame.unit)
     end
 
-    if _role and db[_role:lower()] ~= "" and (_role == "TANK" or _role == "HEALER" or _role == "DAMAGER") then
-        roleIcon:SetTexture(db[_role:lower()])
-        roleIcon:SetTexCoord(0, 1, 0, 1)
-        roleIcon:SetVertexColor(unpack(db.colors[_role:lower()]))
+    if role then
+        role = role:lower()
+
+        if db[role] ~= "" and db[role] ~= nil then
+            roleIcon:SetTexture(db[role])
+            roleIcon:SetTexCoord(0, 1, 0, 1)
+            roleIcon:SetVertexColor(unpack(db.colors[role]))
+        else
+            roleIcon:SetVertexColor(1, 1, 1)
+        end
+
         roleIcon:Show()
     end
 end
