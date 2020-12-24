@@ -200,13 +200,13 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         return
     end
 
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
-
     local name = frame.name
 
     local flags = db.flag ~= "None" and db.flag or ""
 
     local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
+
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     name:SetFont(
         font,
@@ -221,7 +221,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     yOffset = yOffset + db.yOffset
 
     name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", xOffset, yOffset)
+    name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, yOffset)
     name:SetJustifyH(db.hJustify)
 
     self:SetUpNameInternal(frame, groupType)
@@ -722,7 +722,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
 
     local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
-    if role == prevRole then return end
+    if role == prevRole or role == "NONE" then return end
     KHMRaidFrames.rolesCache[frame:GetName()] = role
 
     if role == "HEALER" then
