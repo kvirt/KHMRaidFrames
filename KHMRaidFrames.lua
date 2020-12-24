@@ -228,8 +228,6 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", xOffset, yOffset)
     name:SetJustifyH(db.hJustify)
 
-    name:Show()
-
     self:SetUpNameInternal(frame, groupType)
 end
 
@@ -274,6 +272,8 @@ function KHMRaidFrames:SetUpNameInternal(frame, groupType)
             frame.name:SetVertexColor(1.0, 1.0, 1.0)
         end
     end
+
+    name:Show()
 end
 
 -- STATUS TEXT
