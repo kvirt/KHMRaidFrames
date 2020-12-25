@@ -63,6 +63,8 @@ function KHMRaidFrames:SetInternalVariables()
     }
     self.aurasCache = {}
     self.processedFrames = {}
+    self.currentGroup = IsInRaid() and "raid" or "party"
+
     self.glowingFrames = {
         auraGlow = {
             buffFrames = {},
@@ -278,11 +280,6 @@ function KHMRaidFrames.SyncProfiles(profile)
         for _, v in ipairs(dbProfiles) do
             if profile == v then
                 KHMRaidFrames.db:SetProfile(profile)
-
-                if not KHMRaidFrames.displayPowerBar then
-                    KHMRaidFrames.db.profile.raid.frames.showResourceOnlyForHealers = false
-                    KHMRaidFrames.db.profile.party.frames.showResourceOnlyForHealers = false
-                end
 
                 KHMRaidFrames.RevertName()
                 KHMRaidFrames.RevertStatusText()
