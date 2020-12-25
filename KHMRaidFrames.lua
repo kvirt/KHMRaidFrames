@@ -712,7 +712,7 @@ end
 function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
 
-    if KHMRaidFrames.displayPowerBar and (not showResourceOnlyForHealers and (frame.powerBar and not frame.powerBar:IsVisible())) then
+    if KHMRaidFrames.displayPowerBar and (not showResourceOnlyForHealers and (frame.powerBar and not frame.powerBar:IsShown())) then
         KHMRaidFrames.RevertResourceBarInternal(frame)
         local db = KHMRaidFrames.db.profile[groupType]
 
