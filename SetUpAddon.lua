@@ -143,6 +143,8 @@ function KHMRaidFrames:OnEvent(event, ...)
 
             self.deffered = false
         end
+
+        self.RefreshProfileSettings()
     elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
         self:HideAll()
         self.deffered = true
@@ -162,7 +164,6 @@ end
 
 function KHMRaidFrames.RefreshProfileSettings(forceSettings)
     if InCombatLockdown() then
-        self.deffered = true
         return
     end
 
