@@ -213,8 +213,8 @@ function KHMRaidFrames:SetUpMainSubFramePosition(frame, typedframes, subFrameTyp
     frame[subFrameTypes][1]:SetPoint(anchor1, relativeFrame, anchor2, xOffset, yOffset)
 end
 
-function KHMRaidFrames:RefreshConfig(groupType)
-    if groupType ~= (IsInRaid() and "raid" or "party") then return end
+function KHMRaidFrames:RefreshConfig()
+    groupType = IsInRaid() and "raid" or "party"
 
     local isInCombatLockDown = InCombatLockdown()
 
@@ -464,7 +464,7 @@ function KHMRaidFrames.ColorByClass(unit)
     end
 end
 
-function KHMRaidFrames:SafeRefresh(groupType)
+function KHMRaidFrames:SafeRefresh()
     if not self.refreshingSettings then
         self.refreshingSettings = true
         C_Timer.After(self.refreshThrottleSecs, function()
@@ -473,9 +473,7 @@ function KHMRaidFrames:SafeRefresh(groupType)
     end
 end
 
-function KHMRaidFrames:SafeRefreshInternal(groupType)
-    groupType = groupType or (IsInRaid() and "raid" or "party")
-
+function KHMRaidFrames:SafeRefreshInternal()
     if InCombatLockdown() then
         self:Print("Can not refresh settings while in combat")
         self:HideAll()
@@ -483,7 +481,7 @@ function KHMRaidFrames:SafeRefreshInternal(groupType)
         self.refreshingSettings = false
         return
     else
-        self:RefreshConfig(groupType)
+        self:RefreshConfig()
     end
 
     self.refreshingSettings = false

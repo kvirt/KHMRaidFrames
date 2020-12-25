@@ -104,7 +104,7 @@ function KHMRaidFrames:SetupOptions()
                             self.db.profile.glows.glowBlockList.tracking = self:SanitizeStrings(val)
                             self.db.profile.glows.glowBlockList.excludeStr = val
 
-                            self:SafeRefresh(groupType)
+                            self:SafeRefresh()
                         end,
                         get = function(info)
                             return self.db.profile.glows.glowBlockList.excludeStr
@@ -251,7 +251,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertName()
                     else
                         self.RefreshProfileSettings()
-                        self:SafeRefresh(groupType)
+                        self:SafeRefresh()
                     end
                 end,
                 get = function(info)
@@ -267,7 +267,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.hide = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.name.hide
@@ -283,7 +283,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.font = self.sortedFonts[val]
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     for i, font in ipairs(self.sortedFonts) do
@@ -308,7 +308,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.flag = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.name.flag end
             },
@@ -324,7 +324,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.size = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.name.size end
             },
@@ -340,7 +340,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.hJustify = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                     ReloadUI()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.name.hJustify end
@@ -357,7 +357,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.xOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.name.xOffset end
             },
@@ -373,7 +373,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.yOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.name.yOffset end
             },
@@ -386,7 +386,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.showServer = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.name.showServer
@@ -406,7 +406,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertNameColors()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.name.classColoredNames
@@ -464,7 +464,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusText()
                     else
                         self.RefreshProfileSettings()
-                        self:SafeRefresh(groupType)
+                        self:SafeRefresh()
                     end
                 end,
                 get = function(info)
@@ -481,7 +481,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.font = self.sortedFonts[val]
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     for i, font in ipairs(self.sortedFonts) do
@@ -507,7 +507,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.flag = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.flag end
             },
@@ -523,7 +523,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.size = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.size end
             },
@@ -539,7 +539,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.hJustify = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                     ReloadUI()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.hJustify end
@@ -556,7 +556,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.xOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.xOffset end
             },
@@ -572,7 +572,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.yOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.yOffset end
             },
@@ -588,7 +588,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.statusText.color = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.statusText.color
@@ -609,7 +609,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertNameColors()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.statusText.classColoredText
@@ -632,7 +632,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
                     self.RevertStatusTextFont()
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers end
             },
@@ -651,7 +651,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
                     self.RevertStatusTextFont()
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.precision + 1 end
             },
@@ -667,7 +667,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
                     self.RevertStatusTextFont()
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.showPercents end
             },
@@ -684,7 +684,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusTextFont()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses
@@ -751,7 +751,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertRoleIcon()
                     else
                         self.RefreshProfileSettings()
-                        self:SafeRefresh(groupType)
+                        self:SafeRefresh()
                     end
                 end,
                 get = function(info)
@@ -776,7 +776,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         end
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.roleIcon.hide
@@ -794,7 +794,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.roleIcon.size = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.size end
             },
@@ -810,7 +810,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.roleIcon.xOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.xOffset end
             },
@@ -826,7 +826,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.roleIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.roleIcon.yOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.yOffset end
             },
@@ -858,7 +858,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertRoleIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.healer end
             },
@@ -875,7 +875,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.healer = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.healer
@@ -899,7 +899,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertRoleIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.damager end
             },
@@ -916,7 +916,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.damager = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.damager
@@ -940,7 +940,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertRoleIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.tank end
             },
@@ -957,7 +957,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.tank = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.tank
@@ -981,7 +981,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertRoleIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.roleIcon.vehicle end
             },
@@ -998,7 +998,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.roleIcon.colors.vehicle = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.roleIcon.colors.vehicle
@@ -1057,7 +1057,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertReadyCheckIcon()
                     else
                         self.RefreshProfileSettings()
-                        self:SafeRefresh(groupType)
+                        self:SafeRefresh()
                     end
                 end,
                 get = function(info)
@@ -1073,7 +1073,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide
@@ -1091,7 +1091,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.size = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.size end
             },
@@ -1107,7 +1107,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.xOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.xOffset end
             },
@@ -1123,7 +1123,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.yOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.yOffset end
             },
@@ -1155,7 +1155,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertReadyCheckIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.ready end
             },
@@ -1172,7 +1172,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.ready = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.ready
@@ -1196,7 +1196,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertReadyCheckIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.notready end
             },
@@ -1213,7 +1213,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.notready = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.notready
@@ -1237,7 +1237,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertReadyCheckIconTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.readyCheckIcon.waiting end
             },
@@ -1254,7 +1254,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.waiting = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.readyCheckIcon.colors.waiting
@@ -1313,7 +1313,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcon()
                     else
                         self.RefreshProfileSettings()
-                        self:SafeRefresh(groupType)
+                        self:SafeRefresh()
                     end
                 end,
                 get = function(info)
@@ -1329,7 +1329,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide
@@ -1347,7 +1347,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.size = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.size end
             },
@@ -1363,7 +1363,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.xOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.xOffset end
             },
@@ -1379,7 +1379,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.yOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.yOffset end
             },
@@ -1411,7 +1411,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcoTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherGroup end
             },
@@ -1428,7 +1428,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherGroup = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherGroup
@@ -1452,7 +1452,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcoTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingResurrection end
             },
@@ -1469,7 +1469,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingResurrection = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingResurrection
@@ -1493,7 +1493,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcoTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonPending end
             },
@@ -1510,7 +1510,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonPending = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonPending
@@ -1534,7 +1534,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcoTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonAccepted end
             },
@@ -1551,7 +1551,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonAccepted = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonAccepted
@@ -1575,7 +1575,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcoTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonDeclined end
             },
@@ -1592,7 +1592,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonDeclined = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.hasIncomingSummonDeclined
@@ -1616,7 +1616,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.RevertStatusIcoTexture()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherPhase end
             },
@@ -1633,7 +1633,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherPhase = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.centerStatusIcon.colors.inOtherPhase
@@ -1692,7 +1692,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                         self.UpdateLeaderIcon()
                     end
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.leaderIcon.enabled
@@ -1710,7 +1710,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.size = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.size end
             },
@@ -1728,7 +1728,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.alpha = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.alpha end
             },
@@ -1744,7 +1744,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.xOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.xOffset end
             },
@@ -1760,7 +1760,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.yOffset = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.yOffset end
             },
@@ -1774,7 +1774,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.anchorPoint = val
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.anchorPoint end
             },
@@ -1788,7 +1788,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.healer = val
 
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.leaderIcon.healer end
             },
@@ -1802,7 +1802,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.leaderIcon.enabled end,
                 set = function(info, r, g, b, a)
                     self.db.profile[groupType].nameAndIcons.leaderIcon.colors.icon = {r, g, b, a}
-                    self:SafeRefresh(groupType)
+                    self:SafeRefresh()
                 end,
                 get = function(info)
                     local color = self.db.profile[groupType].nameAndIcons.leaderIcon.colors.icon
@@ -1854,7 +1854,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             order = 1,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.enabled = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].raidIcon.enabled
@@ -1874,7 +1874,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.size = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].raidIcon.size end
         },
@@ -1892,7 +1892,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.alpha = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].raidIcon.alpha end
         },
@@ -1910,7 +1910,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.xOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].raidIcon.xOffset end
         },
@@ -1928,7 +1928,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.yOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].raidIcon.yOffset end
         },
@@ -1944,7 +1944,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.anchorPoint = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].raidIcon.anchorPoint end
         },
@@ -1990,7 +1990,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             order = 1,
             set = function(info,val)
                 self.db.profile[groupType].frames.texture = self.sortedTextures[val]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 for i, texture in ipairs(self.sortedTextures) do
@@ -2032,7 +2032,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].frames.showPartySolo = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.showPartySolo
@@ -2051,7 +2051,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             order = 5,
             set = function(info,val)
                 self.db.profile[groupType].frames.hideGroupTitles = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.hideGroupTitles
@@ -2065,7 +2065,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             order = 6,
             set = function(info,val)
                 self.db.profile[groupType].frames.clickThrough = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.clickThrough
@@ -2086,7 +2086,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                     ReloadUI()
                 end
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.enhancedAbsorbs
@@ -2100,7 +2100,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             order = 8,
             set = function(info,val)
                 self.db.profile[groupType].frames.autoScaling = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.autoScaling
@@ -2141,7 +2141,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             set = function(info,val)
                 self.db.profile[groupType].frames.alpha = val
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.alpha
@@ -2159,7 +2159,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 self.db.profile[groupType].frames.tracking = self.SanitizeStringsByUnit(val)
                 self.db.profile[groupType].frames.trackingStr = val
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.trackingStr

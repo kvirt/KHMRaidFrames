@@ -692,13 +692,14 @@ end
 
 --RESOURСE BAR
 function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
-    if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers then
+    if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then
         return
     end
 
     if not frame.unit then return end
 
-    local role = frame.unit == "pet" and "pet" or UnitGroupRolesAssigned(frame.unit)
+    local ispet = string.find(frame.unit, "pet")
+    local role = ispet and "pet" or UnitGroupRolesAssigned(frame.unit)
 
     local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
@@ -747,7 +748,7 @@ function KHMRaidFrames.RevertResourceBar()
 end
 
 function KHMRaidFrames.RevertResourceBarInternal(frame)
-    if KHMRaidFrames.displayPowerBar and frame.unit and frame.unit ~= "pet" then
+    if KHMRaidFrames.displayPowerBar and frame.unit and not string.find(frame.unit, "pet") then
         frame.healthBar:ClearAllPoints()
         frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)

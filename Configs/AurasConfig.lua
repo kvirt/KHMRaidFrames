@@ -33,7 +33,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             order = 1,
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.num = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.num end
         },
@@ -48,7 +48,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             order = 2,
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.size = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.size end
         },
@@ -63,7 +63,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             order = 3,
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.numInRow = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.numInRow end
         },
@@ -78,7 +78,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             order = 4,
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.alpha = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.alpha end
         },
@@ -93,7 +93,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             order = 5,
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.xOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.xOffset end
         },
@@ -108,7 +108,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             order = 6,
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.yOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.yOffset end
         },
@@ -122,7 +122,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.anchorPoint = val
                 self.db.profile[groupType].buffFrames.rowsGrowDirection = self.rowsGrows[val][self.db.profile[groupType].buffFrames.growDirection]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.anchorPoint end
         },
@@ -136,7 +136,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
             set = function(info,val)
                 self.db.profile[groupType].buffFrames.growDirection = val
                 self.db.profile[groupType].buffFrames.rowsGrowDirection = self.rowsGrows[self.db.profile[groupType].buffFrames.anchorPoint][val]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].buffFrames.growDirection end
         },
@@ -157,7 +157,7 @@ function KHMRaidFrames:SetupBuffFrames(groupType)
                 self.db.profile[groupType].buffFrames.exclude = self:SanitizeStrings(val)
                 self.db.profile[groupType].buffFrames.excludeStr = val
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].buffFrames.excludeStr
@@ -203,7 +203,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 1,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.num = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.num end
         },
@@ -218,7 +218,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 2,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.size = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.size end
         },
@@ -233,7 +233,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 3,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.numInRow = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.numInRow end
         },
@@ -248,7 +248,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 4,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.alpha = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.alpha end
         },
@@ -263,7 +263,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 5,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.xOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.xOffset end
         },
@@ -278,7 +278,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 6,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.yOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.yOffset end
         },
@@ -292,7 +292,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.anchorPoint = val
                 self.db.profile[groupType].debuffFrames.rowsGrowDirection = self.rowsGrows[val][self.db.profile[groupType].debuffFrames.growDirection]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.anchorPoint end
         },
@@ -306,7 +306,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.growDirection = val
                 self.db.profile[groupType].debuffFrames.rowsGrowDirection = self.rowsGrows[self.db.profile[groupType].debuffFrames.anchorPoint][val]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.growDirection end
         },
@@ -323,7 +323,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             order = 10,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.showBigDebuffs = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].debuffFrames.showBigDebuffs
@@ -340,7 +340,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.smartAnchoring = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].debuffFrames.smartAnchoring
@@ -360,7 +360,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
             end,
             set = function(info,val)
                 self.db.profile[groupType].debuffFrames.bigDebuffSize = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].debuffFrames.bigDebuffSize end
         },
@@ -381,7 +381,7 @@ function KHMRaidFrames:SetupDebuffFrames(groupType)
                 self.db.profile[groupType].debuffFrames.exclude = self:SanitizeStrings(val)
                 self.db.profile[groupType].debuffFrames.excludeStr = val
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].debuffFrames.excludeStr
@@ -427,7 +427,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             order = 1,
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.num = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.num end
         },
@@ -442,7 +442,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             order = 2,
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.size = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.size end
         },
@@ -457,7 +457,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             order = 3,
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.numInRow = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.numInRow end
         },
@@ -472,7 +472,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             order = 4,
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.alpha = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.alpha end
         },
@@ -487,7 +487,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             order = 5,
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.xOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.xOffset end
         },
@@ -502,7 +502,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             order = 6,
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.yOffset = val
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.yOffset end
         },
@@ -516,7 +516,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.anchorPoint = val
                 self.db.profile[groupType].dispelDebuffFrames.rowsGrowDirection = self.rowsGrows[val][self.db.profile[groupType].dispelDebuffFrames.growDirection]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.anchorPoint end
         },
@@ -530,7 +530,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
             set = function(info,val)
                 self.db.profile[groupType].dispelDebuffFrames.growDirection = val
                 self.db.profile[groupType].dispelDebuffFrames.rowsGrowDirection = self.rowsGrows[self.db.profile[groupType].dispelDebuffFrames.anchorPoint][val]
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info) return self.db.profile[groupType].dispelDebuffFrames.growDirection end
         },
@@ -551,7 +551,7 @@ function KHMRaidFrames:SetupDispelldebuffFrames(groupType)
                 self.db.profile[groupType].dispelDebuffFrames.exclude = self:SanitizeStrings(val)
                 self.db.profile[groupType].dispelDebuffFrames.excludeStr = val
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].dispelDebuffFrames.excludeStr
