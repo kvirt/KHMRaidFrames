@@ -193,13 +193,24 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
             typedframe:EnableMouse(true)
         end
 
-        if self.Masque and self.Masque[subFrameType] and typedframe:GetName() then
-            self.Masque[subFrameType]:RemoveButton(typedframe)
-            self.Masque[subFrameType]:AddButton(typedframe)
-        end
-
         frameNum = frameNum + 1
     end
+end
+
+function KHMRaidFrames:SetUpMainSubFramePosition(frame, typedframes, subFrameType)
+    local groupType = IsInRaid() and "raid" or "party"
+    local db = self.db.profile[groupType][subFrameType]
+
+    local anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
+
+    xOffset, yOffset = self:Offsets(anchor1, frame, groupType)
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset
+
+    if not frame[subFrameTypes] or not frame[subFrameTypes][1] then return end
+
+    frame[subFrameTypes][1]:ClearAllPoints()
+    frame[subFrameTypes][1]:SetPoint(anchor1, relativeFrame, anchor2, xOffset, yOffset)
 end
 
 function KHMRaidFrames:RefreshConfig(groupType)
@@ -276,8 +287,23 @@ function KHMRaidFrames:AddSubFrames(frame, groupType)
             frameName = frame:GetName().."DispelDebuff"
         end
 
+        for i=1, 3 do
+            local typedFrame = _G[frameName..i]
+
+            if self.Masque and self.Masque[subFrameType] and typedFrame and typedFrame:GetName() then
+                self.Masque[subFrameType]:RemoveButton(typedFrame)
+                self.Masque[subFrameType]:AddButton(typedFrame)
+            end
+        end
+
         for i=#frame[subFrameType] + 1, db.num do
             local typedFrame = _G[frameName..i] or CreateFrame("Button", frameName..i, frame, template)
+
+            if self.Masque and self.Masque[subFrameType] and typedFrame:GetName() then
+                self.Masque[subFrameType]:RemoveButton(typedFrame)
+                self.Masque[subFrameType]:AddButton(typedFrame)
+            end
+
             typedFrame:ClearAllPoints()
             typedFrame:Hide()
         end

@@ -250,7 +250,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertName()
                     else
-                        self:HookNameAndIcons()
+                        self.RefreshProfileSettings()
                         self:SafeRefresh(groupType)
                     end
                 end,
@@ -463,7 +463,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertStatusText()
                     else
-                        self:HookNameAndIcons()
+                        self.RefreshProfileSettings()
                         self:SafeRefresh(groupType)
                     end
                 end,
@@ -750,7 +750,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertRoleIcon()
                     else
-                        self:HookNameAndIcons()
+                        self.RefreshProfileSettings()
                         self:SafeRefresh(groupType)
                     end
                 end,
@@ -1056,7 +1056,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertReadyCheckIcon()
                     else
-                        self:HookNameAndIcons()
+                        self.RefreshProfileSettings()
                         self:SafeRefresh(groupType)
                     end
                 end,
@@ -1312,7 +1312,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertStatusIcon()
                     else
-                        self:HookNameAndIcons()
+                        self.RefreshProfileSettings()
                         self:SafeRefresh(groupType)
                     end
                 end,
@@ -2123,7 +2123,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                     self.RevertResourceBar()
                 end
 
-                self:SafeRefresh(groupType)
+                self:SafeRefresh()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.showResourceOnlyForHealers

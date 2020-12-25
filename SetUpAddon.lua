@@ -63,7 +63,6 @@ function KHMRaidFrames:SetInternalVariables()
     }
     self.aurasCache = {}
     self.processedFrames = {}
-    self.currentGroup = IsInRaid() and "raid" or "party"
 
     self.glowingFrames = {
         auraGlow = {
@@ -115,12 +114,13 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
     self:RegisterEvent("RAID_TARGET_UPDATE", "OnEvent")
     self:RegisterEvent("PLAYER_TALENT_UPDATE", "OnEvent")
+    self:RegisterEvent("PARTY_LEADER_CHANGED", "OnEvent")
 
     self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
 
-    self:HookNameAndIcons()
+    self.RefreshProfileSettings()
 
     -- custom interface display
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
@@ -152,71 +152,126 @@ function KHMRaidFrames:OnEvent(event, ...)
     elseif event == "PLAYER_ROLES_ASSIGNED" then
         self:UpdateRaidMark(groupType)
         self:CustomizeOptions()
-        self.UpdateLeaderIcon()
         self.UpdateResourceBars()
     elseif event == "PLAYER_TALENT_UPDATE" and not IsInGroup() then
         self.UpdateResourceBars()
+    elseif event == "PARTY_LEADER_CHANGED" then
+        self.UpdateLeaderIcon()
     end
 end
 
-function KHMRaidFrames:HookNameAndIcons()
-    local dbParty = self.db.profile.party.nameAndIcons
-    local dbRaid = self.db.profile.raid.nameAndIcons
+function KHMRaidFrames.RefreshProfileSettings(forceSettings)
+    if InCombatLockdown() then
+        self.deffered = true
+        return
+    end
 
-    if (dbParty.name.enabled or dbRaid.name.enabled) and not self:IsHooked("CompactUnitFrame_UpdateName") then
-        self:SecureHook(
+    local groupType = IsInRaid() and "raid" or "party"
+
+    if not forceSettings and groupType == KHMRaidFrames.currentGroup then
+        return
+    end
+
+    KHMRaidFrames.currentGroup = groupType
+    KHMRaidFrames.processedFrames = {}
+    KHMRaidFrames.rolesCache = {}
+
+    local db = KHMRaidFrames.db.profile[KHMRaidFrames.currentGroup].nameAndIcons
+
+    -- unhooking
+    if not db.name.enabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateName") then
+        KHMRaidFrames:Unhook("CompactUnitFrame_UpdateName")
+    end
+
+    if not db.statusText.enabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateStatusText") then
+        KHMRaidFrames:Unhook("CompactUnitFrame_UpdateStatusText")
+    end
+
+    if not db.roleIcon.enabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
+        KHMRaidFrames:Unhook("CompactUnitFrame_UpdateRoleIcon")
+    end
+
+    if not db.readyCheckIcon.enabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateReadyCheck") then
+        KHMRaidFrames:Unhook("CompactUnitFrame_UpdateReadyCheck")
+
+    end
+
+    if not db.centerStatusIcon.enabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateCenterStatusIcon") then
+        KHMRaidFrames:Unhook("CompactUnitFrame_UpdateCenterStatusIcon")
+    end
+
+    -- hooking
+    if db.name.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateName") then
+        KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateName",
             function(frame)
-                if self.SkipFrame(frame) then return end
+                if KHMRaidFrames.SkipFrame(frame) then return end
 
-                self:SetUpNameInternal(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames:SetUpName(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
 
-    if (dbParty.statusText.enabled or dbRaid.statusText.enabled) and not self:IsHooked("CompactUnitFrame_UpdateStatusText") then
-        self:SecureHook(
+    if db.statusText.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateStatusText") then
+        KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateStatusText",
             function(frame)
-                if self.SkipFrame(frame) then return end
+                if KHMRaidFrames.SkipFrame(frame) then return end
 
-                self.SetUpStatusTextInternal(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames.SetUpStatusTextInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
 
-    if (dbParty.roleIcon.enabled or dbRaid.roleIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
-        self:SecureHook(
+    if db.roleIcon.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
+        KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateRoleIcon",
             function(frame)
-                if self.SkipFrame(frame) then return end
+                if KHMRaidFrames.SkipFrame(frame) then return end
 
-            self:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party")
+            KHMRaidFrames:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party")
          end
         )
     end
 
-    if (dbParty.readyCheckIcon.enabled or dbRaid.readyCheckIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateReadyCheck") then
-        self:SecureHook(
+    if db.readyCheckIcon.enabled and not self:IsHooked("CompactUnitFrame_UpdateReadyCheck") then
+        KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateReadyCheck",
             function(frame)
-                if self.SkipFrame(frame) then return end
+                if KHMRaidFrames.SkipFrame(frame) then return end
 
-                self:SetUpReadyCheckIconInternal(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames:SetUpReadyCheckIconInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
 
-    if (dbParty.centerStatusIcon.enabled or dbRaid.centerStatusIcon.enabled) and not self:IsHooked("CompactUnitFrame_UpdateCenterStatusIcon") then
-        self:SecureHook(
+    if db.centerStatusIcon.enabled and not self:IsHooked("CompactUnitFrame_UpdateCenterStatusIcon") then
+        KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateCenterStatusIcon",
             function(frame)
-                if self.SkipFrame(frame) then return end
+                if KHMRaidFrames.SkipFrame(frame) then return end
 
-                self:SetUpCenterStatusIconInternal(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames:SetUpCenterStatusIconInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
+
+    -- disabling
+    if not db.leaderIcon.enabled then
+        KHMRaidFrames.UpdateLeaderIcon()
+    end
+
+    if not KHMRaidFrames.db.profile[KHMRaidFrames.currentGroup].raidIcon.enabled then
+        KHMRaidFrames:UpdateRaidMark()
+    end
+
+    -- reverting
+    KHMRaidFrames.RevertName()
+    KHMRaidFrames.RevertStatusText()
+    KHMRaidFrames.RevertRoleIcon()
+    KHMRaidFrames.RevertReadyCheckIcon()
+    KHMRaidFrames.RevertStatusIcon()
+    KHMRaidFrames.RevertResourceBar()
 end
 --
 
@@ -229,20 +284,23 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
 
     self.processedFrames = {}
 
+    local forceSettings = false
+
     if self.db:GetCurrentProfile() ~= profile then
         self.SyncProfiles(profile)
+        forceSettings = true
     end
 
     if not self.reloadingSettings then
         self.reloadingSettings = true
         C_Timer.After(self.profileThrottleSecs, function()
-            self.ReloadSetting()
+            self.ReloadSetting(forceSettings)
         end)
     end
 end
 
-function KHMRaidFrames.ReloadSetting()
-    KHMRaidFrames.RevertResourceBar()
+function KHMRaidFrames.ReloadSetting(forceSettings)
+    KHMRaidFrames.RefreshProfileSettings(forceSettings)
     KHMRaidFrames:SafeRefresh()
     KHMRaidFrames.reloadingSettings = false
 end
@@ -281,16 +339,7 @@ function KHMRaidFrames.SyncProfiles(profile)
             if profile == v then
                 KHMRaidFrames.db:SetProfile(profile)
 
-                KHMRaidFrames.RevertName()
-                KHMRaidFrames.RevertStatusText()
-                KHMRaidFrames.RevertRoleIcon()
-                KHMRaidFrames.RevertReadyCheckIcon()
-                KHMRaidFrames.RevertStatusIcon()
-                KHMRaidFrames.UpdateLeaderIcon()
-                KHMRaidFrames:UpdateRaidMark()
-
                 KHMRaidFrames:CustomizeOptions()
-                KHMRaidFrames:HookNameAndIcons()
             end
         end
     end

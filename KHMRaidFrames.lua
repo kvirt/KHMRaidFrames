@@ -38,13 +38,9 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
         return
     end
 
-    local groupType = IsInRaid() and "raid" or "party"
+    self.RefreshProfileSettings()
 
-    if groupType ~= self.currentGroup then
-        self.processedFrames = {}
-        self.rolesCache = {}
-        self.currentGroup = groupType
-    end
+    local groupType = IsInRaid() and "raid" or "party"
 
     local isInCombatLockDown = InCombatLockdown()
 
@@ -205,7 +201,14 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         return
     end
 
+    if not frame.unit then return end
+
     local name = frame.name
+
+    if db.hide then
+        name:Hide()
+        return
+    end
 
     local flags = db.flag ~= "None" and db.flag or ""
 
@@ -229,30 +232,9 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, yOffset)
     name:SetJustifyH(db.hJustify)
 
-    self:SetUpNameInternal(frame, groupType)
-end
-
-function KHMRaidFrames:SetUpNameInternal(frame, groupType)
-    if not frame.name then return end
-
-    local db = self.db.profile[groupType].nameAndIcons.name
-
-    if not db.enabled then
-        return
-    end
-
-    if not frame.unit then return end
-
-    local name = frame.name
-
-    if db.hide then
-        name:Hide()
-        return
-    end
-
     local _name
 
-    if db.showServer and frame.unit then
+    if db.showServer then
         _name = GetUnitName(frame.unit, true)
     else
         _name = GetUnitName(frame.unit, false)
@@ -710,25 +692,13 @@ end
 
 --RESOURСE BAR
 function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
-    local showResourceOnlyForHealers = KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers
-
-    if KHMRaidFrames.displayPowerBar and (not showResourceOnlyForHealers and (frame.powerBar and not frame.powerBar:IsShown())) then
-        KHMRaidFrames.RevertResourceBarInternal(frame)
-        local db = KHMRaidFrames.db.profile[groupType]
-
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
-        return
-    end
-
-    if not showResourceOnlyForHealers then
+    if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers then
         return
     end
 
     if not frame.unit then return end
 
-    local role = UnitGroupRolesAssigned(frame.unit)
+    local role = frame.unit == "pet" and "pet" or UnitGroupRolesAssigned(frame.unit)
 
     local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
@@ -750,7 +720,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Show()
         end
-    elseif prevRole == "HEALER" or prevRole == nil then
+    elseif prevRole == "HEALER" or prevRole == nil or role == "pet" then
         frame.healthBar:ClearAllPoints()
         frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
@@ -762,11 +732,9 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     end
 
     if not refresh then
-        local db = KHMRaidFrames.db.profile[groupType]
-
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
-        KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, frame.buffFrames, "buffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, frame.debuffFrames, "debuffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, frame.dispelDebuffFrames, "dispelDebuffFrames")
     end
 end
 
@@ -779,7 +747,7 @@ function KHMRaidFrames.RevertResourceBar()
 end
 
 function KHMRaidFrames.RevertResourceBarInternal(frame)
-    if KHMRaidFrames.displayPowerBar then
+    if KHMRaidFrames.displayPowerBar and frame.unit and frame.unit ~= "pet" then
         frame.healthBar:ClearAllPoints()
         frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)
