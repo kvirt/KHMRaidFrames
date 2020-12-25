@@ -170,7 +170,7 @@ function KHMRaidFrames:OnEvent(event, ...)
 end
 
 function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
-    if InCombatLockdown() then
+    if not forceRefresh and InCombatLockdown() then
         return
     end
 
