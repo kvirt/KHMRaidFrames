@@ -31,7 +31,14 @@ function KHMRaidFrames:Setup()
     self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
     self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
 
-    self:RegisterChatCommand("khm", function()
+    self:RegisterChatCommand("khm", function(arg, ...)
+        if arg == "reload" then
+            self.RefreshProfileSettings(true, true)
+            self:CompactRaidFrameContainer_LayoutFrames()
+            self:Print("Hard Reload")
+            return
+        end
+
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
         InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
     end)
@@ -162,7 +169,7 @@ function KHMRaidFrames:OnEvent(event, ...)
     end
 end
 
-function KHMRaidFrames.RefreshProfileSettings(forceSettings)
+function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
     if InCombatLockdown() then
         return
     end
