@@ -291,6 +291,7 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
     end
 
     self.processedFrames = {}
+    self.rolesCache = {}
 
     local forceSettings = false
 

@@ -733,9 +733,9 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     end
 
     if not refresh then
-        KHMRaidFrames:SetUpMainSubFramePosition(frame, frame.buffFrames, "buffFrames")
-        KHMRaidFrames:SetUpMainSubFramePosition(frame, frame.debuffFrames, "debuffFrames")
-        KHMRaidFrames:SetUpMainSubFramePosition(frame, frame.dispelDebuffFrames, "dispelDebuffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "buffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "debuffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "dispelDebuffFrames")
     end
 end
 

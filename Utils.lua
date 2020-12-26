@@ -197,7 +197,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
     end
 end
 
-function KHMRaidFrames:SetUpMainSubFramePosition(frame, typedframes, subFrameType)
+function KHMRaidFrames:SetUpMainSubFramePosition(frame, subFrameType)
     local groupType = IsInRaid() and "raid" or "party"
     local db = self.db.profile[groupType][subFrameType]
 
@@ -207,10 +207,10 @@ function KHMRaidFrames:SetUpMainSubFramePosition(frame, typedframes, subFrameTyp
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
-    if not frame[subFrameTypes] or not frame[subFrameTypes][1] then return end
+    if not frame[subFrameType] or not frame[subFrameType][1] then return end
 
-    frame[subFrameTypes][1]:ClearAllPoints()
-    frame[subFrameTypes][1]:SetPoint(anchor1, relativeFrame, anchor2, xOffset, yOffset)
+    frame[subFrameType][1]:ClearAllPoints()
+    frame[subFrameType][1]:SetPoint(anchor1, relativeFrame, anchor2, xOffset, yOffset)
 end
 
 function KHMRaidFrames:RefreshConfig()

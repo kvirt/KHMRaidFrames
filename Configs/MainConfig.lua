@@ -250,7 +250,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertName()
                     else
-                        self.RefreshProfileSettings()
+                        self.RefreshProfileSettings(true)
                         self:SafeRefresh()
                     end
                 end,
@@ -463,7 +463,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertStatusText()
                     else
-                        self.RefreshProfileSettings()
+                        self.RefreshProfileSettings(true)
                         self:SafeRefresh()
                     end
                 end,
@@ -750,7 +750,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertRoleIcon()
                     else
-                        self.RefreshProfileSettings()
+                        self.RefreshProfileSettings(true)
                         self:SafeRefresh()
                     end
                 end,
@@ -1056,7 +1056,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertReadyCheckIcon()
                     else
-                        self.RefreshProfileSettings()
+                        self.RefreshProfileSettings(true)
                         self:SafeRefresh()
                     end
                 end,
@@ -1312,7 +1312,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     if not val then
                         self.RevertStatusIcon()
                     else
-                        self.RefreshProfileSettings()
+                        self.RefreshProfileSettings(true)
                         self:SafeRefresh()
                     end
                 end,
