@@ -149,9 +149,6 @@ function KHMRaidFrames:OnEvent(event, ...)
             self:GetRaidProfileSettings()
             self:SafeRefresh()
 
-            InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-            InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-
             self.deffered = false
         end
 
@@ -284,7 +281,6 @@ end
 
 -- PROFILES
 function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile, forceSettings, forceRefresh)
-    self.PrintV(profile)
     self:GetRaidProfileSettings(profile)
 
     self.processedFrames = {}
