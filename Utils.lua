@@ -151,10 +151,12 @@ KHMRaidFrames.rowsGrows = {
 }
 
 
-function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, groupType, subFrameType)
+function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, groupType, virtual)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
+    local db = self.db.profile[groupType][subFrameType]
     local size = db.size * (subFrameType ~= "dispelDebuffFrames" and (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1) or 1)
+    local typedframes = virtual and self.virtual.frames[subFrameType] or frame[subFrameType]
 
     while frameNum <= #typedframes do
         typedframe = typedframes[frameNum]
@@ -197,8 +199,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, typedframes, db, gr
     end
 end
 
-function KHMRaidFrames:SetUpMainSubFramePosition(frame, subFrameType)
-    local groupType = IsInRaid() and "raid" or "party"
+function KHMRaidFrames:SetUpMainSubFramePosition(frame, subFrameType, groupType)
     local db = self.db.profile[groupType][subFrameType]
 
     local anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
@@ -213,14 +214,14 @@ function KHMRaidFrames:SetUpMainSubFramePosition(frame, subFrameType)
     frame[subFrameType][1]:SetPoint(anchor1, relativeFrame, anchor2, xOffset, yOffset)
 end
 
-function KHMRaidFrames:RefreshConfig()
-    groupType = IsInRaid() and "raid" or "party"
+function KHMRaidFrames:RefreshConfig(virtualGroupType)
+    local groupType = IsInRaid() and "raid" or "party"
 
     local isInCombatLockDown = InCombatLockdown()
 
-    self:SetUpVirtual("buffFrames", groupType, self.componentScale)
-    self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
-    self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
+    self:SetUpVirtual("buffFrames", virtualGroupType, self.componentScale)
+    self:SetUpVirtual("debuffFrames", virtualGroupType, self.componentScale, true)
+    self:SetUpVirtual("dispelDebuffFrames", virtualGroupType, 1)
 
     for group in self.IterateCompactGroups(groupType) do
         self:LayoutGroup(group, groupType, isInCombatLockDown)
@@ -369,7 +370,9 @@ function KHMRaidFrames:AdditionalAura(name, debuffType, spellId, unitCaster)
     return false
 end
 
-function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
+function KHMRaidFrames:SmartAnchoring(frame, groupType, virtual)
+    local db = self.db.profile[groupType].debuffFrames
+    local typedframes = virtual and self.virtual.frames.debuffFrames or frame.debuffFrames
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
@@ -383,10 +386,19 @@ function KHMRaidFrames:SmartAnchoring(frame, typedframes, db)
         local index = 1
         local bigs = 0
 
+        if typedframe and not typedframe:IsShown() then
+            break
+        end
+
         while true do
             if frameNum > #typedframes then break end
 
             typedframe = typedframes[frameNum]
+
+            if typedframe and not typedframe:IsShown() then
+                break
+            end
+
             typedframe:ClearAllPoints()
 
             if frameNum == 1 then
@@ -464,16 +476,16 @@ function KHMRaidFrames.ColorByClass(unit)
     end
 end
 
-function KHMRaidFrames:SafeRefresh()
+function KHMRaidFrames:SafeRefresh(virtualGroupType)
     if not self.refreshingSettings then
         self.refreshingSettings = true
         C_Timer.After(self.refreshThrottleSecs, function()
-            self:SafeRefreshInternal(groupType)
+            self:SafeRefreshInternal(virtualGroupType)
         end)
     end
 end
 
-function KHMRaidFrames:SafeRefreshInternal()
+function KHMRaidFrames:SafeRefreshInternal(virtualGroupType)
     if InCombatLockdown() then
         self:Print("Can not refresh settings while in combat")
         self:HideAll()
@@ -481,7 +493,7 @@ function KHMRaidFrames:SafeRefreshInternal()
         self.refreshingSettings = false
         return
     else
-        self:RefreshConfig()
+        self:RefreshConfig(virtualGroupType)
     end
 
     self.refreshingSettings = false

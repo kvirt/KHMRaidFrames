@@ -9,7 +9,7 @@ function KHMRaidFrames:GetVirtualFrames()
     for frameType in self.IterateSubFrameTypes() do
         for i=1, self.maxFrames do
             frame = CreateFrame("Button", nil, UIParent)
-            self.virtual.frames[frameType..i] = frame
+            self.virtual.frames[frameType][i] = frame
 
             texture = frame:CreateTexture(nil, "BACKGROUND")
             texture:SetAllPoints(frame)
@@ -63,11 +63,7 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
 
     local db = self.db.profile[groupType][subFrameType]
 
-    local typedframes = {}
-
-    for i=1, self.maxFrames do
-        typedframes[i] = self.virtual.frames[subFrameType..i]
-    end
+    local typedframes = self.virtual.frames[subFrameType]
 
     for frameNum=1, #typedframes do
         if frameNum > db.num then
@@ -77,7 +73,7 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
         end
     end
 
-    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, typedframes, db, groupType, subFrameType)
+    self:SetUpSubFramesPositionsAndSize(self.virtual.frame, subFrameType, groupType, true)
 
     if db.showBigDebuffs and bigSized then
         typedframes[1].isBossAura = true
@@ -87,14 +83,16 @@ function KHMRaidFrames:SetUpVirtual(subFrameType, groupType, resize, bigSized)
         typedframes[1]:SetSize(size, size)
 
         if db.smartAnchoring then
-            self:SmartAnchoring(self.virtual.frame, typedframes, db)
+            self:SmartAnchoring(self.virtual.frame, groupType, true)
         end
     end
 end
 
 function KHMRaidFrames:HideVirtual()
-    for _, frame in pairs(self.virtual.frames) do
-        frame:Hide()
+    for _, group in pairs(self.virtual.frames) do
+        for _, frame in ipairs(group) do
+            frame:Hide()
+        end
     end
 
     self.virtual.shown = false

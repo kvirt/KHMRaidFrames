@@ -423,19 +423,21 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
     self:CompactUnitFrame_HideAllDebuffs(frame, numUsedDebuffs + 1, self.db.profile.glows.auraGlow)
     CompactUnitFrame_HideAllDispelDebuffs(frame, numUsedDispelDebuffs + 1)
 
-    db = self:GroupTypeDB().debuffFrames
+    local groupType = IsInRaid() and "raid" or "party"
 
-    if db.showBigDebuffs and db.smartAnchoring then
-        self:SmartAnchoring(frame, frame.debuffFrames, db)
-    end
+    if self.db.profile[groupType].debuffFrames.showBigDebuffs and self.db.profile[groupType].debuffFrames.smartAnchoring then
+        self:SmartAnchoring(frame, IsInRaid() and "raid" or "party")
 
-    if self.Masque then
-        for _, _frame in pairs(frame.debuffFrames) do
-            self.Masque.debuffFrames:ReSkin(_frame)
+        if self.Masque then
+            for _, _frame in pairs(frame.debuffFrames) do
+                if frame:IsShown() then
+                    self.Masque.debuffFrames:ReSkin(_frame)
+                end
+            end
         end
     end
 
-    db = self.db.profile.glows.frameGlow
+    local db = self.db.profile.glows.frameGlow
 
     if db.buffFrames.enabled then
         for aura, auras in pairs(frame.buffFramesGlowing) do

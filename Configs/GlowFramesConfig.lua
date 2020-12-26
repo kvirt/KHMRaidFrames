@@ -433,7 +433,7 @@ function KHMRaidFrames:RestoreGlowDefaults(frameType, glowType)
         self.db.profile.glows[glowType][frameType][k] = v
     end
 
-    self:SafeRefresh()
+    self:SafeRefresh(groupType)
 end
 
 function KHMRaidFrames:RestoreDefaultColors(glowType)
@@ -443,7 +443,7 @@ function KHMRaidFrames:RestoreDefaultColors(glowType)
         self.db.profile.glows[glowType].defaultColors[k] = KHMRaidFrames.defuffsColors[k]
     end
 
-    self:SafeRefresh()
+    self:SafeRefresh(groupType)
 end
 
 function KHMRaidFrames:RestartOptionsGlows(frameType, glowType)

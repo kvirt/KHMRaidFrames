@@ -52,7 +52,7 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
         local name = frame and frame:GetName()
         name = name and name..groupType
 
-        if name and self.processedFrames[name] ~= true then
+        if name and self.processedFrames[name] ~= true and frame.unit then
             self.processedFrames[name] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
         end
     end
@@ -83,9 +83,9 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
 
     self.UpdateResourceBar(frame, groupType, true)
 
-    self:SetUpSubFramesPositionsAndSize(frame, frame.buffFrames, db.buffFrames, groupType, "buffFrames")
-    self:SetUpSubFramesPositionsAndSize(frame, frame.debuffFrames, db.debuffFrames, groupType, "debuffFrames")
-    self:SetUpSubFramesPositionsAndSize(frame, frame.dispelDebuffFrames, db.dispelDebuffFrames, groupType, "dispelDebuffFrames")
+    self:SetUpSubFramesPositionsAndSize(frame, "buffFrames", groupType)
+    self:SetUpSubFramesPositionsAndSize(frame, "debuffFrames", groupType)
+    self:SetUpSubFramesPositionsAndSize(frame, "dispelDebuffFrames", groupType)
 
     self:SetUpRaidIcon(frame, groupType)
 
@@ -733,9 +733,15 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
     end
 
     if not refresh then
-        KHMRaidFrames:SetUpMainSubFramePosition(frame, "buffFrames")
-        KHMRaidFrames:SetUpMainSubFramePosition(frame, "debuffFrames")
-        KHMRaidFrames:SetUpMainSubFramePosition(frame, "dispelDebuffFrames")
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "buffFrames", groupType)
+
+        if KHMRaidFrames.db.profile[groupType].debuffFrames.smartAnchoring and KHMRaidFrames.db.profile[groupType].debuffFrames.showBigDebuffs then
+            KHMRaidFrames:SmartAnchoring(frame, groupType)
+        else
+            KHMRaidFrames:SetUpMainSubFramePosition(frame, "debuffFrames", groupType)
+        end
+
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "dispelDebuffFrames", groupType)
     end
 end
 

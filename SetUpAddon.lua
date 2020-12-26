@@ -65,7 +65,11 @@ function KHMRaidFrames:SetInternalVariables()
     self.maxFrames = 10
     self.virtual = {
         shown = false,
-        frames = {},
+        frames = {
+            buffFrames = {},
+            debuffFrames = {},
+            dispelDebuffFrames = {},
+        },
         groupType = "raid",
     }
     self.aurasCache = {}
