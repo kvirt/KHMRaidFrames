@@ -35,7 +35,7 @@ function KHMRaidFrames:SetupProfiles()
         order = 2,
         func = function(info,val)
             self.ExportCurrentProfile(self.ExportProfileToString())
-            self:HideAll()
+            InterfaceOptionsFrame:Hide()
         end,
     }
 

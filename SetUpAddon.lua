@@ -33,7 +33,7 @@ function KHMRaidFrames:Setup()
 
     self:RegisterChatCommand("khm", function(arg, ...)
         if arg == "reload" then
-            self.RefreshProfileSettings(true, true)
+            self.CompactUnitFrameProfiles_ApplyProfile(nil, true, true)
             self:CompactRaidFrameContainer_LayoutFrames()
             self:Print("Hard Reload")
             return
@@ -138,7 +138,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
 
-    self:SafeRefresh()
+    self:RefreshConfig()
 end
 
 function KHMRaidFrames:OnEvent(event, ...)
@@ -157,7 +157,6 @@ function KHMRaidFrames:OnEvent(event, ...)
 
         self.RefreshProfileSettings()
     elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
-        self:HideAll()
         self.deffered = true
     elseif event == "RAID_TARGET_UPDATE" then
         self:UpdateRaidMark(groupType)
@@ -174,10 +173,6 @@ function KHMRaidFrames:OnEvent(event, ...)
 end
 
 function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
-    if not forceRefresh and InCombatLockdown() then
-        return
-    end
-
     local groupType = IsInRaid() and "raid" or "party"
 
     if not forceSettings and groupType == KHMRaidFrames.currentGroup then
@@ -288,16 +283,12 @@ end
 --
 
 -- PROFILES
-function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
-    if self:GetRaidProfileSettings() then
-        self.deffered = true
-        return
-    end
+function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile, forceSettings, forceRefresh)
+    self.PrintV(profile)
+    self:GetRaidProfileSettings(profile)
 
     self.processedFrames = {}
     self.rolesCache = {}
-
-    local forceSettings = false
 
     if self.db:GetCurrentProfile() ~= profile then
         self.SyncProfiles(profile)
@@ -307,30 +298,41 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
     if not self.reloadingSettings then
         self.reloadingSettings = true
         C_Timer.After(self.profileThrottleSecs, function()
-            self.ReloadSetting(forceSettings)
+            self.ReloadSetting(forceSettings, forceRefresh)
         end)
     end
 end
 
-function KHMRaidFrames.ReloadSetting(forceSettings)
-    KHMRaidFrames.RefreshProfileSettings(forceSettings)
+function KHMRaidFrames.ReloadSetting(forceSettings, forceRefresh)
+    KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
     KHMRaidFrames:SafeRefresh()
     KHMRaidFrames.reloadingSettings = false
 end
 
 function KHMRaidFrames:GetRaidProfileSettings(profile)
-    if InCombatLockdown() then return true end
+    local settings
 
-    profile = profile or GetActiveRaidProfile()
-    local settings = GetRaidProfileFlattenedOptions(profile)
+    if InCombatLockdown() then
+        settings = self.db.profile.saved_profiles[profile] or self.db.profile.saved_profiles.default
+        self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
+        self.deffered = true
+    else
+        profile = profile or GetActiveRaidProfile()
+        settings = GetRaidProfileFlattenedOptions(profile)
 
-    if not settings then return end
+        if not settings then
+            settings = self.db.profile.saved_profiles[profile] or self.db.profile.saved_profiles.default
+        end
+
+        self.useCompactPartyFrames = true
+    end
 
     self.horizontalGroups = settings.horizontalGroups
     self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
 
     if self.keepGroupsTogether ~= settings.keepGroupsTogether then
         self.processedFrames = {}
+        self.rolesCache = {}
     end
 
     self.keepGroupsTogether = settings.keepGroupsTogether
@@ -339,9 +341,21 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.frameHeight = settings.frameHeight
     self.displayPowerBar = settings.displayPowerBar
     self.displayPets = settings.displayPets
-    self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
+
+    local savedProfile = {}
+    savedProfile.horizontalGroups = settings.horizontalGroups
+    savedProfile.displayMainTankAndAssist = settings.displayMainTankAndAssist
+    savedProfile.keepGroupsTogether = settings.keepGroupsTogether
+    savedProfile.displayBorder = settings.displayBorder
+    savedProfile.frameWidth = settings.frameWidth
+    savedProfile.frameHeight = settings.frameHeight
+    savedProfile.displayPowerBar = settings.displayPowerBar
+    savedProfile.displayPets = settings.displayPets
+    savedProfile.useCompactPartyFrames = self.useCompactPartyFrames
+
+    self.db.profile.saved_profiles[profile] = savedProfile
 end
 
 function KHMRaidFrames.SyncProfiles(profile)
@@ -362,7 +376,7 @@ end
 -- CONFIG PANEL CLOSE/OPEN
 function KHMRaidFrames:OnOptionShow()
     if InCombatLockdown() then
-        self:HideAll()
+        self:Print("Can not refresh settings while in combat")
         self.deffered = true
         return
     end
@@ -392,10 +406,6 @@ function KHMRaidFrames:HideRaidFrame()
     end
 
     self:HideVirtual()
-end
-
-function KHMRaidFrames:HideAll()
-    _G["InterfaceOptionsFrame"]:Hide()
 end
 --
 
@@ -616,6 +626,19 @@ function KHMRaidFrames:Defaults()
     }
 
     defaults_settings.profile.Masque = false
+    defaults_settings.profile.saved_profiles = {
+        default = {
+            displayPowerBar = true,
+            frameHeight = self.NATIVE_UNIT_FRAME_HEIGHT,
+            frameWidth = self.NATIVE_UNIT_FRAME_WIDTH,
+            displayBorder = true,
+            keepGroupsTogether = false,
+            displayPets = true,
+            useCompactPartyFrames = true,
+            horizontalGroups = false,
+            displayMainTankAndAssist = false,
+        }
+    }
 
     return defaults_settings
 end
