@@ -425,8 +425,10 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
 
     local groupType = IsInRaid() and "raid" or "party"
 
-    if self.db.profile[groupType].debuffFrames.showBigDebuffs and self.db.profile[groupType].debuffFrames.smartAnchoring then
-        self:SmartAnchoring(frame, IsInRaid() and "raid" or "party")
+    if self.db.profile[groupType].debuffFrames.showBigDebuffs then
+        if self.db.profile[groupType].debuffFrames.smartAnchoring then
+            self:SmartAnchoring(frame, IsInRaid() and "raid" or "party")
+        end
 
         if self.Masque then
             for _, _frame in pairs(frame.debuffFrames) do
