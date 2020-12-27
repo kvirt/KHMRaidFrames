@@ -153,7 +153,7 @@ function KHMRaidFrames:OnEvent(event, ...)
             self.deffered = false
         end
 
-        self.RefreshProfileSettings()
+        --self.RefreshProfileSettings()
     elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
         self.deffered = true
     elseif event == "RAID_TARGET_UPDATE" then
