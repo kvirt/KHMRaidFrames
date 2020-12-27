@@ -1,5 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
+local LGF = LibStub("LibGetFrame-1.0")
 
 local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
 
@@ -87,7 +88,6 @@ function KHMRaidFrames:SetInternalVariables()
     }
 
     self.rolesCache = {}
-    self.iconRolesCache = {}
 
     -- throttling refreshes
     self.refreshingSettings = false
@@ -124,7 +124,6 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
     self:RegisterEvent("RAID_TARGET_UPDATE", "OnEvent")
-    self:RegisterEvent("PLAYER_TALENT_UPDATE", "OnEvent")
     self:RegisterEvent("PARTY_LEADER_CHANGED", "OnEvent")
 
     self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
@@ -162,9 +161,6 @@ function KHMRaidFrames:OnEvent(event, ...)
     elseif event == "PLAYER_ROLES_ASSIGNED" then
         self:UpdateRaidMark(groupType)
         self:CustomizeOptions()
-        self.UpdateResourceBars()
-    elseif event == "PLAYER_TALENT_UPDATE" and not IsInGroup() then
-        self.UpdateResourceBars()
     elseif event == "PARTY_LEADER_CHANGED" then
         self.UpdateLeaderIcon()
     end
@@ -192,7 +188,7 @@ function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
         KHMRaidFrames:Unhook("CompactUnitFrame_UpdateStatusText")
     end
 
-    if not db.roleIcon.enabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
+    if (not db.roleIcon.enabled and not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers) and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
         KHMRaidFrames:Unhook("CompactUnitFrame_UpdateRoleIcon")
     end
 
@@ -228,18 +224,32 @@ function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
         )
     end
 
-    if db.roleIcon.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
+    if (db.roleIcon.enabled or KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers) and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateRoleIcon") then
         KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateRoleIcon",
             function(frame)
                 if KHMRaidFrames.SkipFrame(frame) then return end
 
-            KHMRaidFrames:SetUpRoleIconInternal(frame, IsInRaid() and "raid" or "party")
+                local role = KHMRaidFrames.GetRole(frame)
+                local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
+
+                local groupType = IsInRaid() and "raid" or "party"
+
+                KHMRaidFrames:SetUpRoleIconInternal(frame, groupType, role)
+
+                if role == prevRole or role == "NONE" then
+                    return
+                end
+
+                KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole)
+
+                KHMRaidFrames.rolesCache[frame:GetName()] = role
+
          end
         )
     end
 
-    if db.readyCheckIcon.enabled and not self:IsHooked("CompactUnitFrame_UpdateReadyCheck") then
+    if db.readyCheckIcon.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateReadyCheck") then
         KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateReadyCheck",
             function(frame)
@@ -250,7 +260,7 @@ function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
         )
     end
 
-    if db.centerStatusIcon.enabled and not self:IsHooked("CompactUnitFrame_UpdateCenterStatusIcon") then
+    if db.centerStatusIcon.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateCenterStatusIcon") then
         KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateCenterStatusIcon",
             function(frame)
@@ -283,9 +293,6 @@ end
 -- PROFILES
 function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile, forceSettings, forceRefresh)
     self:GetRaidProfileSettings(profile)
-
-    self.processedFrames = {}
-    self.rolesCache = {}
 
     if self.db:GetCurrentProfile() ~= profile then
         self.SyncProfiles(profile)
@@ -327,12 +334,6 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
 
     self.horizontalGroups = settings.horizontalGroups
     self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
-
-    if self.keepGroupsTogether ~= settings.keepGroupsTogether then
-        self.processedFrames = {}
-        self.rolesCache = {}
-    end
-
     self.keepGroupsTogether = settings.keepGroupsTogether
     self.displayBorder = settings.displayBorder
     self.frameWidth = settings.frameWidth

@@ -72,6 +72,8 @@ function KHMRaidFrames:LayoutGroup(frame, groupType)
 end
 
 function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
+    if not frame.unit then return end
+
     local db = self.db.profile[groupType]
     local deferred = false
 
@@ -81,7 +83,13 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         deferred = true
     end
 
-    self.UpdateResourceBar(frame, groupType, true)
+    local role = self.GetRole(frame)
+    local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
+
+    local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
+    frame.healthBar:SetStatusBarTexture(texture, "BORDER")
+
+    self.UpdateResourceBar(frame, groupType, role, prevRole, true)
 
     self:SetUpSubFramesPositionsAndSize(frame, "buffFrames", groupType)
     self:SetUpSubFramesPositionsAndSize(frame, "debuffFrames", groupType)
@@ -98,7 +106,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     end
 
     if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
-        self:SetUpRoleIcon(frame, groupType)
+        self:SetUpRoleIcon(frame, groupType, role)
     end
 
     if self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then
@@ -114,9 +122,6 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     end
 
     self:CompactUnitFrame_UpdateHealPrediction(frame)
-
-    local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
-    frame.healthBar:SetStatusBarTexture(texture, "BORDER")
 
     frame.healthBar:SetAlpha(db.frames.alpha)
     frame.background:SetAlpha(db.frames.alpha)
@@ -241,7 +246,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         _name = _name and _name:gsub("%p", "")
     end
 
-    if _name then
+    if _name ~= "" and _name ~= nil then
         name:SetText(_name)
     end
 
@@ -402,7 +407,7 @@ function KHMRaidFrames:SetUpRaidIcon(frame)
 end
 
 -- ROLE ICON
-function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
+function KHMRaidFrames:SetUpRoleIcon(frame, groupType, role)
     if not self.db.profile[groupType].nameAndIcons.roleIcon.enabled then return end
     if not frame.roleIcon then return end
 
@@ -426,10 +431,10 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType)
 
     roleIcon:SetSize(size, size)
 
-    self:SetUpRoleIconInternal(frame, groupType)
+    self:SetUpRoleIconInternal(frame, groupType, role)
 end
 
-function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
+function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType, role)
     if not self.db.profile[groupType].nameAndIcons.roleIcon.enabled then return end
     if not frame.unit then return end
     if not frame.roleIcon then return end
@@ -442,30 +447,17 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType)
         return
     end
 
-    local raidID = UnitInRaid(frame.unit)
-    local role
+    role = role:lower()
 
-    if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
-        role = "VEHICLE"
-    elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
-        role = select(10, GetRaidRosterInfo(raidID))
+    if db[role] ~= "" and db[role] ~= nil then
+        roleIcon:SetTexture(db[role])
+        roleIcon:SetTexCoord(0, 1, 0, 1)
+        roleIcon:SetVertexColor(unpack(db.colors[role]))
     else
-        role = UnitGroupRolesAssigned(frame.unit)
+        roleIcon:SetVertexColor(1, 1, 1)
     end
 
-    if role then
-        role = role:lower()
-
-        if db[role] ~= "" and db[role] ~= nil then
-            roleIcon:SetTexture(db[role])
-            roleIcon:SetTexCoord(0, 1, 0, 1)
-            roleIcon:SetVertexColor(unpack(db.colors[role]))
-        else
-            roleIcon:SetVertexColor(1, 1, 1)
-        end
-
-        roleIcon:Show()
-    end
+    roleIcon:Show()
 end
 
 -- READY CHECK ICON
@@ -691,41 +683,24 @@ end
 --
 
 --RESOURСE BAR
-function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
+function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, refresh)
+    if not frame.unit then return end
+    if not frame.powerBar then return end
+
     if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then
         return
     end
 
-    if not frame.unit then return end
-
-    local ispet = string.find(frame.unit, "pet")
-    local role = ispet and "pet" or UnitGroupRolesAssigned(frame.unit)
-
-    local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
-
-    if role == "NONE" and not IsInGroup() then
-        role = select(5, GetSpecializationInfo(GetSpecialization()))
-    elseif role == prevRole or role == "NONE" then
-        return
-    end
-
-    KHMRaidFrames.rolesCache[frame:GetName()] = role
-
     if role == "HEALER" then
-        frame.healthBar:ClearAllPoints()
-        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
-        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)
-
         frame.powerBar:Show()
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, KHMRaidFrames.powerBarHeight + 1)
 
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Show()
         end
-    elseif prevRole == "HEALER" or prevRole == nil or role == "pet" then
-        frame.healthBar:ClearAllPoints()
-        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
-        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
+    elseif prevRole == "HEALER" or prevRole == nil then
         frame.powerBar:Hide()
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
 
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Hide()
@@ -746,40 +721,51 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, refresh)
 end
 
 function KHMRaidFrames.RevertResourceBar()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.RevertResourceBarInternal(frame)
-    end
+    local groupType = IsInRaid() and "raid" or "party"
 
     KHMRaidFrames.rolesCache = {}
+
+    if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then
+        for frame in KHMRaidFrames.IterateCompactFrames() do
+            KHMRaidFrames.RevertResourceBarInternal(frame)
+        end
+    else
+        for frame in KHMRaidFrames.IterateCompactFrames() do
+            local role = KHMRaidFrames.GetRole(frame)
+            local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
+
+            KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, true)
+        end
+    end
+
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "buffFrames", groupType)
+
+        if KHMRaidFrames.db.profile[groupType].debuffFrames.smartAnchoring and KHMRaidFrames.db.profile[groupType].debuffFrames.showBigDebuffs then
+            KHMRaidFrames:SmartAnchoring(frame, groupType)
+        else
+            KHMRaidFrames:SetUpMainSubFramePosition(frame, "debuffFrames", groupType)
+        end
+
+        KHMRaidFrames:SetUpMainSubFramePosition(frame, "dispelDebuffFrames", groupType)
+    end
 end
 
 function KHMRaidFrames.RevertResourceBarInternal(frame)
     if KHMRaidFrames.displayPowerBar and frame.unit and not string.find(frame.unit, "pet") then
-        frame.healthBar:ClearAllPoints()
-        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
-        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1 + KHMRaidFrames.powerBarHeight)
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, KHMRaidFrames.powerBarHeight + 1)
         frame.powerBar:Show()
 
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Show()
         end
     else
-        frame.healthBar:ClearAllPoints()
-        frame.healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
         frame.powerBar:Hide()
 
         if KHMRaidFrames.displayBorder then
             frame.horizDivider:Hide()
         end
-    end
-end
-
-function KHMRaidFrames.UpdateResourceBars()
-    local groupType = IsInRaid() and "raid" or "party"
-
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.UpdateResourceBar(frame, groupType)
     end
 end
 --

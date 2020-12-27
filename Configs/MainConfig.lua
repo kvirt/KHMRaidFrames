@@ -2119,11 +2119,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
 
                 self.db.profile[groupType].frames.showResourceOnlyForHealers = val
 
-                if not val then
-                    self.RevertResourceBar()
-                end
-
-                self:SafeRefresh(groupType)
+                self.RevertResourceBar()
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.showResourceOnlyForHealers

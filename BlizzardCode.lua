@@ -432,7 +432,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
 
         if self.Masque then
             for _, _frame in pairs(frame.debuffFrames) do
-                if frame:IsShown() then
+                if _frame:IsShown() then
                     self.Masque.debuffFrames:ReSkin(_frame)
                 end
             end
