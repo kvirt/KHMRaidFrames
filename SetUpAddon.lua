@@ -138,6 +138,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
 
+    self:GetRaidProfileSettings()
     self:RefreshConfig()
 end
 
@@ -309,6 +310,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     local settings
 
     if InCombatLockdown() then
+        profile = profile or self.db.profile.current_profile
         settings = self.db.profile.saved_profiles[profile] or self.db.profile.saved_profiles.default
         self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
         self.deffered = true
@@ -351,6 +353,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     savedProfile.displayPets = settings.displayPets
     savedProfile.useCompactPartyFrames = self.useCompactPartyFrames
 
+    self.db.profile.current_profile = profile
     self.db.profile.saved_profiles[profile] = savedProfile
 end
 
@@ -635,6 +638,8 @@ function KHMRaidFrames:Defaults()
             displayMainTankAndAssist = false,
         }
     }
+
+    defaults_settings.profile.current_profile = "default"
 
     return defaults_settings
 end
