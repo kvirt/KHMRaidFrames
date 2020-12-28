@@ -169,13 +169,13 @@ end
 function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
     local groupType = IsInRaid() and "raid" or "party"
 
+    KHMRaidFrames.RevertResourceBar()
+
     if not forceSettings and groupType == KHMRaidFrames.currentGroup then
         return
     end
 
     KHMRaidFrames.currentGroup = groupType
-    KHMRaidFrames.processedFrames = {}
-    KHMRaidFrames.rolesCache = {}
 
     local db = KHMRaidFrames.db.profile[KHMRaidFrames.currentGroup].nameAndIcons
 
@@ -244,8 +244,7 @@ function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
                 KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole)
 
                 KHMRaidFrames.rolesCache[frame:GetName()] = role
-
-         end
+            end
         )
     end
 
@@ -286,12 +285,15 @@ function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
     KHMRaidFrames.RevertRoleIcon()
     KHMRaidFrames.RevertReadyCheckIcon()
     KHMRaidFrames.RevertStatusIcon()
-    KHMRaidFrames.RevertResourceBar()
 end
 --
 
 -- PROFILES
 function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile, forceSettings, forceRefresh)
+    if profile and (self.db.profile.current_profile ~= profile) then
+        forceSettings = true
+    end
+
     self:GetRaidProfileSettings(profile)
 
     if self.db:GetCurrentProfile() ~= profile then
@@ -308,6 +310,9 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile, forceSetti
 end
 
 function KHMRaidFrames.ReloadSetting(forceSettings, forceRefresh)
+    KHMRaidFrames.processedFrames = {}
+    KHMRaidFrames.rolesCache = {}
+
     KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
     KHMRaidFrames:SafeRefresh()
     KHMRaidFrames.reloadingSettings = false

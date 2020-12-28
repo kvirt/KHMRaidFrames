@@ -52,7 +52,7 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
         local name = frame and frame:GetName()
         name = name and name..groupType
 
-        if name and self.processedFrames[name] ~= true and frame.unit then
+        if name and self.processedFrames[name] ~= true then
             self.processedFrames[name] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
         end
     end
@@ -72,8 +72,6 @@ function KHMRaidFrames:LayoutGroup(frame, groupType)
 end
 
 function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
-    if not frame.unit then return end
-
     local db = self.db.profile[groupType]
     local deferred = false
 
@@ -82,9 +80,6 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     else
         deferred = true
     end
-
-    local role = self.GetRole(frame)
-    local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
     local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
     frame.healthBar:SetStatusBarTexture(texture, "BORDER")
@@ -447,6 +442,8 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType, role)
         return
     end
 
+    role = role or self.GetRole(frame)
+
     role = role:lower()
 
     if db[role] ~= "" and db[role] ~= nil then
@@ -691,6 +688,9 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, refre
         return
     end
 
+    role = role or KHMRaidFrames.GetRole(frame)
+    prevRole = prevRole or KHMRaidFrames.rolesCache[frame:GetName()]
+
     if role == "HEALER" then
         frame.powerBar:Show()
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, KHMRaidFrames.powerBarHeight + 1)
@@ -731,10 +731,12 @@ function KHMRaidFrames.RevertResourceBar()
         end
     else
         for frame in KHMRaidFrames.IterateCompactFrames() do
-            local role = KHMRaidFrames.GetRole(frame)
-            local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
+            if frame.unit then
+                local role = KHMRaidFrames.GetRole(frame)
+                local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
-            KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, true)
+                KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, true)
+            end
         end
     end
 

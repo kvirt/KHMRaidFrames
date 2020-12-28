@@ -540,7 +540,7 @@ function KHMRaidFrames.IterateCompactFrames(groupType)
 
             frame = _G["CompactRaidGroup"..groupIndex.."Member"..index]
 
-            if frame and frame.unit then
+            if frame then
                 return frame
             else
                 if groupIndex >= 8 then
@@ -556,7 +556,7 @@ function KHMRaidFrames.IterateCompactFrames(groupType)
 
             frame = _G["CompactPartyFrameMember"..index]
 
-            if frame and frame.unit then
+            if frame then
                 return frame
             else
                 index = 0
@@ -570,7 +570,7 @@ function KHMRaidFrames.IterateCompactFrames(groupType)
 
             frame = _G["CompactRaidFrame"..index]
 
-            if frame and frame.unit then
+            if frame then
                 return frame
             else
                 doneOldStyle = true
@@ -916,7 +916,7 @@ function KHMRaidFrames.ImportCurrentProfile(text)
 end
 
 function KHMRaidFrames.SkipFrame(frame)
-    return not frame or frame:IsForbidden() or not frame:IsVisible() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not frame.unit
+    return not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not frame:IsShown()
 end
 
 local function Round(num, numDecimalPlaces, litera)
