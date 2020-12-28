@@ -2,6 +2,8 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
+SharedMedia:Register("statusbar", "Blizzard Raid PowerBar", "Interface\\RaidFrame\\Raid-Bar-Resource-Fill")
+
 local _G, tostring, CreateFrame, IsInRaid, InCombatLockdown = _G, tostring, CreateFrame, IsInRaid, InCombatLockdown
 
 local subFrameTypes = {"debuffFrames", "buffFrames", "dispelDebuffFrames"}
@@ -34,7 +36,6 @@ local englishClasses = {
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
 KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH = 72
 KHMRaidFrames.CUF_AURA_BOTTOM_OFFSET = 2
-KHMRaidFrames.powerBarHeight = 8
 
 KHMRaidFrames.defuffsColors = {
     magic = {0.2, 0.6, 1.0, 1},
@@ -258,9 +259,9 @@ function KHMRaidFrames:Offsets(anchor, frame, groupType, force)
             displayPowerBar = self.displayPowerBar
         end
 
-        powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
+        powerBarUsedHeight = (displayPowerBar and self.db.profile[groupType].frames.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     else
-        powerBarUsedHeight = (self.displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
+        powerBarUsedHeight = (self.displayPowerBar and self.db.profile[groupType].frames.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     end
 
     local xOffset, yOffset = 0, 0

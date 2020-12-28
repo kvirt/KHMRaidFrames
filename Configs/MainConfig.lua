@@ -2106,12 +2106,35 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return self.db.profile[groupType].frames.autoScaling
             end
         },
+        ["Transparency"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 9,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alpha = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alpha
+            end
+        },
+        ["Skip1.5"] = {
+            type = "header",
+            name = L["Power Bar"],
+            order = 10,
+        },
         ["Show Resource Only For Healers"] = {
             name = L["Show Resource Only For Healers"],
             desc = L["Show Resource Only For Healers Desc"],
             width = "normal",
             type = "toggle",
-            order = 9,
+            order = 11,
             confirm = function() return not self.displayPowerBar end,
             confirmText = L["Show Resource Only For Healers Desc"],
             set = function(info,val)
@@ -2125,23 +2148,56 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return self.db.profile[groupType].frames.showResourceOnlyForHealers
             end
         },
-        ["Transparency"] = {
-            name = L["Transparency"],
-            desc = "",
+        ["Power Bar Height"] = {
+            name = L["Power Bar Height"],
+            desc = L["Show Resource Only For Healers Desc"],
             width = "normal",
             type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 10,
+            min = 1,
+            max = 50,
+            step = 1,
+            order = 12,
+            confirm = function() return not self.displayPowerBar end,
+            confirmText = L["Show Resource Only For Healers Desc"],
             set = function(info,val)
-                self.db.profile[groupType].frames.alpha = val
+                if val and not self.displayPowerBar then val = false end
+
+                self.db.profile[groupType].frames.powerBarHeight = val
 
                 self:SafeRefresh(groupType)
             end,
             get = function(info)
-                return self.db.profile[groupType].frames.alpha
+                return self.db.profile[groupType].frames.powerBarHeight
             end
+        },
+        ["Power Bar Texture"] = {
+            name = L["Power Bar Texture"],
+            desc = L["Show Resource Only For Healers Desc"],
+            width = "normal",
+            type = "select",
+            values = function(info, val) return self.sortedTextures end,
+            order = 13,
+            set = function(info,val)
+                self.db.profile[groupType].frames.powerBarTexture = self.sortedTextures[val]
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                for i, texture in ipairs(self.sortedTextures) do
+                    if self.db.profile[groupType].frames.powerBarTexture == texture then return i end
+                end
+
+                for i, texture in ipairs(self.sortedTextures) do
+                    if self:Defaults().profile[groupType].frames.powerBarTexture == texture then return i end
+                end
+
+                --fallback hack
+                return 1
+            end
+        },
+        ["Skip2"] = {
+            type = "header",
+            name = "",
+            order = 14,
         },
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
@@ -2150,7 +2206,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "full",
             type = "input",
             multiline = 10,
-            order = 11,
+            order = 15,
             set = function(info,val)
                 self.db.profile[groupType].frames.tracking = self.SanitizeStringsByUnit(val)
                 self.db.profile[groupType].frames.trackingStr = val
@@ -2161,17 +2217,17 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return self.db.profile[groupType].frames.trackingStr
             end
         },
-        ["Skip2"] = {
+        ["Skip3"] = {
             type = "header",
             name = "",
-            order = 12,
+            order = 90,
         },
         ["Copy"] = {
             name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
             width = "normal",
             type = "execute",
-            order = 13,
+            order = 91,
             confirm = true,
             func = function(info,val)
                 self:CopySettings(self.db.profile[groupType].frames, self.db.profile[self.ReverseGroupType(groupType)].frames)
@@ -2183,7 +2239,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "double",
             type = "execute",
             confirm = true,
-            order = 14,
+            order = 92,
             func = function(info,val)
                 self:RestoreDefaults(groupType, "frames")
             end,

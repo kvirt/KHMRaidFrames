@@ -417,7 +417,7 @@ end
 -- DEFAULTS RELATED FUNCTIONS
 function KHMRaidFrames:Defaults()
     local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
-
+    SharedMedia:Register("statusbar", "Blizzard Raid PowerBar", "Interface\\RaidFrame\\Raid-Bar-Resource-Fill")
     local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
     KHMRaidFrames.font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT"
 
@@ -433,6 +433,8 @@ function KHMRaidFrames:Defaults()
                 autoScaling = true,
                 showResourceOnlyForHealers = false,
                 alpha = 1.0,
+                powerBarHeight = 8,
+                powerBarTexture = "Blizzard Raid PowerBar",
             },
             dispelDebuffFrames = {
                 num = 3,
