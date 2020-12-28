@@ -260,7 +260,7 @@ function KHMRaidFrames:Offsets(anchor, frame, groupType, force)
 
         powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     else
-        powerBarUsedHeight = (self.displayPowerBar and self.powerBarHeigh or 0) + self.CUF_AURA_BOTTOM_OFFSET
+        powerBarUsedHeight = (self.displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     end
 
     local xOffset, yOffset = 0, 0
