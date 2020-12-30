@@ -293,13 +293,12 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
         self.SyncProfiles(profile)
     end
 
-self.ReloadSetting()
-    --if not self.reloadingSettings then
-    --    self.reloadingSettings = true
-    --    C_Timer.After(self.profileThrottleSecs, function()
-    --        self.ReloadSetting()
-    --    end)
-    --end
+    if not self.reloadingSettings then
+        self.reloadingSettings = true
+        C_Timer.After(self.profileThrottleSecs, function()
+            self.ReloadSetting()
+        end)
+    end
 end
 
 function KHMRaidFrames.ReloadSetting()
