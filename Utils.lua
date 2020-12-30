@@ -210,6 +210,14 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, group
             typedframe:EnableMouse(true)
         end
 
+        if self.Masque and self.Masque[subFrameType] and typedframe and typedframe:GetName() then
+            self.Masque[subFrameType]:RemoveButton(typedframe)
+
+            if self.db.profile.Masque then
+                self.Masque[subFrameType]:AddButton(typedframe)
+            end
+        end
+
         frameNum = frameNum + 1
     end
 end
@@ -303,22 +311,8 @@ function KHMRaidFrames:AddSubFrames(frame, groupType)
             frameName = frame:GetName().."DispelDebuff"
         end
 
-        for i=1, 3 do
-            local typedFrame = _G[frameName..i]
-
-            if self.Masque and self.Masque[subFrameType] and typedFrame and typedFrame:GetName() then
-                self.Masque[subFrameType]:RemoveButton(typedFrame)
-                self.Masque[subFrameType]:AddButton(typedFrame)
-            end
-        end
-
         for i=#frame[subFrameType] + 1, db.num do
             local typedFrame = _G[frameName..i] or CreateFrame("Button", frameName..i, frame, template)
-
-            if self.Masque and self.Masque[subFrameType] and typedFrame:GetName() then
-                self.Masque[subFrameType]:RemoveButton(typedFrame)
-                self.Masque[subFrameType]:AddButton(typedFrame)
-            end
 
             typedFrame:ClearAllPoints()
             typedFrame:Hide()

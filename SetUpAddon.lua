@@ -1,6 +1,5 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
-local LGF = LibStub("LibGetFrame-1.0")
 
 local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
 
@@ -34,7 +33,7 @@ function KHMRaidFrames:Setup()
 
     self:RegisterChatCommand("khm", function(arg, ...)
         if arg == "reload" then
-            self:CompactUnitFrameProfiles_ApplyProfile(nil, true, true)
+            self:CompactUnitFrameProfiles_ApplyProfile()
             self:CompactRaidFrameContainer_LayoutFrames()
             self:Print("Hard Reload")
             return
@@ -98,6 +97,8 @@ function KHMRaidFrames:SetInternalVariables()
     if self.db.profile.Masque then
         local Masque = LibStub("Masque", true)
 
+        self.masquedFrames = {}
+
         if Masque then
             self.Masque = {}
             self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
@@ -150,8 +151,6 @@ function KHMRaidFrames:OnEvent(event, ...)
 
             self.deffered = false
         end
-
-        --self.RefreshProfileSettings()
     elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
         self.deffered = true
     elseif event == "RAID_TARGET_UPDATE" then
@@ -294,12 +293,13 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
         self.SyncProfiles(profile)
     end
 
-    if not self.reloadingSettings then
-        self.reloadingSettings = true
-        C_Timer.After(self.profileThrottleSecs, function()
-            self.ReloadSetting()
-        end)
-    end
+self.ReloadSetting()
+    --if not self.reloadingSettings then
+    --    self.reloadingSettings = true
+    --    C_Timer.After(self.profileThrottleSecs, function()
+    --        self.ReloadSetting()
+    --    end)
+    --end
 end
 
 function KHMRaidFrames.ReloadSetting()

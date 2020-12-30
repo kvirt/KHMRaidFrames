@@ -52,7 +52,6 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
 
     for frame in self.IterateCompactFrames(groupType) do
         local name = frame and frame:GetName()
-        name = name and name..groupType
 
         if name and self.processedFrames[name] ~= true then
             self.processedFrames[name] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
