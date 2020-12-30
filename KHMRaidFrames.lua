@@ -38,9 +38,11 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
         return
     end
 
-    self.RefreshProfileSettings()
-
     local groupType = IsInRaid() and "raid" or "party"
+
+    if groupType ~= KHMRaidFrames.currentGroup then
+        self.RefreshProfileSettings()
+    end
 
     local isInCombatLockDown = InCombatLockdown()
 
@@ -236,16 +238,34 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, yOffset)
     name:SetJustifyH(db.hJustify)
 
+    name:Show()
+
+    self.SetUpNameInternal(frame, groupType)
+end
+
+function KHMRaidFrames.SetUpNameInternal(frame, groupType)
+    if not frame.name then return end
+
+    local db = self.db.profile[groupType].nameAndIcons.name
+
+    if not db.enabled then
+        return
+    end
+
+    if not frame.unit then return end
+
+    local name = frame.name
+
     local _name
 
     if db.showServer then
         _name = GetUnitName(frame.unit, true)
     else
         _name = GetUnitName(frame.unit, false)
-        _name = _name and _name:gsub("%p", "")
+        _name = _name and _name:gsub("%p", "") or _name
     end
 
-    if _name ~= "" and _name ~= nil then
+    if _name ~= nil and _name:len() > 0 and _name ~= "" then
         name:SetText(_name)
     end
 
@@ -257,13 +277,11 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         end
     else
         if KHMRaidFrames.CompactUnitFrame_IsTapDenied(frame) then
-            frame.name:SetVertexColor(0.5, 0.5, 0.5)
+            name:SetVertexColor(0.5, 0.5, 0.5)
         else
-            frame.name:SetVertexColor(1.0, 1.0, 1.0)
+            name:SetVertexColor(1.0, 1.0, 1.0)
         end
     end
-
-    name:Show()
 end
 
 -- STATUS TEXT

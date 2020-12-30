@@ -34,7 +34,7 @@ function KHMRaidFrames:Setup()
 
     self:RegisterChatCommand("khm", function(arg, ...)
         if arg == "reload" then
-            self.CompactUnitFrameProfiles_ApplyProfile(nil, true, true)
+            self:CompactUnitFrameProfiles_ApplyProfile(nil, true, true)
             self:CompactRaidFrameContainer_LayoutFrames()
             self:Print("Hard Reload")
             return
@@ -166,14 +166,10 @@ function KHMRaidFrames:OnEvent(event, ...)
     end
 end
 
-function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
+function KHMRaidFrames.RefreshProfileSettings()
     local groupType = IsInRaid() and "raid" or "party"
 
     KHMRaidFrames.RevertResourceBar()
-
-    if not forceSettings and groupType == KHMRaidFrames.currentGroup then
-        return
-    end
 
     KHMRaidFrames.currentGroup = groupType
 
@@ -208,7 +204,7 @@ function KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
             function(frame)
                 if KHMRaidFrames.SkipFrame(frame) then return end
 
-                KHMRaidFrames:SetUpName(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames:SetUpNameInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
@@ -289,31 +285,26 @@ end
 --
 
 -- PROFILES
-function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile, forceSettings, forceRefresh)
-    if profile and (self.db.profile.current_profile ~= profile) then
-        forceSettings = true
-    end
-
+function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
     self:GetRaidProfileSettings(profile)
 
     if self.db:GetCurrentProfile() ~= profile then
         self.SyncProfiles(profile)
-        forceSettings = true
     end
 
     if not self.reloadingSettings then
         self.reloadingSettings = true
         C_Timer.After(self.profileThrottleSecs, function()
-            self.ReloadSetting(forceSettings, forceRefresh)
+            self.ReloadSetting()
         end)
     end
 end
 
-function KHMRaidFrames.ReloadSetting(forceSettings, forceRefresh)
+function KHMRaidFrames.ReloadSetting()
     KHMRaidFrames.processedFrames = {}
     KHMRaidFrames.rolesCache = {}
 
-    KHMRaidFrames.RefreshProfileSettings(forceSettings, forceRefresh)
+    KHMRaidFrames.RefreshProfileSettings()
     KHMRaidFrames:SafeRefresh()
     KHMRaidFrames.reloadingSettings = false
 end
