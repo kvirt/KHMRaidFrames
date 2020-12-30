@@ -92,7 +92,7 @@ function KHMRaidFrames:SetInternalVariables()
     -- throttling refreshes
     self.refreshingSettings = false
     self.reloadingSettings = false
-    self.profileThrottleSecs = 0.25
+    self.profileThrottleSecs = 0.1
     self.refreshThrottleSecs = 0.1
 
     if self.db.profile.Masque then
@@ -137,8 +137,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
 
-    self:GetRaidProfileSettings()
-    self:RefreshConfig()
+    self:CompactUnitFrameProfiles_ApplyProfile()
 end
 
 function KHMRaidFrames:OnEvent(event, ...)
@@ -168,6 +167,9 @@ end
 
 function KHMRaidFrames.RefreshProfileSettings()
     local groupType = IsInRaid() and "raid" or "party"
+
+    KHMRaidFrames.processedFrames = {}
+    KHMRaidFrames.rolesCache = {}
 
     KHMRaidFrames.RevertResourceBar()
 
@@ -204,7 +206,7 @@ function KHMRaidFrames.RefreshProfileSettings()
             function(frame)
                 if KHMRaidFrames.SkipFrame(frame) then return end
 
-                KHMRaidFrames:SetUpNameInternal(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames.SetUpNameInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
@@ -288,7 +290,7 @@ end
 function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
     self:GetRaidProfileSettings(profile)
 
-    if self.db:GetCurrentProfile() ~= profile then
+    if profile and (self.db:GetCurrentProfile() ~= profile) then
         self.SyncProfiles(profile)
     end
 
@@ -301,9 +303,6 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
 end
 
 function KHMRaidFrames.ReloadSetting()
-    KHMRaidFrames.processedFrames = {}
-    KHMRaidFrames.rolesCache = {}
-
     KHMRaidFrames.RefreshProfileSettings()
     KHMRaidFrames:SafeRefresh()
     KHMRaidFrames.reloadingSettings = false
@@ -408,7 +407,7 @@ end
 -- DEFAULTS RELATED FUNCTIONS
 function KHMRaidFrames:Defaults()
     local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
-    SharedMedia:Register("statusbar", "Blizzard Raid PowerBar", "Interface\\RaidFrame\\Raid-Bar-Resource-Fill")
+
     local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
     KHMRaidFrames.font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT"
 

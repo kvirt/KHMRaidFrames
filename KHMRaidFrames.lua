@@ -41,7 +41,7 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
     local groupType = IsInRaid() and "raid" or "party"
 
     if groupType ~= KHMRaidFrames.currentGroup then
-        self.RefreshProfileSettings()
+        self:CompactUnitFrameProfiles_ApplyProfile()
     end
 
     local isInCombatLockDown = InCombatLockdown()
@@ -85,12 +85,15 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
 
     local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
     frame.healthBar:SetStatusBarTexture(texture, "BORDER")
-    frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, self.db.profile[groupType].frames.powerBarHeight + 1)
+
+    if not self.db.profile[groupType].frames.showResourceOnlyForHealers then
+        frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, self.db.profile[groupType].frames.powerBarHeight + 1)
+    end
 
     texture = self.textures[db.frames.powerBarTexture] or self.textures[self:Defaults().profile[groupType].frames.powerBarTexture]
     frame.powerBar:SetStatusBarTexture(texture, "BORDER");
 
-    self.UpdateResourceBar(frame, groupType, role, prevRole, true)
+    self.UpdateResourceBar(frame, groupType, nil, nil, true)
 
     self:SetUpSubFramesPositionsAndSize(frame, "buffFrames", groupType)
     self:SetUpSubFramesPositionsAndSize(frame, "debuffFrames", groupType)
@@ -107,7 +110,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     end
 
     if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
-        self:SetUpRoleIcon(frame, groupType, role)
+        self:SetUpRoleIcon(frame, groupType, nil)
     end
 
     if self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then
@@ -246,7 +249,7 @@ end
 function KHMRaidFrames.SetUpNameInternal(frame, groupType)
     if not frame.name then return end
 
-    local db = self.db.profile[groupType].nameAndIcons.name
+    local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.name
 
     if not db.enabled then
         return
