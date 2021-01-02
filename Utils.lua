@@ -502,14 +502,7 @@ function KHMRaidFrames:SafeRefresh(virtualGroupType)
 end
 
 function KHMRaidFrames:SafeRefreshInternal(virtualGroupType)
-    if InCombatLockdown() then
-        self:Print("Can not refresh settings while in combat")
-        self.deffered = true
-        self.refreshingSettings = false
-        return
-    else
-        self:RefreshConfig(virtualGroupType)
-    end
+    self:RefreshConfig(virtualGroupType)
 
     self.refreshingSettings = false
 end

@@ -126,6 +126,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
+    self:SecureHook("CompactUnitFrame_UpdateAll")
 
     self.RefreshProfileSettings()
 
@@ -133,9 +134,8 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
-    self:SecureHook("CompactUnitFrame_UpdateAll")
 
-    self:CompactUnitFrameProfiles_ApplyProfile()
+    self:SafeRefresh()
 end
 
 function KHMRaidFrames:OnEvent(event, ...)
