@@ -210,15 +210,21 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, group
             typedframe:EnableMouse(true)
         end
 
-        if self.Masque and self.Masque[subFrameType] and typedframe and typedframe:GetName() then
-            self.Masque[subFrameType]:RemoveButton(typedframe)
-
-            if self.db.profile.Masque then
-                self.Masque[subFrameType]:AddButton(typedframe)
-            end
-        end
-
         frameNum = frameNum + 1
+    end
+end
+
+function KHMRaidFrames.MasqueSupport(frame)
+    if not KHMRaidFrames.Masque then return end
+
+    for _, typedframe in ipairs(frame.buffFrames) do
+        KHMRaidFrames.Masque.buffFrames:RemoveButton(typedframe)
+        KHMRaidFrames.Masque.buffFrames:AddButton(typedframe)
+    end
+
+    for _, typedframe in ipairs(frame.debuffFrames) do
+        KHMRaidFrames.Masque.debuffFrames:RemoveButton(typedframe)
+        KHMRaidFrames.Masque.debuffFrames:AddButton(typedframe)
     end
 end
 
@@ -252,6 +258,7 @@ function KHMRaidFrames:RefreshConfig(virtualGroupType)
 
     for frame in self.IterateCompactFrames(groupType) do
         self:LayoutFrame(frame, groupType, isInCombatLockDown)
+        self.MasqueSupport(frame)
     end
 
     self:SetUpSoloFrame()

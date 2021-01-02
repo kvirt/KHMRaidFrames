@@ -55,6 +55,7 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
 
         if name and self.processedFrames[name] ~= true then
             self.processedFrames[name] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
+            self.MasqueSupport(frame)
         end
     end
 
@@ -70,6 +71,15 @@ function KHMRaidFrames:LayoutGroup(frame, groupType)
         frame.title:Show()
     end
 
+end
+
+function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
+    if self.SkipFrame(frame) then return end
+
+    local groupType = IsInRaid() and "raid" or "party"
+    local isInCombatLockDown = InCombatLockdown()
+
+    self:LayoutFrame(frame, groupType, isInCombatLockDown)
 end
 
 function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
@@ -94,7 +104,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     texture = self.textures[db.frames.powerBarTexture] or self.textures[self:Defaults().profile[groupType].frames.powerBarTexture]
     frame.powerBar:SetStatusBarTexture(texture, "BORDER");
 
-    self.UpdateResourceBar(frame, groupType, nil, nil, true)
+    self.UpdateResourceBar(frame, groupType, nil, true)
 
     self:SetUpSubFramesPositionsAndSize(frame, "buffFrames", groupType)
     self:SetUpSubFramesPositionsAndSize(frame, "debuffFrames", groupType)
@@ -706,7 +716,7 @@ end
 --
 
 --RESOURСE BAR
-function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, refresh)
+function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, refresh)
     if not frame.unit then return end
     if not frame.powerBar then return end
 
@@ -715,7 +725,6 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, refre
     end
 
     role = role or KHMRaidFrames.GetRole(frame)
-    prevRole = prevRole or KHMRaidFrames.rolesCache[frame:GetName()]
 
     if role == "HEALER" then
         frame.powerBar:Show()
@@ -726,7 +735,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, refre
             frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
             frame.horizDivider:Show()
         end
-    elseif prevRole == "HEALER" or prevRole == nil then
+    else
         frame.powerBar:Hide()
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
 
@@ -751,8 +760,6 @@ end
 function KHMRaidFrames.RevertResourceBar()
     local groupType = IsInRaid() and "raid" or "party"
 
-    KHMRaidFrames.rolesCache = {}
-
     if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then
         for frame in KHMRaidFrames.IterateCompactFrames() do
             KHMRaidFrames.RevertResourceBarInternal(frame)
@@ -761,9 +768,8 @@ function KHMRaidFrames.RevertResourceBar()
         for frame in KHMRaidFrames.IterateCompactFrames() do
             if frame.unit then
                 local role = KHMRaidFrames.GetRole(frame)
-                local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
-                KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole, true)
+                KHMRaidFrames.UpdateResourceBar(frame, groupType, role, true)
             end
         end
     end
@@ -790,6 +796,8 @@ function KHMRaidFrames.RevertResourceBarInternal(frame)
         frame.powerBar:Show()
 
         if KHMRaidFrames.displayBorder then
+            frame.horizDivider:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
+            frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
             frame.horizDivider:Show()
         end
     else

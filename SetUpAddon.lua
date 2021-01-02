@@ -86,8 +86,6 @@ function KHMRaidFrames:SetInternalVariables()
         },
     }
 
-    self.rolesCache = {}
-
     -- throttling refreshes
     self.refreshingSettings = false
     self.reloadingSettings = false
@@ -96,8 +94,6 @@ function KHMRaidFrames:SetInternalVariables()
 
     if self.db.profile.Masque then
         local Masque = LibStub("Masque", true)
-
-        self.masquedFrames = {}
 
         if Masque then
             self.Masque = {}
@@ -137,6 +133,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
+    self:SecureHook("CompactUnitFrame_UpdateAll")
 
     self:CompactUnitFrameProfiles_ApplyProfile()
 end
@@ -168,7 +165,6 @@ function KHMRaidFrames.RefreshProfileSettings()
     local groupType = IsInRaid() and "raid" or "party"
 
     KHMRaidFrames.processedFrames = {}
-    KHMRaidFrames.rolesCache = {}
 
     KHMRaidFrames.RevertResourceBar()
 
@@ -228,19 +224,11 @@ function KHMRaidFrames.RefreshProfileSettings()
                 if KHMRaidFrames.SkipFrame(frame) then return end
 
                 local role = KHMRaidFrames.GetRole(frame)
-                local prevRole = KHMRaidFrames.rolesCache[frame:GetName()]
 
                 local groupType = IsInRaid() and "raid" or "party"
 
                 KHMRaidFrames:SetUpRoleIconInternal(frame, groupType, role)
-
-                if role == prevRole or role == "NONE" then
-                    return
-                end
-
-                KHMRaidFrames.UpdateResourceBar(frame, groupType, role, prevRole)
-
-                KHMRaidFrames.rolesCache[frame:GetName()] = role
+                KHMRaidFrames.UpdateResourceBar(frame, groupType, role)
             end
         )
     end
@@ -291,6 +279,16 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
 
     if profile and (self.db:GetCurrentProfile() ~= profile) then
         self.SyncProfiles(profile)
+    end
+
+    if self.db.profile.Masque then
+        local Masque = LibStub("Masque", true)
+
+        if Masque then
+            self.Masque = self.Masque or {}
+            self.Masque.buffFrames = self.Masque.buffFrames or Masque:Group("KHMRaidFrames", "Buff Auras")
+            self.Masque.debuffFrames = self.Masque.debuffFrames or Masque:Group("KHMRaidFrames", "Debuff Auras")
+        end
     end
 
     if not self.reloadingSettings then
