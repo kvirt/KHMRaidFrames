@@ -44,7 +44,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
 
     local isInCombatLockDown = InCombatLockdown()
 
-    local name = frame and frame:GetName()..groupType
+    local name = frame and frame:GetName()
     if not name then return end
 
     local lastGroupType = self.processedFrames[name]
@@ -56,30 +56,11 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
 end
 
 function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
-    --if self.reloadingSettings then
-    --    return
-    --end
-
     local groupType = IsInRaid() and "raid" or "party"
-
-    --if groupType ~= KHMRaidFrames.currentGroup then
-    --    self:CompactUnitFrameProfiles_ApplyProfile()
-    --end
-
-    --local isInCombatLockDown = InCombatLockdown()
 
     for group in self.IterateCompactGroups(groupType) do
         self:LayoutGroup(group, groupType)
     end
-
-    --for frame in self.IterateCompactFrames(groupType) do
-    --    local name = frame and frame:GetName()..groupType
-
-    --    if name and self.processedFrames[name] ~= true then
-    --        self.processedFrames[name] = not self:LayoutFrame(frame, groupType, isInCombatLockDown)
-    --        self.MasqueSupport(frame)
-    --    end
-    --end
 
     self:SetUpSoloFrame()
 end
@@ -87,7 +68,7 @@ end
 function KHMRaidFrames:LayoutGroup(frame, groupType)
     local db = self.db.profile[groupType]
 
-    if db.frames.hideGroupTitles then
+    if self.db.profile[groupType].frames.hideGroupTitles then
         frame.title:Hide()
     else
         frame.title:Show()
@@ -162,7 +143,7 @@ end
 -- ABSORB PREDICTION
 function KHMRaidFrames:CompactUnitFrame_UpdateHealPrediction(frame)
     if not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not UnitIsPlayer(frame.displayedUnit) then return end
-    self.PrintV(frame:GetName())
+
     if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end
 
     local absorbBar = frame.totalAbsorb
