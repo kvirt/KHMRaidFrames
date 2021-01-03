@@ -215,7 +215,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, group
 end
 
 function KHMRaidFrames.MasqueSupport(frame)
-    if not KHMRaidFrames.Masque then return end
+    if not KHMRaidFrames.db.profile.Masque then return end
 
     for _, typedframe in ipairs(frame.buffFrames) do
         KHMRaidFrames.Masque.buffFrames:RemoveButton(typedframe)

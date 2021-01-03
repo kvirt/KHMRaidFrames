@@ -430,7 +430,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
             self:SmartAnchoring(frame, IsInRaid() and "raid" or "party")
         end
 
-        if self.Masque then
+        if self.db.profile.Masque then
             for _, _frame in pairs(frame.debuffFrames) do
                 if _frame:IsShown() then
                     self.Masque.debuffFrames:ReSkin(_frame)

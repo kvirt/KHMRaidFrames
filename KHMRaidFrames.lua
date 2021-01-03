@@ -38,11 +38,11 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
 
     local groupType = IsInRaid() and "raid" or "party"
 
-    if groupType ~= KHMRaidFrames.currentGroup then
+    local isInCombatLockDown = InCombatLockdown()
+
+    if groupType ~= self.currentGroup then
         self:CompactUnitFrameProfiles_ApplyProfile()
     end
-
-    local isInCombatLockDown = InCombatLockdown()
 
     local name = frame and frame:GetName()
     if not name then return end
@@ -50,6 +50,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
     local lastGroupType = self.processedFrames[name]
 
     if groupType ~= lastGroupType then
+        self.PrintV(name)
         self:LayoutFrame(frame, groupType)
         self.processedFrames[name] = groupType
     end
@@ -725,9 +726,11 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, refresh)
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, KHMRaidFrames.db.profile[groupType].frames.powerBarHeight + 1)
 
         if KHMRaidFrames.displayBorder then
-            frame.horizDivider:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
-            frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
+            frame.horizDivider:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 1 + KHMRaidFrames.db.profile[groupType].frames.powerBarHeight)
+            frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + KHMRaidFrames.db.profile[groupType].frames.powerBarHeight)
             frame.horizDivider:Show()
+        else
+            frame.horizDivider:Hide()
         end
     else
         frame.powerBar:Hide()
@@ -793,6 +796,8 @@ function KHMRaidFrames.RevertResourceBarInternal(frame)
             frame.horizDivider:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 1 + KHMRaidFrames.db.profile[groupType].frames.powerBarHeight)
             frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + KHMRaidFrames.db.profile[groupType].frames.powerBarHeight)
             frame.horizDivider:Show()
+        else
+            frame.horizDivider:Hide()
         end
     else
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)

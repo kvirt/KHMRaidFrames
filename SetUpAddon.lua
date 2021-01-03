@@ -92,11 +92,12 @@ function KHMRaidFrames:SetInternalVariables()
     self.profileThrottleSecs = 0.1
     self.refreshThrottleSecs = 0.1
 
-    if self.db.profile.Masque then
-        local Masque = LibStub("Masque", true)
 
-        if Masque then
-            self.Masque = {}
+    local Masque = LibStub("Masque", true)
+    self.Masque = Masque and {} or nil
+
+    if self.db.profile.Masque then
+        if self.Masque then
             self.Masque.buffFrames = Masque:Group("KHMRaidFrames", "Buff Auras")
             self.Masque.debuffFrames = Masque:Group("KHMRaidFrames", "Debuff Auras")
         end
@@ -282,10 +283,7 @@ function KHMRaidFrames:CompactUnitFrameProfiles_ApplyProfile(profile)
     end
 
     if self.db.profile.Masque then
-        local Masque = LibStub("Masque", true)
-
-        if Masque then
-            self.Masque = self.Masque or {}
+        if self.Masque then
             self.Masque.buffFrames = self.Masque.buffFrames or Masque:Group("KHMRaidFrames", "Buff Auras")
             self.Masque.debuffFrames = self.Masque.debuffFrames or Masque:Group("KHMRaidFrames", "Debuff Auras")
         end
