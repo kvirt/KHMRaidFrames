@@ -1408,7 +1408,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherGroup = val
 
                     if val == "" then
-                        self.RevertStatusIcoTexture()
+                        self.RevertStatusIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1449,7 +1449,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingResurrection = val
 
                     if val == "" then
-                        self.RevertStatusIcoTexture()
+                        self.RevertStatusIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1490,7 +1490,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonPending = val
 
                     if val == "" then
-                        self.RevertStatusIcoTexture()
+                        self.RevertStatusIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1531,7 +1531,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonAccepted = val
 
                     if val == "" then
-                        self.RevertStatusIcoTexture()
+                        self.RevertStatusIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1572,7 +1572,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hasIncomingSummonDeclined = val
 
                     if val == "" then
-                        self.RevertStatusIcoTexture()
+                        self.RevertStatusIconTexture()
                     end
 
                     self:SafeRefresh(groupType)
@@ -1613,7 +1613,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.inOtherPhase = val
 
                     if val == "" then
-                        self.RevertStatusIcoTexture()
+                        self.RevertStatusIconTexture()
                     end
 
                     self:SafeRefresh(groupType)

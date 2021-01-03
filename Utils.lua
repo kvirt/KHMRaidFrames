@@ -911,7 +911,7 @@ function KHMRaidFrames.ImportCurrentProfile(text)
 end
 
 function KHMRaidFrames.SkipFrame(frame)
-    return not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d") or not frame:IsShown()
+    return not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d")
 end
 
 local function Round(num, numDecimalPlaces, litera)

@@ -50,7 +50,6 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
     local lastGroupType = self.processedFrames[name]
 
     if groupType ~= lastGroupType then
-        self.PrintV(name)
         self:LayoutFrame(frame, groupType)
         self.processedFrames[name] = groupType
     end

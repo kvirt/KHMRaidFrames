@@ -573,7 +573,7 @@ function KHMRaidFrames.RevertStatusIcon()
     end
 end
 
-function KHMRaidFrames.RevertStatusIcoTexture()
+function KHMRaidFrames.RevertStatusIconTexture()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         if frame.unit then
             KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIconTexture(frame)
