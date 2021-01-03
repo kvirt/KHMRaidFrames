@@ -215,8 +215,6 @@ function KHMRaidFrames:SetUpName(frame, groupType)
         return
     end
 
-    if not frame.unit then return end
-
     local name = frame.name
 
     if db.hide then
@@ -628,8 +626,6 @@ function KHMRaidFrames.UpdateLeaderIcon()
 end
 
 function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
-    if not frame or not frame.unit then return end
-
     if not frame.leaderIcon then
         frame.leaderIcon = frame:CreateTexture(nil, "OVERLAY")
     end
@@ -638,6 +634,8 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
         frame.leaderIcon:Hide()
         return
     end
+
+    if not frame or not frame.unit then return end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
     local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale or 1)
