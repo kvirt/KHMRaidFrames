@@ -30,6 +30,7 @@ local AbbreviateLargeNumbers = AbbreviateLargeNumbers
 local AbbreviateNumbers = AbbreviateNumbers
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
+local UnitExists = UnitExists
 
 
 -- MAIN FUNCTIONS FOR LAYOUT
@@ -46,6 +47,8 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
 
     local name = frame and frame:GetName()
     if not name then return end
+
+    if not UnitExists(frame.displayedUnit) then return end
 
     local lastGroupType = self.processedFrames[name]
 
