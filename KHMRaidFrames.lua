@@ -262,6 +262,7 @@ function KHMRaidFrames.SetUpNameInternal(frame, groupType)
     end
 
     if not frame.unit then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     local name = frame.name
 
@@ -328,6 +329,7 @@ end
 
 function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     if not frame.unit then return end
+    if not UnitExists(frame.displayedUnit) then return end
     if not frame.statusText then return end
     if not frame.optionTable.displayStatusText then return end
 
@@ -390,6 +392,7 @@ end
 
 function KHMRaidFrames:SetUpRaidIcon(frame)
     if not frame.unit then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     local db = self.db.profile[IsInRaid() and "raid" or "party"]
 
@@ -464,6 +467,7 @@ function KHMRaidFrames:SetUpRoleIconInternal(frame, groupType, role)
     if not self.db.profile[groupType].nameAndIcons.roleIcon.enabled then return end
     if not frame.unit then return end
     if not frame.roleIcon then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     local db = self.db.profile[groupType].nameAndIcons.roleIcon
     local roleIcon = frame.roleIcon
@@ -520,6 +524,7 @@ function KHMRaidFrames:SetUpReadyCheckIconInternal(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled then return end
     if not frame.unit then return end
     if not frame.readyCheckIcon then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
     local readyCheckIcon = frame.readyCheckIcon
@@ -569,6 +574,7 @@ function KHMRaidFrames:SetUpCenterStatusIconInternal(frame, groupType)
     if not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled then return end
     if not frame.unit then return end
     if not frame.centerStatusIcon then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
     local centerStatusIcon = frame.centerStatusIcon
@@ -639,6 +645,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
     end
 
     if not frame or not frame.unit then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
     local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale or 1)
@@ -714,6 +721,7 @@ end
 function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, refresh)
     if not frame.unit then return end
     if not frame.powerBar then return end
+    if not UnitExists(frame.displayedUnit) then return end
 
     if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then
         return
@@ -763,7 +771,7 @@ function KHMRaidFrames.RevertResourceBar()
         end
     else
         for frame in KHMRaidFrames.IterateCompactFrames() do
-            if frame.unit then
+            if frame.unit and UnitExists(frame.displayedUnit) then
                 local role = KHMRaidFrames.GetRole(frame)
 
                 KHMRaidFrames.UpdateResourceBar(frame, groupType, role, true)
@@ -788,7 +796,7 @@ function KHMRaidFrames.RevertResourceBarInternal(frame)
     local groupType = IsInRaid() and "raid" or "party"
     local powerBarHeight = KHMRaidFrames.db.profile[groupType].frames.powerBarHeight
 
-    if KHMRaidFrames.displayPowerBar and frame.unit and not string.find(frame.unit, "pet") then
+    if KHMRaidFrames.displayPowerBar and frame.unit and not string.find(frame.unit, "pet") and UnitExists(frame.displayedUnit) then
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, powerBarHeight + 1)
         frame.powerBar:Show()
 

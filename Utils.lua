@@ -257,8 +257,10 @@ function KHMRaidFrames:RefreshConfig(virtualGroupType)
     end
 
     for frame in self.IterateCompactFrames(groupType) do
-        self:LayoutFrame(frame, groupType, isInCombatLockDown)
-        self.MasqueSupport(frame)
+        if UnitExists(frame.displayedUnit) then
+            self:LayoutFrame(frame, groupType, isInCombatLockDown)
+            self.MasqueSupport(frame)
+        end
     end
 
     self:SetUpSoloFrame()
