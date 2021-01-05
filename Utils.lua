@@ -2,6 +2,8 @@ local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
 local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
 
+SharedMedia:Register("statusbar", "Blizzard Raid PowerBar", "Interface\\RaidFrame\\Raid-Bar-Resource-Fill")
+
 local _G, tostring, CreateFrame, IsInRaid, InCombatLockdown = _G, tostring, CreateFrame, IsInRaid, InCombatLockdown
 
 local subFrameTypes = {"debuffFrames", "buffFrames", "dispelDebuffFrames"}
@@ -34,7 +36,6 @@ local englishClasses = {
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
 KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH = 72
 KHMRaidFrames.CUF_AURA_BOTTOM_OFFSET = 2
-KHMRaidFrames.powerBarHeight = 8
 
 KHMRaidFrames.defuffsColors = {
     magic = {0.2, 0.6, 1.0, 1},
@@ -150,6 +151,20 @@ KHMRaidFrames.rowsGrows = {
     }
 }
 
+function KHMRaidFrames.GetRole(frame)
+    local raidID = UnitInRaid(frame.unit)
+    local role
+
+    if UnitInVehicle(frame.unit) and UnitHasVehicleUI(frame.unit) then
+        role = "VEHICLE"
+    elseif frame.optionTable.displayRaidRoleIcon and raidID and select(10, GetRaidRosterInfo(raidID)) then
+        role = select(10, GetRaidRosterInfo(raidID))
+    else
+        role = UnitGroupRolesAssigned(frame.unit)
+    end
+
+    return role
+end
 
 function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, groupType, virtual)
     local frameNum = 1
@@ -199,6 +214,20 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, group
     end
 end
 
+function KHMRaidFrames.MasqueSupport(frame)
+    if not KHMRaidFrames.db.profile.Masque then return end
+
+    for _, typedframe in ipairs(frame.buffFrames) do
+        KHMRaidFrames.Masque.buffFrames:RemoveButton(typedframe)
+        KHMRaidFrames.Masque.buffFrames:AddButton(typedframe)
+    end
+
+    for _, typedframe in ipairs(frame.debuffFrames) do
+        KHMRaidFrames.Masque.debuffFrames:RemoveButton(typedframe)
+        KHMRaidFrames.Masque.debuffFrames:AddButton(typedframe)
+    end
+end
+
 function KHMRaidFrames:SetUpMainSubFramePosition(frame, subFrameType, groupType)
     local db = self.db.profile[groupType][subFrameType]
 
@@ -228,7 +257,10 @@ function KHMRaidFrames:RefreshConfig(virtualGroupType)
     end
 
     for frame in self.IterateCompactFrames(groupType) do
-        self:LayoutFrame(frame, groupType, isInCombatLockDown)
+        if UnitExists(frame.displayedUnit) then
+            self:LayoutFrame(frame, groupType, isInCombatLockDown)
+            self.MasqueSupport(frame)
+        end
     end
 
     self:SetUpSoloFrame()
@@ -244,9 +276,9 @@ function KHMRaidFrames:Offsets(anchor, frame, groupType, force)
             displayPowerBar = self.displayPowerBar
         end
 
-        powerBarUsedHeight = (displayPowerBar and self.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
+        powerBarUsedHeight = (displayPowerBar and self.db.profile[groupType].frames.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     else
-        powerBarUsedHeight = (self.displayPowerBar and self.powerBarHeigh or 0) + self.CUF_AURA_BOTTOM_OFFSET
+        powerBarUsedHeight = (self.displayPowerBar and self.db.profile[groupType].frames.powerBarHeight or 0) + self.CUF_AURA_BOTTOM_OFFSET
     end
 
     local xOffset, yOffset = 0, 0
@@ -288,22 +320,8 @@ function KHMRaidFrames:AddSubFrames(frame, groupType)
             frameName = frame:GetName().."DispelDebuff"
         end
 
-        for i=1, 3 do
-            local typedFrame = _G[frameName..i]
-
-            if self.Masque and self.Masque[subFrameType] and typedFrame and typedFrame:GetName() then
-                self.Masque[subFrameType]:RemoveButton(typedFrame)
-                self.Masque[subFrameType]:AddButton(typedFrame)
-            end
-        end
-
         for i=#frame[subFrameType] + 1, db.num do
             local typedFrame = _G[frameName..i] or CreateFrame("Button", frameName..i, frame, template)
-
-            if self.Masque and self.Masque[subFrameType] and typedFrame:GetName() then
-                self.Masque[subFrameType]:RemoveButton(typedFrame)
-                self.Masque[subFrameType]:AddButton(typedFrame)
-            end
 
             typedFrame:ClearAllPoints()
             typedFrame:Hide()
@@ -486,15 +504,7 @@ function KHMRaidFrames:SafeRefresh(virtualGroupType)
 end
 
 function KHMRaidFrames:SafeRefreshInternal(virtualGroupType)
-    if InCombatLockdown() then
-        self:Print("Can not refresh settings while in combat")
-        self:HideAll()
-        self.deffered = true
-        self.refreshingSettings = false
-        return
-    else
-        self:RefreshConfig(virtualGroupType)
-    end
+    self:RefreshConfig(virtualGroupType)
 
     self.refreshingSettings = false
 end

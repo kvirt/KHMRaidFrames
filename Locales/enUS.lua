@@ -160,3 +160,6 @@ L["Auto Scaling Desc"] = "Following elements are scaled by default: \n|cFFffd100
 L["Hide Element"] = true
 L["Show Resource Only For Healers"] = true
 L["Show Resource Only For Healers Desc"] = "\"Display Power Bars\" in raid profiles must be enabled"
+L["Power Bar Height"] = "Height"
+L["Power Bar"] = true
+L["Power Bar Texture"] = "Texture"

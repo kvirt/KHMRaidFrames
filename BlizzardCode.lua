@@ -430,9 +430,9 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
             self:SmartAnchoring(frame, IsInRaid() and "raid" or "party")
         end
 
-        if self.Masque then
+        if self.db.profile.Masque then
             for _, _frame in pairs(frame.debuffFrames) do
-                if frame:IsShown() then
+                if _frame:IsShown() then
                     self.Masque.debuffFrames:ReSkin(_frame)
                 end
             end
@@ -573,7 +573,7 @@ function KHMRaidFrames.RevertStatusIcon()
     end
 end
 
-function KHMRaidFrames.RevertStatusIcoTexture()
+function KHMRaidFrames.RevertStatusIconTexture()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         if frame.unit then
             KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIconTexture(frame)
