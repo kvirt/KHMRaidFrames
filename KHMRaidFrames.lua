@@ -92,7 +92,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
     frame.healthBar:SetStatusBarTexture(texture, "BORDER")
 
-    if not self.db.profile[groupType].frames.showResourceOnlyForHealers and KHMRaidFrames.displayPowerBar then
+    if not self.db.profile[groupType].frames.showResourceOnlyForHealers and KHMRaidFrames.displayPowerBar and not string.find(frame.unit, "pet") then
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, self.db.profile[groupType].frames.powerBarHeight + 1)
         frame.horizDivider:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
         frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
@@ -722,6 +722,7 @@ function KHMRaidFrames.UpdateResourceBar(frame, groupType, role, refresh)
     if not frame.unit then return end
     if not frame.powerBar then return end
     if not UnitExists(frame.displayedUnit) then return end
+    if string.find(frame.unit, "pet") then return end
 
     if not KHMRaidFrames.db.profile[groupType].frames.showResourceOnlyForHealers or not KHMRaidFrames.displayPowerBar then
         return
@@ -796,7 +797,9 @@ function KHMRaidFrames.RevertResourceBarInternal(frame)
     local groupType = IsInRaid() and "raid" or "party"
     local powerBarHeight = KHMRaidFrames.db.profile[groupType].frames.powerBarHeight
 
-    if KHMRaidFrames.displayPowerBar and frame.unit and not string.find(frame.unit, "pet") and UnitExists(frame.displayedUnit) then
+    if string.find(frame.unit, "pet") then return end
+
+    if KHMRaidFrames.displayPowerBar and frame.unit and UnitExists(frame.displayedUnit) then
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, powerBarHeight + 1)
         frame.powerBar:Show()
 
