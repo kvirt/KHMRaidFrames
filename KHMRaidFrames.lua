@@ -42,7 +42,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
     local isInCombatLockDown = InCombatLockdown()
 
     if groupType ~= self.currentGroup then
-        self:CompactUnitFrameProfiles_ApplyProfile()
+        self:RefreshProfileSettings()
     end
 
     local name = frame and frame:GetName()
@@ -133,7 +133,9 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         self.SetUpLeaderIcon(frame, groupType)
     end
 
-    self:CompactUnitFrame_UpdateHealPrediction(frame)
+    if self.IsFrameOk(frame) then
+        self:CompactUnitFrame_UpdateHealPrediction(frame)
+    end
 
     frame.healthBar:SetAlpha(db.frames.alpha)
     frame.background:SetAlpha(db.frames.alpha)

@@ -143,8 +143,15 @@ function KHMRaidFrames:OnEvent(event, ...)
     local groupType = IsInRaid() and "raid" or "party"
 
     if event == "PLAYER_REGEN_ENABLED" then
+        for frame in self.IterateCompactFrames(groupType) do
+            if not InCombatLockdown() then
+                self:AddSubFrames(frame, groupType)
+            end
+        end
+
         if self.deffered then
             self:GetRaidProfileSettings()
+
             self:SafeRefresh()
 
             self.deffered = false
@@ -367,12 +374,6 @@ end
 
 -- CONFIG PANEL CLOSE/OPEN
 function KHMRaidFrames:OnOptionShow()
-    if InCombatLockdown() then
-        self:Print("Can not refresh settings while in combat")
-        self.deffered = true
-        return
-    end
-
     self.isOpen = true
     self:ShowRaidFrame()
     self:ConfigOptionsOpen()

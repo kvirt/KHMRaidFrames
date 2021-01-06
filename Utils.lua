@@ -233,7 +233,7 @@ function KHMRaidFrames:SetUpMainSubFramePosition(frame, subFrameType, groupType)
 
     local anchor1, relativeFrame, anchor2 = db.anchorPoint, frame, db.anchorPoint
 
-    xOffset, yOffset = self:Offsets(anchor1, frame, groupType)
+    local xOffset, yOffset = self:Offsets(anchor1, frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
@@ -303,6 +303,8 @@ function KHMRaidFrames:Offsets(anchor, frame, groupType, force)
 end
 
 function KHMRaidFrames:AddSubFrames(frame, groupType)
+    if not self.IsFrameOk(frame) then return end
+
     for subFrameType in self.IterateSubFrameTypes() do
         local frameName, template
         local db = self.db.profile[groupType][subFrameType]
