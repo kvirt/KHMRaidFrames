@@ -257,10 +257,8 @@ function KHMRaidFrames:RefreshConfig(virtualGroupType)
     end
 
     for frame in self.IterateCompactFrames(groupType) do
-        if UnitExists(frame.displayedUnit) then
-            self:LayoutFrame(frame, groupType, isInCombatLockDown)
-            self.MasqueSupport(frame)
-        end
+        self:LayoutFrame(frame, groupType, isInCombatLockDown)
+        self.MasqueSupport(frame)
     end
 
     self:SetUpSoloFrame()
@@ -914,6 +912,10 @@ end
 
 function KHMRaidFrames.SkipFrame(frame)
     return not frame or frame:IsForbidden() or not frame:GetName() or frame:GetName():find("^NamePlate%d")
+end
+
+function KHMRaidFrames.IsFrameOk(frame)
+    return not KHMRaidFrames.SkipFrame(frame) and (UnitExists(frame.displayedUnit)) and not (frame.unit and string.find(frame.unit, "pet"))
 end
 
 local function Round(num, numDecimalPlaces, litera)

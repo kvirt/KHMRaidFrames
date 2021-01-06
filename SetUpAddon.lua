@@ -224,6 +224,8 @@ function KHMRaidFrames.RefreshProfileSettings()
             function(frame)
                 if KHMRaidFrames.SkipFrame(frame) then return end
 
+                if not frame.unit then return end
+
                 local role = KHMRaidFrames.GetRole(frame)
 
                 local groupType = IsInRaid() and "raid" or "party"
@@ -309,7 +311,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     if InCombatLockdown() then
         profile = profile or self.db.profile.current_profile
         settings = self.db.profile.saved_profiles[profile] or self.db.profile.saved_profiles.default
-        self.useCompactPartyFrames = GetCVar("useCompactPartyFrames") == "1"
+        self.useCompactPartyFrames = true
         self.deffered = true
     else
         profile = profile or GetActiveRaidProfile()
