@@ -45,7 +45,10 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
         self:CompactUnitFrameProfiles_ApplyProfile()
     end
 
-    local name = frame:GetName()
+    local name = frame and frame:GetName()
+    if not name then return end
+
+    if not UnitExists(frame.displayedUnit) then return end
 
     local lastGroupType = self.processedFrames[name]
 
@@ -89,7 +92,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
     frame.healthBar:SetStatusBarTexture(texture, "BORDER")
 
-    if not self.db.profile[groupType].frames.showResourceOnlyForHealers and KHMRaidFrames.displayPowerBar  and (frame.unit and not string.find(frame.unit, "pet"))then
+    if not self.db.profile[groupType].frames.showResourceOnlyForHealers and KHMRaidFrames.displayPowerBar and (frame.unit and not string.find(frame.unit, "pet")) then
         frame.healthBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, self.db.profile[groupType].frames.powerBarHeight + 1)
         frame.horizDivider:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
         frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
@@ -769,7 +772,7 @@ function KHMRaidFrames.RevertResourceBar()
         end
     else
         for frame in KHMRaidFrames.IterateCompactFrames() do
-            if frame.unit then
+            if frame.unit and UnitExists(frame.displayedUnit) then
                 local role = KHMRaidFrames.GetRole(frame)
 
                 KHMRaidFrames.UpdateResourceBar(frame, groupType, role, true)
