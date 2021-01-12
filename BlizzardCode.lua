@@ -649,3 +649,15 @@ function KHMRaidFrames.RevertNameColors()
         end
     end
 end
+
+function KHMRaidFrames.ReverseHealthBarColors()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.unit then
+            local classColor = KHMRaidFrames.ColorByClass(frame.unit)
+
+            if classColor then
+                frame.healthBar:SetStatusBarColor(classColor.r, classColor.g, classColor.b)
+            end
+        end
+    end
+end

@@ -128,6 +128,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
     self:SecureHook("CompactUnitFrame_UpdateAll")
+    self:SecureHook("CompactUnitFrame_UpdateHealthColor")
 
     self.RefreshProfileSettings()
 
@@ -280,6 +281,7 @@ function KHMRaidFrames.RefreshProfileSettings()
     KHMRaidFrames.RevertRoleIcon()
     KHMRaidFrames.RevertReadyCheckIcon()
     KHMRaidFrames.RevertStatusIcon()
+    KHMRaidFrames.ReverseHealthBarColors()
 end
 --
 
@@ -339,6 +341,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.frameHeight = settings.frameHeight
     self.displayPowerBar = settings.displayPowerBar
     self.displayPets = settings.displayPets
+    self.useClassColors = settings.useClassColors
 
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
 
@@ -352,6 +355,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     savedProfile.displayPowerBar = settings.displayPowerBar
     savedProfile.displayPets = settings.displayPets
     savedProfile.useCompactPartyFrames = self.useCompactPartyFrames
+    savedProfile.useClassColors = settings.useClassColors
 
     self.db.profile.current_profile = profile
     self.db.profile.saved_profiles[profile] = savedProfile
@@ -410,167 +414,168 @@ function KHMRaidFrames:Defaults()
     KHMRaidFrames.font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT"
 
     local commons = {
-            frames = {
-                hideGroupTitles = false,
-                texture = "Blizzard Raid Bar",
-                clickThrough = false,
-                enhancedAbsorbs = false,
-                showPartySolo = false,
-                tracking = {},
-                trackingStr = "",
-                autoScaling = true,
-                showResourceOnlyForHealers = false,
-                alpha = 1.0,
-                powerBarHeight = 8,
-                powerBarTexture = "Blizzard Raid PowerBar",
+        frames = {
+            hideGroupTitles = false,
+            texture = "Blizzard Raid Bar",
+            clickThrough = false,
+            enhancedAbsorbs = false,
+            showPartySolo = false,
+            tracking = {},
+            trackingStr = "",
+            autoScaling = true,
+            showResourceOnlyForHealers = false,
+            alpha = 1.0,
+            powerBarHeight = 8,
+            powerBarTexture = "Blizzard Raid PowerBar",
+            color = {1, 1, 1},
+        },
+        dispelDebuffFrames = {
+            num = 3,
+            numInRow = 3,
+            rowsGrowDirection = "TOP",
+            anchorPoint = "TOPRIGHT",
+            growDirection = "LEFT",
+            size = 12,
+            xOffset = 0,
+            yOffset = 0,
+            exclude = {},
+            excludeStr = "",
+            alpha = 1.0,
+        },
+        debuffFrames = {
+            num = 3,
+            numInRow = 3,
+            rowsGrowDirection = "TOP",
+            anchorPoint = "BOTTOMLEFT",
+            growDirection = "RIGHT",
+            size = 11,
+            xOffset = 0,
+            yOffset = 0,
+            exclude = {},
+            excludeStr = "",
+            bigDebuffSize = 11 + 9,
+            showBigDebuffs = true,
+            smartAnchoring = true,
+            alpha = 1.0,
+        },
+        buffFrames = {
+            num = 3,
+            numInRow = 3,
+            rowsGrowDirection = "TOP",
+            anchorPoint = "BOTTOMRIGHT",
+            growDirection = "LEFT",
+            size = 11,
+            xOffset = 0,
+            yOffset = 0,
+            exclude = {},
+            excludeStr = "",
+            alpha = 1.0,
+        },
+        raidIcon = {
+            enabled = false,
+            size = 15,
+            xOffset = 0,
+            yOffset = 0,
+            anchorPoint = "TOP",
+            alpha = 1.0,
+        },
+        nameAndIcons = {
+            name = {
+                font = KHMRaidFrames.font,
+                size = 11,
+                flag = "None",
+                hJustify = "LEFT",
+                xOffset = 0,
+                yOffset = -1,
+                showServer = true,
+                classColoredNames = false,
+                enabled = false,
+                hide = false,
             },
-            dispelDebuffFrames = {
-                num = 3,
-                numInRow = 3,
-                rowsGrowDirection = "TOP",
-                anchorPoint = "TOPRIGHT",
-                growDirection = "LEFT",
+            statusText = {
+                font = KHMRaidFrames.font,
+                size = 12,
+                flag = "None",
+                hJustify = "CENTER",
+                xOffset = 0,
+                yOffset = 0,
+                enabled = false,
+                abbreviateNumbers = false,
+                precision = 0,
+                notShowStatuses = false,
+                showPercents = false,
+                color = {1, 1, 1, 1},
+                classColoredText = false,
+            },
+            roleIcon = {
                 size = 12,
                 xOffset = 0,
                 yOffset = 0,
-                exclude = {},
-                excludeStr = "",
-                alpha = 1.0,
-            },
-            debuffFrames = {
-                num = 3,
-                numInRow = 3,
-                rowsGrowDirection = "TOP",
-                anchorPoint = "BOTTOMLEFT",
-                growDirection = "RIGHT",
-                size = 11,
-                xOffset = 0,
-                yOffset = 0,
-                exclude = {},
-                excludeStr = "",
-                bigDebuffSize = 11 + 9,
-                showBigDebuffs = true,
-                smartAnchoring = true,
-                alpha = 1.0,
-            },
-            buffFrames = {
-                num = 3,
-                numInRow = 3,
-                rowsGrowDirection = "TOP",
-                anchorPoint = "BOTTOMRIGHT",
-                growDirection = "LEFT",
-                size = 11,
-                xOffset = 0,
-                yOffset = 0,
-                exclude = {},
-                excludeStr = "",
-                alpha = 1.0,
-            },
-            raidIcon = {
+                healer = "",
+                damager = "",
+                tank = "",
+                vehicle = "",
+                toggle = false,
                 enabled = false,
-                size = 15,
+                colors = {
+                    healer = {1, 1, 1, 1},
+                    damager = {1, 1, 1, 1},
+                    tank = {1, 1, 1, 1},
+                    vehicle = {1, 1, 1, 1},
+                },
+                hide = false,
+            },
+            readyCheckIcon  = {
+                size = 15 ,
                 xOffset = 0,
                 yOffset = 0,
-                anchorPoint = "TOP",
+                ready = "",
+                notready = "",
+                waiting = "",
+                toggle = false,
+                enabled = false,
+                colors = {
+                    ready = {1, 1, 1, 1},
+                    notready = {1, 1, 1, 1},
+                    waiting = {1, 1, 1, 1},
+                },
+                hide = false,
+            },
+            centerStatusIcon = {
+                size = 22,
+                xOffset = 0,
+                yOffset = 0,
+                inOtherGroup = "",
+                hasIncomingResurrection = "",
+                hasIncomingSummonPending = "",
+                hasIncomingSummonAccepted = "",
+                hasIncomingSummonDeclined = "",
+                inOtherPhase = "",
+                toggle = false,
+                enabled = false,
+                colors = {
+                    inOtherGroup = {1, 1, 1, 1},
+                    hasIncomingResurrection = {1, 1, 1, 1},
+                    hasIncomingSummonPending = {1, 1, 1, 1},
+                    hasIncomingSummonAccepted = {1, 1, 1, 1},
+                    hasIncomingSummonDeclined = {1, 1, 1, 1},
+                    inOtherPhase = {1, 1, 1, 1},
+                },
+                hide = false,
+            },
+            leaderIcon = {
+                size = 10 ,
+                xOffset = 0,
+                yOffset = 0,
+                anchorPoint = "TOPRIGHT",
+                icon = "",
+                enabled = false,
                 alpha = 1.0,
-            },
-            nameAndIcons = {
-                name = {
-                    font = KHMRaidFrames.font,
-                    size = 11,
-                    flag = "None",
-                    hJustify = "LEFT",
-                    xOffset = 0,
-                    yOffset = -1,
-                    showServer = true,
-                    classColoredNames = false,
-                    enabled = false,
-                    hide = false,
-                },
-                statusText = {
-                    font = KHMRaidFrames.font,
-                    size = 12,
-                    flag = "None",
-                    hJustify = "CENTER",
-                    xOffset = 0,
-                    yOffset = 0,
-                    enabled = false,
-                    abbreviateNumbers = false,
-                    precision = 0,
-                    notShowStatuses = false,
-                    showPercents = false,
-                    color = {1, 1, 1, 1},
-                    classColoredText = false,
-                },
-                roleIcon = {
-                    size = 12,
-                    xOffset = 0,
-                    yOffset = 0,
-                    healer = "",
-                    damager = "",
-                    tank = "",
-                    vehicle = "",
-                    toggle = false,
-                    enabled = false,
-                    colors = {
-                        healer = {1, 1, 1, 1},
-                        damager = {1, 1, 1, 1},
-                        tank = {1, 1, 1, 1},
-                        vehicle = {1, 1, 1, 1},
-                    },
-                    hide = false,
-                },
-                readyCheckIcon  = {
-                    size = 15 ,
-                    xOffset = 0,
-                    yOffset = 0,
-                    ready = "",
-                    notready = "",
-                    waiting = "",
-                    toggle = false,
-                    enabled = false,
-                    colors = {
-                        ready = {1, 1, 1, 1},
-                        notready = {1, 1, 1, 1},
-                        waiting = {1, 1, 1, 1},
-                    },
-                    hide = false,
-                },
-                centerStatusIcon = {
-                    size = 22,
-                    xOffset = 0,
-                    yOffset = 0,
-                    inOtherGroup = "",
-                    hasIncomingResurrection = "",
-                    hasIncomingSummonPending = "",
-                    hasIncomingSummonAccepted = "",
-                    hasIncomingSummonDeclined = "",
-                    inOtherPhase = "",
-                    toggle = false,
-                    enabled = false,
-                    colors = {
-                        inOtherGroup = {1, 1, 1, 1},
-                        hasIncomingResurrection = {1, 1, 1, 1},
-                        hasIncomingSummonPending = {1, 1, 1, 1},
-                        hasIncomingSummonAccepted = {1, 1, 1, 1},
-                        hasIncomingSummonDeclined = {1, 1, 1, 1},
-                        inOtherPhase = {1, 1, 1, 1},
-                    },
-                    hide = false,
-                },
-                leaderIcon = {
-                    size = 10 ,
-                    xOffset = 0,
-                    yOffset = 0,
-                    anchorPoint = "TOPRIGHT",
-                    icon = "",
-                    enabled = false,
-                    alpha = 1.0,
-                    colors = {
-                        icon = {1, 1, 1, 1},
-                    },
+                colors = {
+                    icon = {1, 1, 1, 1},
                 },
             },
+        },
     }
     defaults_settings.profile.party = commons
     defaults_settings.profile.raid = commons

@@ -141,7 +141,21 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.background:SetAlpha(db.frames.alpha)
     frame.powerBar:SetAlpha(db.frames.alpha)
 
+    self:CompactUnitFrame_UpdateHealthColor(frame)
+
     return deferred
+end
+--
+
+-- HEALTHBAR COLOR
+function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame)
+    if self.useClassColors then return end
+    if self.SkipFrame(frame) then return end
+    if not UnitIsConnected(frame.unit) then return end
+
+    local db = self.db.profile[IsInRaid() and "raid" or "party"]
+
+    frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
 end
 --
 
