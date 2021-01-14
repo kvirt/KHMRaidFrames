@@ -340,7 +340,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
     statusText:SetJustifyH(db.hJustify)
-    ViragDevTool_AddData("delau ebobo", frame:GetName())
+
     self.SetUpStatusTextInternal(frame, groupType)
 end
 
