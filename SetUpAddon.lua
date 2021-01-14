@@ -428,6 +428,7 @@ function KHMRaidFrames:Defaults()
             powerBarHeight = 8,
             powerBarTexture = "Blizzard Raid PowerBar",
             color = {1, 1, 1},
+            backGroundColor = {0, 0, 0},
         },
         dispelDebuffFrames = {
             num = 3,

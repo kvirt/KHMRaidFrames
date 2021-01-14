@@ -2026,7 +2026,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["color"] = {
             name = "",
             desc = "",
-            width = "normal",
+            width = "half",
             type = "color",
             order = 3,
             set = function(info, r, g, b, a)
@@ -2038,6 +2038,22 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end,
             get = function(info)
                 local color = self.db.profile[groupType].frames.color
+                return color[1], color[2], color[3], color[4]
+            end
+        },
+        ["backGroundColor"] = {
+            name = "",
+            desc = "",
+            width = "half",
+            type = "color",
+            order = 3.5,
+            set = function(info, r, g, b, a)
+                self.db.profile[groupType].frames.backGroundColor = {r, g, b, a}
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                local color = self.db.profile[groupType].frames.backGroundColor
                 return color[1], color[2], color[3], color[4]
             end
         },

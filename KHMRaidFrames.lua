@@ -151,11 +151,12 @@ end
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame)
     if self.useClassColors then return end
     if self.SkipFrame(frame) then return end
-    if not UnitIsConnected(frame.unit) then return end
+    if frame.unit and not UnitIsConnected(frame.unit) then return end
 
     local db = self.db.profile[IsInRaid() and "raid" or "party"]
 
     frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
+    frame.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
 end
 --
 
@@ -339,7 +340,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
     statusText:SetJustifyH(db.hJustify)
-
+    ViragDevTool_AddData("delau ebobo", frame:GetName())
     self.SetUpStatusTextInternal(frame, groupType)
 end
 

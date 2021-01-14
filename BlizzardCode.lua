@@ -652,6 +652,8 @@ end
 
 function KHMRaidFrames.ReverseHealthBarColors()
     for frame in KHMRaidFrames.IterateCompactFrames() do
+        frame.background:SetColorTexture(0, 0, 0)
+
         if frame.unit then
             local classColor = KHMRaidFrames.ColorByClass(frame.unit)
 
