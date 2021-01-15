@@ -165,6 +165,7 @@ L["Power Bar"] = true
 L["Power Bar Texture"] = "Texture"
 L["Healthbar"] = true
 L["Healthbar Color"] = true
+L["Healthbar Color Desc"] = "Make sure \"Class colors\" is unticked in Blizzard raid settings"
 L["Healthbar Background Color"] = true
 L["Background Transparency"] = true
 L["Power Bar Transparency"] = true

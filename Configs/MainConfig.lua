@@ -2007,7 +2007,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         },
         ["color"] = {
             name = L["Healthbar Color"],
-            desc = L["Healthbar Color"],
+            desc = L["Healthbar Color Desc"],
             width = "normal",
             type = "color",
             order = 2,
