@@ -137,9 +137,24 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         self:CompactUnitFrame_UpdateHealPrediction(frame)
     end
 
-    frame.healthBar:SetAlpha(db.frames.alpha)
-    frame.background:SetAlpha(db.frames.alpha)
-    frame.powerBar:SetAlpha(db.frames.alpha)
+    local backgroundAlpha, healthAplpha, healthBackgroundAlpha, powerBarAlpha
+
+    if db.frames.advancedTransparency then
+        backgroundAlpha = db.frames.alphaBackgound
+        healthAplpha = db.frames.alphaHealth
+        healthBackgroundAlpha = db.frames.alphaHealthBackground
+        powerBarAlpha = db.frames.alphaPowerBar
+    else
+        backgroundAlpha = db.frames.alpha
+        healthAplpha = db.frames.alpha
+        healthBackgroundAlpha = db.frames.alpha
+        powerBarAlpha = db.frames.alpha
+    end
+
+    frame.background:SetAlpha(backgroundAlpha)
+    frame.healthBar:SetAlpha(healthAplpha)
+    frame.healthBar.background:SetAlpha(healthBackgroundAlpha)
+    frame.powerBar:SetAlpha(powerBarAlpha)
 
     self:CompactUnitFrame_UpdateHealthColor(frame)
 
@@ -156,7 +171,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame)
     local db = self.db.profile[IsInRaid() and "raid" or "party"]
 
     frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
-    frame.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
+    frame.healthBar.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
 end
 --
 

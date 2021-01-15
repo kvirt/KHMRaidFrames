@@ -32,10 +32,21 @@ function KHMRaidFrames:Setup()
     self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
 
     self:RegisterChatCommand("khm", function(arg, ...)
-        if arg == "reload" then
+        local args = {}
+
+        for token in string.gmatch(arg, "[^%s]+") do
+            table.insert(args, token)
+        end
+
+        if args[1] == "reload" then
             self:CompactUnitFrameProfiles_ApplyProfile()
             self:CompactRaidFrameContainer_LayoutFrames()
             self:Print("Hard Reload")
+            return
+        end
+
+        if args[1] == "dump" then
+            self.PrintV(_G[args[2]])
             return
         end
 
@@ -424,7 +435,12 @@ function KHMRaidFrames:Defaults()
             trackingStr = "",
             autoScaling = true,
             showResourceOnlyForHealers = false,
+            advancedTransparency = false,
             alpha = 1.0,
+            alphaHealth = 1.0,
+            alphaHealthBackground = 1.0,
+            alphaBackgound = 1.0,
+            alphaPowerBar = 1.0,
             powerBarHeight = 8,
             powerBarTexture = "Blizzard Raid PowerBar",
             color = {1, 1, 1},

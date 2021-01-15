@@ -1984,10 +1984,10 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["Texture"] = {
             name = L["Texture"],
             desc = "",
-            width = "normal",
+            width = "full",
             type = "select",
             values = function(info, val) return self.sortedTextures end,
-            order = 1,
+            order = 1.5,
             set = function(info,val)
                 self.db.profile[groupType].frames.texture = self.sortedTextures[val]
                 self:SafeRefresh(groupType)
@@ -2005,30 +2005,12 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return 3
             end
         },
-        ["Transparency"] = {
-            name = L["Transparency"],
-            desc = "",
-            width = "normal",
-            type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 2,
-            set = function(info,val)
-                self.db.profile[groupType].frames.alpha = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.alpha
-            end
-        },
         ["color"] = {
-            name = "",
-            desc = "",
-            width = "half",
+            name = L["Healthbar Color"],
+            desc = L["Healthbar Color"],
+            width = "normal",
             type = "color",
-            order = 3,
+            order = 2,
             set = function(info, r, g, b, a)
                 self.db.profile[groupType].frames.color = {r, g, b, a}
 
@@ -2042,11 +2024,11 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end
         },
         ["backGroundColor"] = {
-            name = "",
-            desc = "",
-            width = "half",
+            name = L["Healthbar Background Color"],
+            desc = L["Healthbar Background Color"],
+            width = "double",
             type = "color",
-            order = 3.5,
+            order = 2.5,
             set = function(info, r, g, b, a)
                 self.db.profile[groupType].frames.backGroundColor = {r, g, b, a}
 
@@ -2055,6 +2037,121 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             get = function(info)
                 local color = self.db.profile[groupType].frames.backGroundColor
                 return color[1], color[2], color[3], color[4]
+            end
+        },
+        ["SkipTransparency"] = {
+            type = "header",
+            name = "",
+            order = 2.9,
+        },
+        ["advancedTransparency"] = {
+            name = L["Advanced Transparency"],
+            desc = L["Advanced Transparency"],
+            width = "full",
+            type = "toggle",
+            order = 3,
+            set = function(info,val)
+                self.db.profile[groupType].frames.advancedTransparency = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return  self.db.profile[groupType].frames.advancedTransparency
+            end
+        },
+        ["Transparency"] = {
+            name = L["Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 3.5,
+            hidden = function() return self.db.profile[groupType].frames.advancedTransparency end,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alpha = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alpha
+            end
+        },
+        ["backgroundTransparency"] = {
+            name = L["Background Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 3.1,
+            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alphaBackgound = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alphaBackgound
+            end
+        },
+        ["healthTransparency"] = {
+            name = L["Health Transparency"],
+            desc = "",
+            width = "double",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 3.2,
+            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alphaHealth = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alphaHealth
+            end
+        },
+        ["healthBckgroundTransparency"] = {
+            name = L["Health Background Transparency"],
+            desc = "",
+            width = "normal",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 3.3,
+            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alphaHealthBackground = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alphaHealthBackground
+            end
+        },
+        ["powerBarTransparency"] = {
+            name = L["Power Bar Transparency"],
+            desc = "",
+            width = "double",
+            type = "range",
+            min = 0.1,
+            max = 1.0,
+            step = 0.05,
+            order = 3.4,
+            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+            set = function(info,val)
+                self.db.profile[groupType].frames.alphaPowerBar = val
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.alphaPowerBar
             end
         },
         ["Skip1"] = {
@@ -2164,12 +2261,36 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             name = L["Power Bar"],
             order = 11,
         },
+        ["Power Bar Texture"] = {
+            name = L["Power Bar Texture"],
+            desc = L["Show Resource Only For Healers Desc"],
+            width = "full",
+            type = "select",
+            values = function(info, val) return self.sortedTextures end,
+            order = 12,
+            set = function(info,val)
+                self.db.profile[groupType].frames.powerBarTexture = self.sortedTextures[val]
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                for i, texture in ipairs(self.sortedTextures) do
+                    if self.db.profile[groupType].frames.powerBarTexture == texture then return i end
+                end
+
+                for i, texture in ipairs(self.sortedTextures) do
+                    if self:Defaults().profile[groupType].frames.powerBarTexture == texture then return i end
+                end
+
+                --fallback hack
+                return 1
+            end
+        },
         ["Show Resource Only For Healers"] = {
             name = L["Show Resource Only For Healers"],
             desc = L["Show Resource Only For Healers Desc"],
             width = "normal",
             type = "toggle",
-            order = 12,
+            order = 13,
             confirm = function() return not self.displayPowerBar end,
             confirmText = L["Show Resource Only For Healers Desc"],
             set = function(info,val)
@@ -2191,7 +2312,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             min = 1,
             max = 50,
             step = 1,
-            order = 13,
+            order = 14,
             confirm = function() return not self.displayPowerBar end,
             confirmText = L["Show Resource Only For Healers Desc"],
             set = function(info,val)
@@ -2205,34 +2326,10 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return self.db.profile[groupType].frames.powerBarHeight
             end
         },
-        ["Power Bar Texture"] = {
-            name = L["Power Bar Texture"],
-            desc = L["Show Resource Only For Healers Desc"],
-            width = "normal",
-            type = "select",
-            values = function(info, val) return self.sortedTextures end,
-            order = 14,
-            set = function(info,val)
-                self.db.profile[groupType].frames.powerBarTexture = self.sortedTextures[val]
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                for i, texture in ipairs(self.sortedTextures) do
-                    if self.db.profile[groupType].frames.powerBarTexture == texture then return i end
-                end
-
-                for i, texture in ipairs(self.sortedTextures) do
-                    if self:Defaults().profile[groupType].frames.powerBarTexture == texture then return i end
-                end
-
-                --fallback hack
-                return 1
-            end
-        },
         ["Skip2"] = {
             type = "header",
             name = "",
-            order = 15,
+            order = 16,
         },
         ["additionalTracking"] = {
             name = L["Additional Auras Tracking"],
@@ -2241,7 +2338,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             width = "full",
             type = "input",
             multiline = 10,
-            order = 16,
+            order = 20,
             set = function(info,val)
                 self.db.profile[groupType].frames.tracking = self.SanitizeStringsByUnit(val)
                 self.db.profile[groupType].frames.trackingStr = val
