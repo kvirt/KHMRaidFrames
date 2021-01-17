@@ -133,6 +133,10 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         self.SetUpLeaderIcon(frame, groupType)
     end
 
+    if self.db.profile[groupType].frames.colorEnabled then
+        self:CompactUnitFrame_UpdateHealthColor(frame, groupType)
+    end
+
     if self.IsFrameOk(frame) then
         self:CompactUnitFrame_UpdateHealPrediction(frame)
     end
@@ -156,7 +160,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.healthBar.background:SetAlpha(healthBackgroundAlpha)
     frame.powerBar:SetAlpha(powerBarAlpha)
 
-    self:CompactUnitFrame_UpdateHealthColor(frame, groupType)
+
 
     return deferred
 end
@@ -164,8 +168,6 @@ end
 
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
-    if not self.db.profile[groupType].frames.colorEnabled then return end
-    self.PrintV(frame)
     local db = self.db.profile[groupType]
 
     if frame.unit and not UnitIsConnected(frame.unit) then
