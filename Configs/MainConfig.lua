@@ -2047,7 +2047,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["advancedTransparency"] = {
             name = L["Advanced Transparency"],
             desc = L["Advanced Transparency"],
-            width = "full",
+            width = "double",
             type = "toggle",
             order = 3,
             set = function(info,val)
@@ -2081,12 +2081,12 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["backgroundTransparency"] = {
             name = L["Background Transparency"],
             desc = "",
-            width = "normal",
+            width = "double",
             type = "range",
             min = 0.1,
             max = 1.0,
             step = 0.05,
-            order = 3.1,
+            order = 3.3,
             hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
             set = function(info,val)
                 self.db.profile[groupType].frames.alphaBackgound = val
@@ -2100,7 +2100,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["healthTransparency"] = {
             name = L["Health Transparency"],
             desc = "",
-            width = "double",
+            width = "normal",
             type = "range",
             min = 0.1,
             max = 1.0,
@@ -2119,12 +2119,12 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["healthBckgroundTransparency"] = {
             name = L["Health Background Transparency"],
             desc = "",
-            width = "normal",
+            width = "double",
             type = "range",
             min = 0.1,
             max = 1.0,
             step = 0.05,
-            order = 3.3,
+            order = 3.1,
             hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
             set = function(info,val)
                 self.db.profile[groupType].frames.alphaHealthBackground = val
@@ -2138,7 +2138,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
         ["powerBarTransparency"] = {
             name = L["Power Bar Transparency"],
             desc = "",
-            width = "double",
+            width = "normal",
             type = "range",
             min = 0.1,
             max = 1.0,

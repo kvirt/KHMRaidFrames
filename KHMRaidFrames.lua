@@ -164,13 +164,20 @@ end
 
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame)
-    if self.useClassColors then return end
     if self.SkipFrame(frame) then return end
-    if frame.unit and not UnitIsConnected(frame.unit) then return end
 
     local db = self.db.profile[IsInRaid() and "raid" or "party"]
 
-    frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
+    if not self.useClassColors then
+        if frame.unit and not UnitIsConnected(frame.unit) then
+            frame.healthBar:SetStatusBarColor(0.5, 0.5, 0.5)
+        elseif CompactUnitFrame_IsTapDenied(frame) then
+            frame.healthBar:SetStatusBarColor(0.9, 0.9, 0.9)
+        else
+            frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
+        end
+    end
+
     frame.healthBar.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
 end
 --
@@ -258,16 +265,8 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     end
 
     local flags = db.flag ~= "None" and db.flag or ""
-
     local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
-
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
-
-    name:SetFont(
-        font,
-        size,
-        flags
-    )
 
     name:ClearAllPoints()
 
@@ -275,11 +274,10 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     xOffset = xOffset + db.xOffset
     yOffset = yOffset + db.yOffset
 
+    name:SetFont(font, size, flags)
     name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, yOffset)
     name:SetJustifyH(db.hJustify)
-
-    name:Show()
 
     self.SetUpNameInternal(frame, groupType)
 end
@@ -295,6 +293,7 @@ function KHMRaidFrames.SetUpNameInternal(frame, groupType)
 
     if not frame.unit then return end
     if not UnitExists(frame.displayedUnit) then return end
+    if not ShouldShowName(frame) then return end
 
     local name = frame.name
 

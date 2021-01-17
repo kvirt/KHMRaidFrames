@@ -1,6 +1,6 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 local L = LibStub("AceLocale-3.0"):GetLocale("KHMRaidFrames")
-local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
+local SharedMedia = LibStub("LibSharedMedia-3.0")
 
 SharedMedia:Register("statusbar", "Blizzard Raid PowerBar", "Interface\\RaidFrame\\Raid-Bar-Resource-Fill")
 

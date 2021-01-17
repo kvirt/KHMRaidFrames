@@ -147,8 +147,6 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
-
-    self:SafeRefresh()
 end
 
 function KHMRaidFrames:OnEvent(event, ...)
@@ -419,7 +417,7 @@ end
 
 -- DEFAULTS RELATED FUNCTIONS
 function KHMRaidFrames:Defaults()
-    local SharedMedia = LibStub:GetLibrary("LibSharedMedia-3.0")
+    local SharedMedia = LibStub("LibSharedMedia-3.0")
 
     local defaults_settings = {profile = {party = {}, raid = {}, glows = {}}}
     KHMRaidFrames.font = SharedMedia.DefaultMedia.font or "Friz Quadrata TT"
@@ -444,7 +442,7 @@ function KHMRaidFrames:Defaults()
             powerBarHeight = 8,
             powerBarTexture = "Blizzard Raid PowerBar",
             color = {1, 1, 1},
-            backGroundColor = {0, 0, 0},
+            backGroundColor = {0.1, 0.1, 0.1},
         },
         dispelDebuffFrames = {
             num = 3,
