@@ -2005,12 +2005,37 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return 3
             end
         },
+        ["SkipColor"] = {
+            type = "header",
+            name = "",
+            order = 1.9,
+        },
+        ["colorEnabled"] = {
+            name = L["Enable"],
+            desc = "",
+            width = "full",
+            type = "toggle",
+            order = 2,
+            set = function(info,val)
+                self.db.profile[groupType].frames.colorEnabled = val
+
+                self.ReverseHealthBarColors()
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                return self.db.profile[groupType].frames.colorEnabled
+            end
+        },
         ["color"] = {
             name = L["Healthbar Color"],
             desc = L["Healthbar Color Desc"],
             width = "normal",
             type = "color",
-            order = 2,
+            order = 2.4,
+            disabled = function(info)
+                return not self.db.profile[groupType].frames.colorEnabled
+            end,
             set = function(info, r, g, b, a)
                 self.db.profile[groupType].frames.color = {r, g, b, a}
 
@@ -2023,12 +2048,34 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return color[1], color[2], color[3], color[4]
             end
         },
-        ["backGroundColor"] = {
+        ["healthbarBackGroundColor"] = {
             name = L["Healthbar Background Color"],
             desc = L["Healthbar Background Color"],
-            width = "double",
+            width = "normal",
             type = "color",
             order = 2.5,
+            disabled = function(info)
+                return not self.db.profile[groupType].frames.colorEnabled
+            end,
+            set = function(info, r, g, b, a)
+                self.db.profile[groupType].frames.healthbarBackGroundColor = {r, g, b, a}
+
+                self:SafeRefresh(groupType)
+            end,
+            get = function(info)
+                local color = self.db.profile[groupType].frames.healthbarBackGroundColor
+                return color[1], color[2], color[3], color[4]
+            end
+        },
+        ["backGroundColor"] = {
+            name = L["Background Color"],
+            desc = L["Background Color"],
+            width = "normal",
+            type = "color",
+            order = 2.7,
+            disabled = function(info)
+                return not self.db.profile[groupType].frames.colorEnabled
+            end,
             set = function(info, r, g, b, a)
                 self.db.profile[groupType].frames.backGroundColor = {r, g, b, a}
 

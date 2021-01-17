@@ -212,7 +212,23 @@ function KHMRaidFrames.RefreshProfileSettings()
         KHMRaidFrames:Unhook("CompactUnitFrame_UpdateCenterStatusIcon")
     end
 
+
+    if not KHMRaidFrames.db.profile[KHMRaidFrames.currentGroup].frames.colorEnabled and KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateHealthColor") then
+        KHMRaidFrames:Unhook("CompactUnitFrame_UpdateHealthColor")
+    end
+
     -- hooking
+    if KHMRaidFrames.db.profile[KHMRaidFrames.currentGroup].frames.colorEnabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateHealthColor") then
+        KHMRaidFrames:SecureHook(
+            "CompactUnitFrame_UpdateHealthColor",
+            function(frame)
+                if KHMRaidFrames.SkipFrame(frame) then return end
+
+                KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, IsInRaid() and "raid" or "party")
+            end
+        )
+    end
+
     if db.name.enabled and not KHMRaidFrames:IsHooked("CompactUnitFrame_UpdateName") then
         KHMRaidFrames:SecureHook(
             "CompactUnitFrame_UpdateName",
@@ -441,8 +457,10 @@ function KHMRaidFrames:Defaults()
             alphaPowerBar = 1.0,
             powerBarHeight = 8,
             powerBarTexture = "Blizzard Raid PowerBar",
+            colorEnabled = false,
             color = {1, 1, 1},
             backGroundColor = {0.1, 0.1, 0.1},
+            healthbarBackGroundColor = {0.1, 0.1, 0.1},
         },
         dispelDebuffFrames = {
             num = 3,

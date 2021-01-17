@@ -156,29 +156,28 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.healthBar.background:SetAlpha(healthBackgroundAlpha)
     frame.powerBar:SetAlpha(powerBarAlpha)
 
-    self:CompactUnitFrame_UpdateHealthColor(frame)
+    self:CompactUnitFrame_UpdateHealthColor(frame, groupType)
 
     return deferred
 end
 --
 
 -- HEALTHBAR COLOR
-function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame)
-    if self.SkipFrame(frame) then return end
+function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
+    if not self.db.profile[groupType].frames.colorEnabled then return end
+    self.PrintV(frame)
+    local db = self.db.profile[groupType]
 
-    local db = self.db.profile[IsInRaid() and "raid" or "party"]
-
-    if not self.useClassColors then
-        if frame.unit and not UnitIsConnected(frame.unit) then
-            frame.healthBar:SetStatusBarColor(0.5, 0.5, 0.5)
-        elseif CompactUnitFrame_IsTapDenied(frame) then
-            frame.healthBar:SetStatusBarColor(0.9, 0.9, 0.9)
-        else
-            frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
-        end
+    if frame.unit and not UnitIsConnected(frame.unit) then
+        frame.healthBar:SetStatusBarColor(0.5, 0.5, 0.5)
+    elseif CompactUnitFrame_IsTapDenied(frame) then
+        frame.healthBar:SetStatusBarColor(0.9, 0.9, 0.9)
+    else
+        frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
     end
 
-    frame.healthBar.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
+    frame.healthBar.background:SetColorTexture(db.frames.healthbarBackGroundColor[1], db.frames.healthbarBackGroundColor[2], db.frames.healthbarBackGroundColor[3])
+    frame.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
 end
 --
 
