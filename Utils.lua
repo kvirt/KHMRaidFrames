@@ -905,10 +905,12 @@ end
 function KHMRaidFrames.ImportCurrentProfile(text)
     local db = KHMRaidFrames.DecompressData(text)
 
-    local dbTo = KHMRaidFrames.db.profile
+    if not db then return end
+
+    KHMRaidFrames.db:SetProfile(db.current_profile)
 
     for k, v in pairs(db) do
-        dbTo[k] = v
+        KHMRaidFrames.db.profile[k] = v
     end
 end
 
