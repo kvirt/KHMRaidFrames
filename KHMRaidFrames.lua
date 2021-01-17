@@ -160,26 +160,65 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.healthBar.background:SetAlpha(healthBackgroundAlpha)
     frame.powerBar:SetAlpha(powerBarAlpha)
 
-
-
     return deferred
 end
 --
 
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
-    local db = self.db.profile[groupType]
+    local db = self.db.profile[groupType].frames
+    local r, g, b
+    local name = frame:GetName()
+    local br, bg, bb = db.backGroundColor[1], db.backGroundColor[2], db.backGroundColor[3]
+    local hbr, hbg, hbb = db.healthbarBackGroundColor[1], db.healthbarBackGroundColor[2], db.healthbarBackGroundColor[3]
 
-    if frame.unit and not UnitIsConnected(frame.unit) then
-        frame.healthBar:SetStatusBarColor(0.5, 0.5, 0.5)
-    elseif CompactUnitFrame_IsTapDenied(frame) then
-        frame.healthBar:SetStatusBarColor(0.9, 0.9, 0.9)
-    else
-        frame.healthBar:SetStatusBarColor(db.frames.color[1], db.frames.color[2], db.frames.color[3])
+    if not self.coloredFrames[name] then
+        self.coloredFrames[name] = {
+            health = {},
+            healthBackground = {},
+            background = {},
+        }
     end
 
-    frame.healthBar.background:SetColorTexture(db.frames.healthbarBackGroundColor[1], db.frames.healthbarBackGroundColor[2], db.frames.healthbarBackGroundColor[3])
-    frame.background:SetColorTexture(db.frames.backGroundColor[1], db.frames.backGroundColor[2], db.frames.backGroundColor[3])
+    local cache = self.coloredFrames[name]
+
+    if frame.unit and not UnitIsConnected(frame.unit) then
+        r, g, b = 0.5, 0.5, 0.5
+    elseif CompactUnitFrame_IsTapDenied(frame) then
+        r, g, b = 0.9, 0.9, 0.9
+    else
+        r, g, b = db.color[1], db.color[2], db.color[3]
+    end
+
+    if r ~= cache.health.r or g ~= cache.health.g or b ~= cache.health.b then
+        frame.healthBar:SetStatusBarColor(r, g, b)
+
+        self.coloredFrames[name].health = {
+            r=r,
+            g=g,
+            b=b,
+        }
+    end
+
+    if r ~= cache.healthBackground.r or g ~= cache.healthBackground.g or b ~= cache.healthBackground.b then
+        frame.healthBar.background:SetColorTexture(hbr, hbg, hbb)
+
+        self.coloredFrames[name].healthBackground = {
+            r=hbr,
+            g=hbg,
+            b=hbb,
+        }
+    end
+
+    if r ~= cache.background.r or g ~= cache.background.g or b ~= cache.background.b then
+        frame.background:SetColorTexture(br, bg, bb)
+
+        self.coloredFrames[name].background = {
+            r=br,
+            g=bg,
+            b=bb,
+        }
+    end
 end
 --
 

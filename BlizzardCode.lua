@@ -655,25 +655,8 @@ function KHMRaidFrames.ReverseHealthBarColors()
     local hbr, hbg, hbb = unpack(KHMRaidFrames:Defaults().profile.party.frames.healthbarBackGroundColor)
 
     for frame in KHMRaidFrames.IterateCompactFrames() do
-        frame.background:SetColorTexture(0, 0, 0)
-
-        if frame.unit then
-            if not UnitIsConnected(frame.unit) then
-                frame.healthBar:SetStatusBarColor(0.5, 0.5, 0.5)
-            elseif CompactUnitFrame_IsTapDenied(frame) then
-                frame.healthBar:SetStatusBarColor(0.9, 0.9, 0.9)
-            elseif not KHMRaidFrames.useClassColors then
-                frame.healthBar:SetStatusBarColor(0.0, 1.0, 0.0)
-            else
-                local classColor = KHMRaidFrames.ColorByClass(frame.unit)
-
-                if classColor then
-                    frame.healthBar:SetStatusBarColor(classColor.r, classColor.g, classColor.b)
-                end
-            end
-
-            frame.healthBar.background:SetColorTexture(hbr, hbg, hbb)
-            frame.background:SetColorTexture(br, bg, bb)
-        end
+        frame.healthBar:SetStatusBarColor(frame.healthBar.r, frame.healthBar.g, frame.healthBar.b)
+        frame.healthBar.background:SetColorTexture(hbr, hbg, hbb)
+        frame.background:SetColorTexture(br, bg, bb)
     end
 end

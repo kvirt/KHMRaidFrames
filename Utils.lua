@@ -246,6 +246,8 @@ end
 function KHMRaidFrames:RefreshConfig(virtualGroupType)
     local groupType = IsInRaid() and "raid" or "party"
 
+    self.coloredFrames = {}
+
     local isInCombatLockDown = InCombatLockdown()
 
     self:SetUpVirtual("buffFrames", virtualGroupType, self.componentScale)

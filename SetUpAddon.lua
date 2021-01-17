@@ -83,8 +83,10 @@ function KHMRaidFrames:SetInternalVariables()
         },
         groupType = "raid",
     }
+
     self.aurasCache = {}
     self.processedFrames = {}
+    self.coloredFrames = {}
 
     self.glowingFrames = {
         auraGlow = {
@@ -139,7 +141,6 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
     self:SecureHook("CompactUnitFrame_UpdateAll")
-    self:SecureHook("CompactUnitFrame_UpdateHealthColor")
 
     self.RefreshProfileSettings()
 
@@ -183,6 +184,7 @@ function KHMRaidFrames.RefreshProfileSettings()
     local groupType = IsInRaid() and "raid" or "party"
 
     KHMRaidFrames.processedFrames = {}
+    KHMRaidFrames.coloredFrames = {}
 
     KHMRaidFrames.RevertResourceBar()
 
