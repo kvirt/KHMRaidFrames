@@ -117,9 +117,6 @@ function KHMRaidFrames:SetInternalVariables()
     end
 
     self:GetVirtualFrames()
-
-    self.textures, self.sortedTextures = self.GetTextures()
-    self.fonts, self.sortedFonts = self.GetFons()
 end
 --
 
@@ -148,6 +145,8 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
     self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
+
+    self:SafeRefresh()
 end
 
 function KHMRaidFrames:OnEvent(event, ...)
@@ -454,7 +453,6 @@ function KHMRaidFrames:Defaults()
             advancedTransparency = false,
             alpha = 1.0,
             alphaHealth = 1.0,
-            alphaHealthBackground = 1.0,
             alphaBackgound = 1.0,
             alphaPowerBar = 1.0,
             powerBarHeight = 8,
@@ -462,7 +460,6 @@ function KHMRaidFrames:Defaults()
             colorEnabled = false,
             color = {1, 1, 1},
             backGroundColor = {0.1, 0.1, 0.1},
-            healthbarBackGroundColor = {0.1, 0.1, 0.1},
         },
         dispelDebuffFrames = {
             num = 3,

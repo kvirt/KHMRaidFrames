@@ -279,24 +279,15 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "select",
                 dialogControl = "LSM30_Font",
-                values = function(info, val) return self.sortedFonts end,
+                values = AceGUIWidgetLSMlists.font,
                 order = 2,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
-                    self.db.profile[groupType].nameAndIcons.name.font = self.sortedFonts[val]
+                    self.db.profile[groupType].nameAndIcons.name.font = val
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
-                    for i, font in ipairs(self.sortedFonts) do
-                        if self.db.profile[groupType].nameAndIcons.name.font == font then return i end
-                    end
-
-                    for i, font in ipairs(self.sortedFonts) do
-                        if self:Defaults().profile[groupType].nameAndIcons.name.font == font then return i end
-                    end
-
-                    --fallback hack
-                    return 7
+                    return self.db.profile[groupType].nameAndIcons.name.font
                 end
             },
             ["Flags"] = {
@@ -482,22 +473,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 order = 2,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
-                print(val)
-                    self.db.profile[groupType].nameAndIcons.statusText.font = self.sortedFonts[val]
+                    self.db.profile[groupType].nameAndIcons.statusText.font = val
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
-                    for i, font in ipairs(self.sortedFonts) do
-                        if self.db.profile[groupType].nameAndIcons.statusText.font == font then return i end
-                    end
-
-
-                    for i, font in ipairs(self.sortedFonts) do
-                        if self:Defaults().profile[groupType].nameAndIcons.statusText.font == font then return i end
-                    end
-
-                    --fallback hack
-                    return 7
+                    return self.db.profile[groupType].nameAndIcons.statusText.font
                 end
             },
             ["Flags"] = {
@@ -1991,23 +1971,13 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             type = "select",
             values = AceGUIWidgetLSMlists.statusbar,
             dialogControl = "LSM30_Statusbar",
-            --values = function(info, val) return self.sortedTextures end,
             order = 1.5,
             set = function(info,val)
-                self.db.profile[groupType].frames.texture = self.sortedTextures[val]
+                self.db.profile[groupType].frames.texture = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info)
-                for i, texture in ipairs(self.sortedTextures) do
-                    if self.db.profile[groupType].frames.texture == texture then return i end
-                end
-
-                for i, texture in ipairs(self.sortedTextures) do
-                    if self:Defaults().profile[groupType].frames.texture == texture then return i end
-                end
-
-                --fallback hack
-                return 3
+                return self.db.profile[groupType].frames.texture
             end
         },
         ["SkipColor"] = {
@@ -2024,7 +1994,7 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             set = function(info,val)
                 self.db.profile[groupType].frames.colorEnabled = val
 
-                self.ReverseHealthBarColors()
+                if self.useClassColors then self.ReverseHealthBarColors() end
 
                 self:SafeRefresh(groupType)
             end,
@@ -2044,31 +2014,10 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             set = function(info, r, g, b, a)
                 self.db.profile[groupType].frames.color = {r, g, b, a}
 
-                if self.useClassColors then self.ReverseHealthBarColors() end
-
                 self:SafeRefresh(groupType)
             end,
             get = function(info)
                 local color = self.db.profile[groupType].frames.color
-                return color[1], color[2], color[3], color[4]
-            end
-        },
-        ["healthbarBackGroundColor"] = {
-            name = L["Healthbar Background Color"],
-            desc = L["Healthbar Background Color"],
-            width = "normal",
-            type = "color",
-            order = 2.5,
-            disabled = function(info)
-                return not self.db.profile[groupType].frames.colorEnabled
-            end,
-            set = function(info, r, g, b, a)
-                self.db.profile[groupType].frames.healthbarBackGroundColor = {r, g, b, a}
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                local color = self.db.profile[groupType].frames.healthbarBackGroundColor
                 return color[1], color[2], color[3], color[4]
             end
         },
@@ -2166,25 +2115,6 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             end,
             get = function(info)
                 return self.db.profile[groupType].frames.alphaHealth
-            end
-        },
-        ["healthBckgroundTransparency"] = {
-            name = L["Health Background Transparency"],
-            desc = "",
-            width = "double",
-            type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 3.1,
-            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-            set = function(info,val)
-                self.db.profile[groupType].frames.alphaHealthBackground = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.alphaHealthBackground
             end
         },
         ["powerBarTransparency"] = {
@@ -2318,23 +2248,15 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             desc = L["Show Resource Only For Healers Desc"],
             width = "full",
             type = "select",
-            values = function(info, val) return self.sortedTextures end,
+            values = AceGUIWidgetLSMlists.statusbar,
+            dialogControl = "LSM30_Statusbar",
             order = 12,
             set = function(info,val)
-                self.db.profile[groupType].frames.powerBarTexture = self.sortedTextures[val]
+                self.db.profile[groupType].frames.powerBarTexture = val
                 self:SafeRefresh(groupType)
             end,
             get = function(info)
-                for i, texture in ipairs(self.sortedTextures) do
-                    if self.db.profile[groupType].frames.powerBarTexture == texture then return i end
-                end
-
-                for i, texture in ipairs(self.sortedTextures) do
-                    if self:Defaults().profile[groupType].frames.powerBarTexture == texture then return i end
-                end
-
-                --fallback hack
-                return 1
+                return self.db.profile[groupType].frames.powerBarTexture
             end
         },
         ["Show Resource Only For Healers"] = {

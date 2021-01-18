@@ -4,7 +4,7 @@ addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "Ac
 local KHMRaidFrames = addonTable.KHMRaidFrames
 
 local LCG = LibStub("LibCustomGlow-1.0")
-local SharedMedia = LibStub("LibSharedMedia-3.0");
+local SharedMedia = LibStub("LibSharedMedia-3.0")
 
 local unpack, select, tonumber = unpack, select, tonumber
 local _G = _G
@@ -90,7 +90,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         deferred = true
     end
 
-    local texture = self.textures[db.frames.texture] or self.textures[self:Defaults().profile[groupType].frames.texture]
+    local texture = SharedMedia:Fetch("statusbar", db.frames.texture) or SharedMedia:Fetch("statusbar", self:Defaults().profile[groupType].frames.texture)
     frame.healthBar:SetStatusBarTexture(texture, "BORDER")
 
     if not self.db.profile[groupType].frames.showResourceOnlyForHealers and KHMRaidFrames.displayPowerBar and (frame.unit and not string.find(frame.unit, "pet")) then
@@ -99,7 +99,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         frame.horizDivider:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, 1 + self.db.profile[groupType].frames.powerBarHeight)
     end
 
-    texture = self.textures[db.frames.powerBarTexture] or self.textures[self:Defaults().profile[groupType].frames.powerBarTexture]
+    local texture = SharedMedia:Fetch("statusbar", db.frames.powerBarTexture) or SharedMedia:Fetch("statusbar", self:Defaults().profile[groupType].frames.powerBarTexture)
     frame.powerBar:SetStatusBarTexture(texture, "BORDER")
 
     self.UpdateResourceBar(frame, groupType, nil, true)
@@ -135,6 +135,14 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     end
 
     if self.db.profile[groupType].frames.colorEnabled then
+        local bg = frame.healthBar.background
+        bg:ClearAllPoints()
+        bg:SetPoint("TOPLEFT", frame.healthBar:GetStatusBarTexture(), "TOPRIGHT")
+        bg:SetPoint("BOTTOMLEFT", frame.healthBar:GetStatusBarTexture(), "BOTTOMRIGHT")
+
+        bg:SetPoint("TOPRIGHT", frame.healthBar, "TOPRIGHT")
+        bg:SetPoint("BOTTOMRIGHT", frame.healthBar, "BOTTOMRIGHT")
+
         self:CompactUnitFrame_UpdateHealthColor(frame, groupType)
     end
 
@@ -147,18 +155,16 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     if db.frames.advancedTransparency then
         backgroundAlpha = db.frames.alphaBackgound
         healthAplpha = db.frames.alphaHealth
-        healthBackgroundAlpha = db.frames.alphaHealthBackground
         powerBarAlpha = db.frames.alphaPowerBar
     else
         backgroundAlpha = db.frames.alpha
         healthAplpha = db.frames.alpha
-        healthBackgroundAlpha = db.frames.alpha
         powerBarAlpha = db.frames.alpha
     end
 
     frame.background:SetAlpha(backgroundAlpha)
     frame.healthBar:SetAlpha(healthAplpha)
-    frame.healthBar.background:SetAlpha(healthBackgroundAlpha)
+    frame.healthBar.background:SetAlpha(backgroundAlpha)
     frame.powerBar:SetAlpha(powerBarAlpha)
 
     return deferred
@@ -168,51 +174,44 @@ end
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
     local db = self.db.profile[groupType].frames
+
+    if not db.colorEnabled then return end
+
     local r, g, b
     local name = frame:GetName()
     local br, bg, bb = db.backGroundColor[1], db.backGroundColor[2], db.backGroundColor[3]
-    local hbr, hbg, hbb = db.healthbarBackGroundColor[1], db.healthbarBackGroundColor[2], db.healthbarBackGroundColor[3]
 
     if not self.coloredFrames[name] then
         self.coloredFrames[name] = {
             health = {},
-            healthBackground = {},
             background = {},
         }
     end
 
     local cache = self.coloredFrames[name]
 
-    if frame.unit and not UnitIsConnected(frame.unit) then
-        r, g, b = 0.5, 0.5, 0.5
-    elseif CompactUnitFrame_IsTapDenied(frame) then
-        r, g, b = 0.9, 0.9, 0.9
-    else
-        r, g, b = db.color[1], db.color[2], db.color[3]
+    if not self.useClassColors then
+        if frame.unit and not UnitIsConnected(frame.unit) then
+            r, g, b = 0.5, 0.5, 0.5
+        elseif CompactUnitFrame_IsTapDenied(frame) then
+            r, g, b = 0.9, 0.9, 0.9
+        else
+            r, g, b = db.color[1], db.color[2], db.color[3]
+        end
+
+        if r ~= cache.health.r or g ~= cache.health.g or b ~= cache.health.b then
+            frame.healthBar:SetStatusBarColor(r, g, b)
+
+            self.coloredFrames[name].health = {
+                r=r,
+                g=g,
+                b=b,
+            }
+        end
     end
 
-    if r ~= cache.health.r or g ~= cache.health.g or b ~= cache.health.b then
-        frame.healthBar:SetStatusBarColor(r, g, b)
-
-        self.coloredFrames[name].health = {
-            r=r,
-            g=g,
-            b=b,
-        }
-    end
-
-    if r ~= cache.healthBackground.r or g ~= cache.healthBackground.g or b ~= cache.healthBackground.b then
-        frame.healthBar.background:SetColorTexture(hbr, hbg, hbb)
-
-        self.coloredFrames[name].healthBackground = {
-            r=hbr,
-            g=hbg,
-            b=hbb,
-        }
-    end
-
-    if r ~= cache.background.r or g ~= cache.background.g or b ~= cache.background.b then
-        frame.background:SetColorTexture(br, bg, bb)
+    if br ~= cache.background.r or bg ~= cache.background.g or bb ~= cache.background.b then
+        frame.healthBar.background:SetColorTexture(br, bg, bb)
 
         self.coloredFrames[name].background = {
             r=br,
@@ -306,7 +305,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     end
 
     local flags = db.flag ~= "None" and db.flag or ""
-    local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.name.font]
+    local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
     name:ClearAllPoints()
@@ -378,9 +377,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
     local flags = db.flag ~= "None" and db.flag or ""
-    local font = SharedMedia:Fetch("font", db.font)
-    self.PrintV(font)
-    --local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.statusText.font]
+    local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
     statusText:SetHeight(size)
 

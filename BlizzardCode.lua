@@ -1,5 +1,7 @@
 local KHMRaidFrames = LibStub("AceAddon-3.0"):GetAddon("KHMRaidFrames")
 
+local SharedMedia = LibStub("LibSharedMedia-3.0")
+
 local UnitIsTapDenied = UnitIsTapDenied
 local UnitPlayerControlled = UnitPlayerControlled
 local UnitInRaid = UnitInRaid
@@ -587,7 +589,7 @@ function KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
     if not frame.unit then return end
 
     frame.statusText:ClearAllPoints()
-    frame.statusText:SetFont(KHMRaidFrames.fonts[KHMRaidFrames.font], 12 * KHMRaidFrames.componentScale)
+    frame.statusText:SetFont(SharedMedia:Fetch("font", KHMRaidFrames.font), 12 * KHMRaidFrames.componentScale)
     frame.statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 3, KHMRaidFrames.frameHeight / 3 - 2)
     frame.statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -3, KHMRaidFrames.frameHeight / 3 - 2)
     frame.statusText:SetHeight(12 * KHMRaidFrames.componentScale);
@@ -614,7 +616,7 @@ function KHMRaidFrames.RevertStatusTextFont()
 end
 
 function KHMRaidFrames.CompactUnitFrame_UpdateName(frame)
-    frame.name:SetFont(KHMRaidFrames.fonts[KHMRaidFrames.font], 11)
+    frame.name:SetFont(SharedMedia:Fetch("font", KHMRaidFrames.font), 11)
 
     frame.name:ClearAllPoints()
 
@@ -651,11 +653,10 @@ end
 
 function KHMRaidFrames.ReverseHealthBarColors()
     local br, bg, bb = unpack(KHMRaidFrames:Defaults().profile.party.frames.backGroundColor)
-    local hbr, hbg, hbb = unpack(KHMRaidFrames:Defaults().profile.party.frames.healthbarBackGroundColor)
 
     for frame in KHMRaidFrames.IterateCompactFrames() do
         frame.healthBar:SetStatusBarColor(frame.healthBar.r, frame.healthBar.g, frame.healthBar.b)
-        frame.healthBar.background:SetColorTexture(hbr, hbg, hbb)
+        frame.healthBar.background:SetColorTexture(br, bg, bb)
         frame.background:SetColorTexture(br, bg, bb)
     end
 end
