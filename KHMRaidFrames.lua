@@ -4,6 +4,7 @@ addonTable.KHMRaidFrames = LibStub("AceAddon-3.0"):NewAddon("KHMRaidFrames", "Ac
 local KHMRaidFrames = addonTable.KHMRaidFrames
 
 local LCG = LibStub("LibCustomGlow-1.0")
+local SharedMedia = LibStub("LibSharedMedia-3.0");
 
 local unpack, select, tonumber = unpack, select, tonumber
 local _G = _G
@@ -372,20 +373,20 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     if not frame.optionTable.displayStatusText then return end
 
     local db = self.db.profile[groupType].nameAndIcons.statusText
+
     local statusText = frame.statusText
+
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
-
     local flags = db.flag ~= "None" and db.flag or ""
+    local font = SharedMedia:Fetch("font", db.font)
+    self.PrintV(font)
+    --local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.statusText.font]
 
-    local font = self.fonts[db.font] or self.fonts[self:Defaults().profile[groupType].nameAndIcons.statusText.font]
-
-    statusText:SetFont(
-        font,
-        size,
-        flags
-    )
+    statusText:SetHeight(size)
 
     statusText:ClearAllPoints()
+
+    statusText:SetFont(font, size, flags)
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
     local xOffset = xOffset + db.xOffset
@@ -394,6 +395,8 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
     statusText:SetJustifyH(db.hJustify)
+
+    statusText:Show()
 
     self.SetUpStatusTextInternal(frame, groupType)
 end
@@ -410,6 +413,8 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
     local statusText = frame.statusText
     local text
+
+    statusText:SetText("")
 
     if db.notShowStatuses or db.abbreviateNumbers or db.showPercents then
         if not db.notShowStatuses then

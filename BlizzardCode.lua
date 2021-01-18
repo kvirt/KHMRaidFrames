@@ -624,8 +624,7 @@ function KHMRaidFrames.CompactUnitFrame_UpdateName(frame)
         frame.name:SetPoint("TOPLEFT", frame.roleIcon, "TOPRIGHT", 0, -1)
     end
 
-    frame.name:SetHeight(11)
-    frame.name:SetPoint("TOPRIGHT", -3, -3)
+    frame.name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, -3)
     frame.name:SetJustifyH("LEFT")
     frame.name:SetVertexColor(1.0, 1.0, 1.0)
 

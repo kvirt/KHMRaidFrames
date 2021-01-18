@@ -5,7 +5,7 @@ local _G, CompactRaidFrameContainer = _G, CompactRaidFrameContainer
 
 -- SETUP
 function KHMRaidFrames:OnInitialize()
-     self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")
+    self:RegisterEvent("COMPACT_UNIT_FRAME_PROFILES_LOADED")
 end
 
 function KHMRaidFrames:Setup()

@@ -278,6 +278,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 desc = "",
                 width = "normal",
                 type = "select",
+                dialogControl = "LSM30_Font",
                 values = function(info, val) return self.sortedFonts end,
                 order = 2,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
@@ -476,10 +477,12 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 desc = "",
                 width = "normal",
                 type = "select",
-                values = function(info, val) return self.sortedFonts end,
+                dialogControl = "LSM30_Font",
+                values = AceGUIWidgetLSMlists.font,
                 order = 2,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
+                print(val)
                     self.db.profile[groupType].nameAndIcons.statusText.font = self.sortedFonts[val]
                     self:SafeRefresh(groupType)
                 end,
@@ -1986,7 +1989,9 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             desc = "",
             width = "full",
             type = "select",
-            values = function(info, val) return self.sortedTextures end,
+            values = AceGUIWidgetLSMlists.statusbar,
+            dialogControl = "LSM30_Statusbar",
+            --values = function(info, val) return self.sortedTextures end,
             order = 1.5,
             set = function(info,val)
                 self.db.profile[groupType].frames.texture = self.sortedTextures[val]
