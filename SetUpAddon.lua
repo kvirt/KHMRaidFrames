@@ -368,7 +368,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.displayPowerBar = settings.displayPowerBar
     self.displayPets = settings.displayPets
     self.useClassColors = settings.useClassColors
-
+    self.healthText = settings.healthText
     self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
 
     local savedProfile = {}

@@ -317,6 +317,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     name:SetFont(font, size, flags)
     name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, yOffset)
+    --name:SetHeight(size * 1.2)
     name:SetJustifyH(db.hJustify)
 
     self.SetUpNameInternal(frame, groupType)
@@ -373,27 +374,25 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.statusText
 
-    local statusText = frame.statusText
-
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
     local flags = db.flag ~= "None" and db.flag or ""
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
-    statusText:SetHeight(size)
+    frame.__statusText = frame.__statusText or frame:CreateFontString(nil, "OVERLAY")
 
+    local statusText = frame.__statusText
     statusText:ClearAllPoints()
-
-    statusText:SetFont(font, size, flags)
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
     local xOffset = xOffset + db.xOffset
     local yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
 
+    statusText:SetFont(font, size, flags)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
+    statusText:SetShadowColor(0, 0, 0, 1)
+    statusText:SetShadowOffset(1, -1)
     statusText:SetJustifyH(db.hJustify)
-
-    statusText:Show()
 
     self.SetUpStatusTextInternal(frame, groupType)
 end
@@ -403,15 +402,14 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     if not UnitExists(frame.displayedUnit) then return end
     if not frame.statusText then return end
     if not frame.optionTable.displayStatusText then return end
+    if not frame.__statusText then return end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText
 
     if not db.enabled then return end
 
-    local statusText = frame.statusText
+    local statusText = frame.__statusText
     local text
-
-    statusText:SetText("")
 
     if db.notShowStatuses or db.abbreviateNumbers or db.showPercents then
         if not db.notShowStatuses then
@@ -439,6 +437,8 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
             statusText:SetText(health)
         end
+    else
+        statusText:SetText(frame.statusText:GetText())
     end
 
     if db.classColoredText then
@@ -454,6 +454,17 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
             statusText:SetVertexColor(unpack(db.color))
         end
     end
+
+    if not frame.statusText:IsShown() then
+        if KHMRaidFrames.healthText == "None" then
+            if frame.__statusText then
+                frame.__statusText:Hide()
+            end
+        end
+    else
+        frame.statusText:Hide()
+    end
+
 end
 
 -- RAID TARGET ICON (STAR, SQUARE, etc)
