@@ -683,7 +683,7 @@ function KHMRaidFrames:RestoreDefaults(groupType, frameType, subType)
         return
     end
 
-    local defaults_settings = subType and self:Defaults()["profile"][groupType][frameType][subType]
+    local defaults_settings = subType and self:Defaults()["profile"][groupType][frameType][subType] or self:Defaults()["profile"][groupType][frameType]
 
     for k, v in pairs(defaults_settings) do
         self.db.profile[groupType][frameType][k] = v
@@ -706,4 +706,35 @@ function KHMRaidFrames:CopySettings(dbFrom, dbTo)
 
     self:SafeRefresh(groupType)
 end
+
+function KHMRaidFrames:RestoreDefaultsByTable(groupType, frameType, subType, vars)
+    if InCombatLockdown() then
+        print("Can not refresh settings while in combat")
+        return
+    end
+
+    local defaults_settings = subType and self:Defaults()["profile"][groupType][frameType][subType] or self:Defaults()["profile"][groupType][frameType]
+
+    for _, v in ipairs(vars) do
+        self.db.profile[groupType][frameType][v] = defaults_settings[v]
+    end
+
+    self:SafeRefresh(groupType)
+end
+
+function KHMRaidFrames:CopySettingsByTable(dbFrom, dbTo, vars)
+    if InCombatLockdown() then
+        print("Can not refresh settings while in combat")
+        return
+    end
+
+    for _, v in ipairs(vars) do
+        if dbFrom[v] ~= nil then
+            dbTo[v] = dbFrom[v]
+        end
+    end
+
+    self:SafeRefresh(groupType)
+end
+
 --

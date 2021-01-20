@@ -225,6 +225,15 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         args = self:SetupNameAndIconsOptions(groupType),
     }
 
+    options.textures = {
+        type = "group",
+        order = 8,
+        name = L["Textures & Frames"],
+        desc = "",
+        childGroups = "tree",
+        args = self:SetupTexturesAndFrames(groupType),
+    }
+
     return options
 end
 
@@ -607,8 +616,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers = val
 
-                    self.RevertStatusTextFont()
-
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.abbreviateNumbers end
@@ -626,8 +633,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.precision = val - 1
 
-                    self.RevertStatusTextFont()
-
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.precision + 1 end
@@ -642,8 +647,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.showPercents = val
 
-                    self.RevertStatusTextFont()
-
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info, value) return self.db.profile[groupType].nameAndIcons.statusText.showPercents end
@@ -656,10 +659,6 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 order = 14,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses = val
-
-                    if not val then
-                        self.RevertStatusTextFont()
-                    end
 
                     self:SafeRefresh(groupType)
                 end,
@@ -1957,184 +1956,8 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
 end
 
 function KHMRaidFrames:SetupFrameOptions(groupType)
+
     local options = {
-        ["Texture"] = {
-            name = L["Texture"],
-            desc = "",
-            width = "full",
-            type = "select",
-            values = AceGUIWidgetLSMlists.statusbar,
-            dialogControl = "LSM30_Statusbar",
-            order = 1.5,
-            set = function(info,val)
-                self.db.profile[groupType].frames.texture = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.texture
-            end
-        },
-        ["SkipColor"] = {
-            type = "header",
-            name = "",
-            order = 1.9,
-        },
-        ["colorEnabled"] = {
-            name = L["Enable"],
-            desc = "",
-            width = "full",
-            type = "toggle",
-            order = 2,
-            set = function(info,val)
-                self.db.profile[groupType].frames.colorEnabled = val
-
-                if self.useClassColors then self.ReverseHealthBarColors() end
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.colorEnabled
-            end
-        },
-        ["color"] = {
-            name = L["Healthbar Color"],
-            desc = L["Healthbar Color Desc"],
-            width = "normal",
-            type = "color",
-            order = 2.4,
-            disabled = function(info)
-                return not self.db.profile[groupType].frames.colorEnabled
-            end,
-            set = function(info, r, g, b, a)
-                self.db.profile[groupType].frames.color = {r, g, b, a}
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                local color = self.db.profile[groupType].frames.color
-                return color[1], color[2], color[3], color[4]
-            end
-        },
-        ["backGroundColor"] = {
-            name = L["Background Color"],
-            desc = L["Background Color"],
-            width = "normal",
-            type = "color",
-            order = 2.7,
-            disabled = function(info)
-                return not self.db.profile[groupType].frames.colorEnabled
-            end,
-            set = function(info, r, g, b, a)
-                self.db.profile[groupType].frames.backGroundColor = {r, g, b, a}
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                local color = self.db.profile[groupType].frames.backGroundColor
-                return color[1], color[2], color[3], color[4]
-            end
-        },
-        ["SkipTransparency"] = {
-            type = "header",
-            name = "",
-            order = 2.9,
-        },
-        ["advancedTransparency"] = {
-            name = L["Advanced Transparency"],
-            desc = L["Advanced Transparency"],
-            width = "double",
-            type = "toggle",
-            order = 3,
-            set = function(info,val)
-                self.db.profile[groupType].frames.advancedTransparency = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return  self.db.profile[groupType].frames.advancedTransparency
-            end
-        },
-        ["Transparency"] = {
-            name = L["Transparency"],
-            desc = "",
-            width = "normal",
-            type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 3.5,
-            hidden = function() return self.db.profile[groupType].frames.advancedTransparency end,
-            set = function(info,val)
-                self.db.profile[groupType].frames.alpha = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.alpha
-            end
-        },
-        ["backgroundTransparency"] = {
-            name = L["Background Transparency"],
-            desc = "",
-            width = "double",
-            type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 3.3,
-            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-            set = function(info,val)
-                self.db.profile[groupType].frames.alphaBackgound = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.alphaBackgound
-            end
-        },
-        ["healthTransparency"] = {
-            name = L["Health Transparency"],
-            desc = "",
-            width = "normal",
-            type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 3.2,
-            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-            set = function(info,val)
-                self.db.profile[groupType].frames.alphaHealth = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.alphaHealth
-            end
-        },
-        ["powerBarTransparency"] = {
-            name = L["Power Bar Transparency"],
-            desc = "",
-            width = "normal",
-            type = "range",
-            min = 0.1,
-            max = 1.0,
-            step = 0.05,
-            order = 3.4,
-            hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-            set = function(info,val)
-                self.db.profile[groupType].frames.alphaPowerBar = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.alphaPowerBar
-            end
-        },
-        ["Skip1"] = {
-            type = "header",
-            name = "",
-            order = 4,
-        },
         ["Masque Support"] = {
             name = L["Enable Masque Support"],
             desc = L["Enable Masque Support Desc"],
@@ -2232,68 +2055,6 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
                 return self.db.profile[groupType].frames.autoScaling
             end
         },
-        ["Skip1.5"] = {
-            type = "header",
-            name = L["Power Bar"],
-            order = 11,
-        },
-        ["Power Bar Texture"] = {
-            name = L["Power Bar Texture"],
-            desc = L["Show Resource Only For Healers Desc"],
-            width = "full",
-            type = "select",
-            values = AceGUIWidgetLSMlists.statusbar,
-            dialogControl = "LSM30_Statusbar",
-            order = 12,
-            set = function(info,val)
-                self.db.profile[groupType].frames.powerBarTexture = val
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.powerBarTexture
-            end
-        },
-        ["Show Resource Only For Healers"] = {
-            name = L["Show Resource Only For Healers"],
-            desc = L["Show Resource Only For Healers Desc"],
-            width = "normal",
-            type = "toggle",
-            order = 13,
-            confirm = function() return not self.displayPowerBar end,
-            confirmText = L["Show Resource Only For Healers Desc"],
-            set = function(info,val)
-                if val and not self.displayPowerBar then val = false end
-
-                self.db.profile[groupType].frames.showResourceOnlyForHealers = val
-
-                self.RevertResourceBar()
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.showResourceOnlyForHealers
-            end
-        },
-        ["Power Bar Height"] = {
-            name = L["Power Bar Height"],
-            desc = L["Show Resource Only For Healers Desc"],
-            width = "normal",
-            type = "range",
-            min = 1,
-            max = 50,
-            step = 1,
-            order = 14,
-            confirm = function() return not self.displayPowerBar end,
-            confirmText = L["Show Resource Only For Healers Desc"],
-            set = function(info,val)
-                if val and not self.displayPowerBar then val = 8 end
-
-                self.db.profile[groupType].frames.powerBarHeight = val
-
-                self:SafeRefresh(groupType)
-            end,
-            get = function(info)
-                return self.db.profile[groupType].frames.powerBarHeight
-            end
-        },
         ["Skip2"] = {
             type = "header",
             name = "",
@@ -2341,9 +2102,419 @@ function KHMRaidFrames:SetupFrameOptions(groupType)
             confirm = true,
             order = 92,
             func = function(info,val)
-                self:RestoreDefaults(groupType, "frames")
+                local vars = {
+                    "showPartySolo",
+                    "hideGroupTitles",
+                    "clickThrough",
+                    "enhancedAbsorbs",
+                    "autoScaling",
+                    "tracking",
+                    "trackingStr"
+                }
+
+                self:RestoreDefaultsByTable(groupType, "frames", vars)
             end,
         },
     }
+    return options
+end
+
+function KHMRaidFrames:SetupTexturesAndFrames(groupType)
+    local options = {}
+
+    options.health = {
+        type = "group",
+        order = 1,
+        name = L["Healthbar"],
+        desc = "",
+        childGroups = "tab",
+        args = {
+            ["Texture"] = {
+                name = L["Texture"],
+                desc = "",
+                width = "full",
+                type = "select",
+                values = AceGUIWidgetLSMlists.statusbar,
+                dialogControl = "LSM30_Statusbar",
+                order = 1,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.texture = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.texture
+                end
+            },
+            ["skipHealthColoring"] = {
+                name = "",
+                type = "header",
+                order = 2,
+            },
+            ["colorEnabled"] = {
+                name = L["Enable"],
+                desc = "",
+                width = "full",
+                type = "toggle",
+                order = 3,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.colorEnabled = val
+
+                    if not val then
+                        self.ReverseHealthBarColors()
+                    end
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.colorEnabled
+                end
+            },
+            ["color"] = {
+                name = L["Healthbar Color"],
+                desc = L["Healthbar Color Desc"],
+                width = "normal",
+                type = "color",
+                order = 4,
+                disabled = function(info)
+                    return not self.db.profile[groupType].frames.colorEnabled
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].frames.color = {r, g, b, a}
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].frames.color
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
+            ["backGroundColor"] = {
+                name = L["Background Color"],
+                desc = L["Background Color"],
+                width = "normal",
+                type = "color",
+                order = 5,
+                disabled = function(info)
+                    return not self.db.profile[groupType].frames.colorEnabled
+                end,
+                set = function(info, r, g, b, a)
+                    self.db.profile[groupType].frames.backGroundColor = {r, g, b, a}
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    local color = self.db.profile[groupType].frames.backGroundColor
+                    return color[1], color[2], color[3], color[4]
+                end
+            },
+            ["Skip3"] = {
+                type = "header",
+                name = "",
+                order = 90,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 91,
+                confirm = true,
+                func = function(info,val)
+                    local vars = {
+                        "alphaPowerBar",
+                        "alphaHealth",
+                        "advancedTransparency",
+                        "alphaBackgound",
+                        "alpha",
+                    }
+
+                    self:CopySettingsByTable(
+                        self.db.profile[groupType].frames,
+                        self.db.profile[self.ReverseGroupType(groupType)].frames,
+                        vars
+                    )
+                end,
+            },
+            ["Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "normal",
+                type = "execute",
+                confirm = true,
+                order = 92,
+                func = function(info,val)
+                    local vars = {
+                        "backGroundColor",
+                        "color",
+                        "colorEnabled",
+                        "texture",
+                    }
+
+                    self:RestoreDefaultsByTable(groupType, "frames", nil, vars)
+                end,
+            },
+        }
+    }
+
+    options.powerbar = {
+        type = "group",
+        order = 2,
+        name = L["Power Bar"],
+        desc = "",
+        childGroups = "tab",
+        args = {
+            ["Power Bar Texture"] = {
+                name = L["Power Bar Texture"],
+                desc = L["Show Resource Only For Healers Desc"],
+                width = "full",
+                type = "select",
+                values = AceGUIWidgetLSMlists.statusbar,
+                dialogControl = "LSM30_Statusbar",
+                order = 1,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.powerBarTexture = val
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.powerBarTexture
+                end
+            },
+            ["Power Bar Height"] = {
+                name = L["Power Bar Height"],
+                desc = L["Show Resource Only For Healers Desc"],
+                width = "full",
+                type = "range",
+                min = 1,
+                max = 50,
+                step = 1,
+                order = 2,
+                confirm = function() return not self.displayPowerBar end,
+                confirmText = L["Show Resource Only For Healers Desc"],
+                set = function(info,val)
+                    if val and not self.displayPowerBar then val = 8 end
+
+                    self.db.profile[groupType].frames.powerBarHeight = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.powerBarHeight
+                end
+            },
+            ["Show Resource Only For Healers"] = {
+                name = L["Show Resource Only For Healers"],
+                desc = L["Show Resource Only For Healers Desc"],
+                width = "full",
+                type = "toggle",
+                order = 3,
+                confirm = function() return not self.displayPowerBar end,
+                confirmText = L["Show Resource Only For Healers Desc"],
+                set = function(info,val)
+                    if val and not self.displayPowerBar then val = false end
+
+                    self.db.profile[groupType].frames.showResourceOnlyForHealers = val
+
+                    self.RevertResourceBar()
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.showResourceOnlyForHealers
+                end
+            },
+            ["Skip3"] = {
+                type = "header",
+                name = "",
+                order = 90,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 91,
+                confirm = true,
+                func = function(info,val)
+                    local vars = {
+                        "alphaPowerBar",
+                        "alphaHealth",
+                        "advancedTransparency",
+                        "alphaBackgound",
+                        "alpha",
+                    }
+
+                    self:CopySettingsByTable(
+                        self.db.profile[groupType].frames,
+                        self.db.profile[self.ReverseGroupType(groupType)].frames,
+                        vars
+                    )
+                end,
+            },
+            ["Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "normal",
+                type = "execute",
+                confirm = true,
+                order = 92,
+                func = function(info,val)
+                    local vars = {
+                        "powerBarTexture",
+                        "powerBarHeight",
+                        "showResourceOnlyForHealers",
+                    }
+
+                    self:RestoreDefaultsByTable(groupType, "frames", nil, vars)
+                end,
+            },
+        }
+    }
+
+    options.transparency = {
+        type = "group",
+        order = 3,
+        name = L["Transparency"],
+        desc = "",
+        childGroups = "tab",
+        args = {
+            ["advancedTransparency"] = {
+                name = L["Advanced Transparency"],
+                desc = L["Advanced Transparency"],
+                width = "double",
+                type = "toggle",
+                order = 1,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.advancedTransparency = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return  self.db.profile[groupType].frames.advancedTransparency
+                end
+            },
+            ["Transparency"] = {
+                name = L["Transparency"],
+                desc = "",
+                width = "full",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.05,
+                order = 2,
+                hidden = function() return self.db.profile[groupType].frames.advancedTransparency end,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.alpha = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.alpha
+                end
+            },
+            ["backgroundTransparency"] = {
+                name = L["Background Transparency"],
+                desc = "",
+                width = "full",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.05,
+                order = 3,
+                hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.alphaBackgound = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.alphaBackgound
+                end
+            },
+            ["healthTransparency"] = {
+                name = L["Health Transparency"],
+                desc = "",
+                width = "full",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.05,
+                order = 4,
+                hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.alphaHealth = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.alphaHealth
+                end
+            },
+            ["powerBarTransparency"] = {
+                name = L["Power Bar Transparency"],
+                desc = "",
+                width = "full",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.05,
+                order = 5,
+                hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.alphaPowerBar = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.alphaPowerBar
+                end
+            },
+            ["Skip3"] = {
+                type = "header",
+                name = "",
+                order = 90,
+            },
+            ["Copy"] = {
+                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
+                width = "normal",
+                type = "execute",
+                order = 91,
+                confirm = true,
+                func = function(info,val)
+                    local vars = {
+                        "alphaPowerBar",
+                        "alphaHealth",
+                        "advancedTransparency",
+                        "alphaBackgound",
+                        "alpha",
+                    }
+
+                    self:CopySettingsByTable(
+                        self.db.profile[groupType].frames,
+                        self.db.profile[self.ReverseGroupType(groupType)].frames,
+                        vars
+                    )
+                end,
+            },
+            ["Reset"] = {
+                name = L["Reset to Default"],
+                desc = "",
+                width = "normal",
+                type = "execute",
+                confirm = true,
+                order = 92,
+                func = function(info,val)
+                    local vars = {
+                        "alphaPowerBar",
+                        "alphaHealth",
+                        "advancedTransparency",
+                        "alphaBackgound",
+                        "alpha",
+                    }
+
+                    self:RestoreDefaultsByTable(groupType, "frames", nil, vars)
+                end,
+            },
+        }
+    }
+
     return options
 end

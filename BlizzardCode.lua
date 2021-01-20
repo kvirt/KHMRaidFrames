@@ -583,38 +583,10 @@ function KHMRaidFrames.RevertStatusIconTexture()
     end
 end
 
-function KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
-    if not frame.statusText then return end
-    if not frame.optionTable.displayStatusText then return end
-    if not frame.unit then return end
-
-    frame.statusText:ClearAllPoints()
-    frame.statusText:SetFont(SharedMedia:Fetch("font", KHMRaidFrames.font), 12 * KHMRaidFrames.componentScale)
-    frame.statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 3, KHMRaidFrames.frameHeight / 3 - 2)
-    frame.statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -3, KHMRaidFrames.frameHeight / 3 - 2)
-    frame.statusText:SetHeight(12 * KHMRaidFrames.componentScale);
-
-    CompactUnitFrame_UpdateStatusText(frame)
-
-    frame.statusText:SetVertexColor(0.5, 0.5, 0.5, 1)
-end
-
 function KHMRaidFrames.RevertStatusText()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         if frame.__statusText then
             frame.statusText:Hide()
-        end
-
-        --if frame.unit then
-        --    KHMRaidFrames.CompactUnitFrame_UpdateStatusText(frame)
-        --end
-    end
-end
-
-function KHMRaidFrames.RevertStatusTextFont()
-    for frame in KHMRaidFrames.IterateCompactFrames() do
-        if frame.unit then
-            CompactUnitFrame_UpdateStatusText(frame)
         end
     end
 end
