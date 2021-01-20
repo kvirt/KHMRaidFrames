@@ -327,13 +327,10 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 type = "select",
                 values = positionsText,
                 order = 5,
-                confirm = true,
-                confirmText = L["UI will be reloaded to apply settings"],
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.hJustify = val
                     self:SafeRefresh(groupType)
-                    ReloadUI()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.name.hJustify end
             },
@@ -518,12 +515,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 values = positionsText,
                 order = 5,
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
-                confirm = true,
-                confirmText = L["UI will be reloaded to apply settings"],
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.hJustify = val
                     self:SafeRefresh(groupType)
-                    ReloadUI()
                 end,
                 get = function(info) return self.db.profile[groupType].nameAndIcons.statusText.hJustify end
             },

@@ -308,6 +308,8 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
     local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
 
+    name:SetJustifyH(db.hJustify)
+
     name:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("TOPLEFT", frame, groupType)
@@ -317,8 +319,6 @@ function KHMRaidFrames:SetUpName(frame, groupType)
     name:SetFont(font, size, flags)
     name:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
     name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, yOffset)
-    --name:SetHeight(size * 1.2)
-    name:SetJustifyH(db.hJustify)
 
     self.SetUpNameInternal(frame, groupType)
 end
@@ -378,9 +378,13 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     local flags = db.flag ~= "None" and db.flag or ""
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
+    -- i dont know why blizzard frames mess with fonts
     frame.__statusText = frame.__statusText or frame:CreateFontString(nil, "OVERLAY")
 
     local statusText = frame.__statusText
+
+    statusText:SetJustifyH(db.hJustify)
+
     statusText:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
@@ -392,7 +396,6 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
     statusText:SetShadowColor(0, 0, 0, 1)
     statusText:SetShadowOffset(1, -1)
-    statusText:SetJustifyH(db.hJustify)
 
     self.SetUpStatusTextInternal(frame, groupType)
 end
