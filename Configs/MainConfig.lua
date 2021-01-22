@@ -2207,6 +2207,28 @@ function KHMRaidFrames:SetupTexturesAndFrames(groupType)
                     return color[1], color[2], color[3], color[4]
                 end
             },
+            ["outOfRangeColor"] = {
+                name = L["Out of Range"],
+                desc = L["Out of Range"],
+                width = "normal",
+                type = "select",
+                values = {
+                    ["Dark"] = L["Dark"],
+                    ["Light"] = L["Light"],
+                },
+                order = 6,
+                disabled = function(info)
+                    return not self.db.profile[groupType].frames.colorEnabled
+                end,
+                set = function(info, val)
+                    self.db.profile[groupType].frames.outOfRangeColor = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.outOfRangeColor
+                end
+            },
             ["Skip3"] = {
                 type = "header",
                 name = "",

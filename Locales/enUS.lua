@@ -174,3 +174,6 @@ L["Advanced Transparency"] = true
 L["Health Transparency"] = true
 L["Health Background Transparency"] = true
 L["Textures & Frames"] = true
+L["Dark"] = true
+L["Light"] = true
+L["Out of Range"] = true

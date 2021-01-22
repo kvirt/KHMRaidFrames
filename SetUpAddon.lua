@@ -225,7 +225,7 @@ function KHMRaidFrames.RefreshProfileSettings()
             function(frame)
                 if KHMRaidFrames.SkipFrame(frame) then return end
 
-                KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, IsInRaid() and "raid" or "party")
+                KHMRaidFrames:CompactUnitFrame_UpdateHealthColorInternal(frame, IsInRaid() and "raid" or "party")
             end
         )
     end
@@ -460,6 +460,7 @@ function KHMRaidFrames:Defaults()
             colorEnabled = false,
             color = {1, 1, 1},
             backGroundColor = {0.1, 0.1, 0.1},
+            outOfRangeColor = "Dark",
         },
         dispelDebuffFrames = {
             num = 3,

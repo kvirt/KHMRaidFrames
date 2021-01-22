@@ -135,14 +135,6 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     end
 
     if self.db.profile[groupType].frames.colorEnabled then
-        local bg = frame.healthBar.background
-        bg:ClearAllPoints()
-        bg:SetPoint("TOPLEFT", frame.healthBar:GetStatusBarTexture(), "TOPRIGHT")
-        bg:SetPoint("BOTTOMLEFT", frame.healthBar:GetStatusBarTexture(), "BOTTOMRIGHT")
-
-        bg:SetPoint("TOPRIGHT", frame.healthBar, "TOPRIGHT")
-        bg:SetPoint("BOTTOMRIGHT", frame.healthBar, "BOTTOMRIGHT")
-
         self:CompactUnitFrame_UpdateHealthColor(frame, groupType)
     end
 
@@ -173,51 +165,65 @@ end
 
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
+    local bg = frame.healthBar.background
+
+    bg:ClearAllPoints()
+    bg:SetPoint("TOPLEFT", frame.healthBar:GetStatusBarTexture(), "TOPRIGHT")
+    bg:SetPoint("BOTTOMLEFT", frame.healthBar:GetStatusBarTexture(), "BOTTOMRIGHT")
+
+    bg:SetPoint("TOPRIGHT", frame.healthBar, "TOPRIGHT")
+    bg:SetPoint("BOTTOMRIGHT", frame.healthBar, "BOTTOMRIGHT")
+
+    local db = self.db.profile[groupType].frames
+
+    local br, bg, bb = db.backGroundColor[1], db.backGroundColor[2], db.backGroundColor[3]
+
+    frame.healthBar.background:SetColorTexture(br, bg, bb)
+
+    if db.outOfRangeColor == "Dark" then
+        frame.background:SetColorTexture(0.1, 0.1, 0.1)
+    else
+        frame.background:SetColorTexture(0.5, 0.5, 0.5)
+    end
+
+    self:CompactUnitFrame_UpdateHealthColorInternal(frame, groupType)
+end
+
+function KHMRaidFrames:CompactUnitFrame_UpdateHealthColorInternal(frame, groupType)
     local db = self.db.profile[groupType].frames
 
     if not db.colorEnabled then return end
 
     local r, g, b
     local name = frame:GetName()
-    local br, bg, bb = db.backGroundColor[1], db.backGroundColor[2], db.backGroundColor[3]
 
     if not self.coloredFrames[name] then
         self.coloredFrames[name] = {
             health = {},
-            background = {},
         }
     end
 
     local cache = self.coloredFrames[name]
 
     if not self.useClassColors then
-        if frame.unit and not UnitIsConnected(frame.unit) then
-            r, g, b = 0.5, 0.5, 0.5
-        elseif CompactUnitFrame_IsTapDenied(frame) then
-            r, g, b = 0.9, 0.9, 0.9
-        else
-            r, g, b = db.color[1], db.color[2], db.color[3]
-        end
+        if frame.healthBar.r ~= cache.health.r or frame.healthBar.g ~= cache.health.g or frame.healthBar.b ~= cache.health.b then
+            self.PrintV(frame:GetName())
+            if frame.unit and not UnitIsConnected(frame.unit) then
+                r, g, b = 0.5, 0.5, 0.5
+            elseif CompactUnitFrame_IsTapDenied(frame) then
+                r, g, b = 0.9, 0.9, 0.9
+            else
+                r, g, b = db.color[1], db.color[2], db.color[3]
+            end
 
-        if r ~= cache.health.r or g ~= cache.health.g or b ~= cache.health.b then
             frame.healthBar:SetStatusBarColor(r, g, b)
 
             self.coloredFrames[name].health = {
-                r=r,
-                g=g,
-                b=b,
+                r=frame.healthBar.r,
+                g=frame.healthBar.g,
+                b=frame.healthBar.b,
             }
         end
-    end
-
-    if br ~= cache.background.r or bg ~= cache.background.g or bb ~= cache.background.b then
-        frame.healthBar.background:SetColorTexture(br, bg, bb)
-
-        self.coloredFrames[name].background = {
-            r=br,
-            g=bg,
-            b=bb,
-        }
     end
 end
 --

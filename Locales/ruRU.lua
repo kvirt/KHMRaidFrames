@@ -171,3 +171,6 @@ L["Advanced Transparency"] = "Расширенные настройки проз
 L["Health Transparency"] = "Прозрачность Здоровья"
 L["Health Background Transparency"] = "Прозрачность Фона Здоровья"
 L["Textures & Frames"] = "Текстуры и Фреймы"
+L["Dark"] = "Темный"
+L["Light"] = "Светлый"
+L["Out of Range"] = "Вне ренжа"
