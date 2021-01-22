@@ -207,7 +207,6 @@ function KHMRaidFrames:CompactUnitFrame_UpdateHealthColorInternal(frame, groupTy
 
     if not self.useClassColors then
         if frame.healthBar.r ~= cache.health.r or frame.healthBar.g ~= cache.health.g or frame.healthBar.b ~= cache.health.b then
-            self.PrintV(frame:GetName())
             if frame.unit and not UnitIsConnected(frame.unit) then
                 r, g, b = 0.5, 0.5, 0.5
             elseif CompactUnitFrame_IsTapDenied(frame) then
