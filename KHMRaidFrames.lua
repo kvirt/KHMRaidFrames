@@ -408,17 +408,23 @@ end
 function KHMRaidFrames.HideStatusText(frame)
     local hide = not frame.statusText or not frame.optionTable.displayStatusText
 
-    if hide then return hide end
+    if hide then
+        statusText:Hide()
+        return
+    end
+
+    local percents
 
     if not UnitIsConnected(frame.unit) then
         hide = false
-    elseif ( UnitIsDeadOrGhost(frame.displayedUnit) ) then
+    elseif UnitIsDeadOrGhost(frame.displayedUnit) then
         hide = false
-    elseif ( frame.optionTable.healthText == "health" ) then
+    elseif frame.optionTable.healthText == "health" then
         hide = false
-    elseif ( frame.optionTable.healthText == "losthealth" ) then
-        local healthLost = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit);
-        if healthLost > 0 then
+    elseif frame.optionTable.healthText == "losthealth" then
+        local losthealth = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit)
+
+        if losthealth > 0 then
             hide = false
         else
             hide = true
@@ -443,8 +449,9 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
     if not db.enabled then return end
 
+    local health
     local statusText = frame.__statusText
-    local text
+    local text = frame.statusText:GetText()
 
     if KHMRaidFrames.HideStatusText(frame) then
         statusText:Hide()
@@ -456,19 +463,17 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     end
 
     if db.notShowStatuses or db.abbreviateNumbers or db.showPercents then
-        if not db.notShowStatuses then
-            if not UnitIsConnected(frame.unit) and not db.notShowStatuses then
-                text = PLAYER_OFFLINE
-            elseif UnitIsDeadOrGhost(frame.displayedUnit) and not db.notShowStatuses then
-                text = DEAD
-            end
+        if frame.optionTable.healthText == "losthealth" then
+            text = text:gsub("-", "")
         end
 
-        if text then
-            statusText:SetText(text)
-        else
-            local health = UnitHealth(frame.displayedUnit)
+        health = tonumber(text)
 
+        if not health and db.notShowStatuses then
+            health = 0
+        end
+
+        if health then
             if db.abbreviateNumbers then
                 health = KHMRaidFrames.Abbreviate(health, groupType)
             end
@@ -478,12 +483,14 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
                 percents = (percents ~= math.huge and percents ~= -math.huge and percents) or 0
                 health = health.." - "..percents.."%"
             end
-
-            statusText:SetText(health)
         end
-    else
-        statusText:SetText(frame.statusText:GetText())
+
+        if frame.optionTable.healthText == "losthealth" then
+            health = "-"..health
+        end
     end
+
+    statusText:SetText(health or text)
 
     if db.classColoredText then
         local classColor = KHMRaidFrames.ColorByClass(frame.unit)
