@@ -405,6 +405,33 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     self.SetUpStatusTextInternal(frame, groupType)
 end
 
+function KHMRaidFrames.HideStatusText(frame)
+    local hide = not frame.statusText or not frame.optionTable.displayStatusText
+
+    if hide then return hide end
+
+    if not UnitIsConnected(frame.unit) then
+        hide = false
+    elseif ( UnitIsDeadOrGhost(frame.displayedUnit) ) then
+        hide = false
+    elseif ( frame.optionTable.healthText == "health" ) then
+        hide = false
+    elseif ( frame.optionTable.healthText == "losthealth" ) then
+        local healthLost = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit);
+        if healthLost > 0 then
+            hide = false
+        else
+            hide = true
+        end
+    elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
+        hide = false
+    else
+        hide = true
+    end
+
+    return hide
+end
+
 function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     if not frame.unit then return end
     if not UnitExists(frame.displayedUnit) then return end
@@ -419,7 +446,7 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     local statusText = frame.__statusText
     local text
 
-    if not frame.statusText:IsShown() then
+    if KHMRaidFrames.HideStatusText(frame) then
         statusText:Hide()
 
         return
