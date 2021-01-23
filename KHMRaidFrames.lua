@@ -419,6 +419,15 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     local statusText = frame.__statusText
     local text
 
+    if not frame.statusText:IsShown() then
+        statusText:Hide()
+
+        return
+    else
+        frame.statusText:Hide()
+        statusText:Show()
+    end
+
     if db.notShowStatuses or db.abbreviateNumbers or db.showPercents then
         if not db.notShowStatuses then
             if not UnitIsConnected(frame.unit) and not db.notShowStatuses then
@@ -462,17 +471,6 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
             statusText:SetVertexColor(unpack(db.color))
         end
     end
-
-    if not frame.statusText:IsShown() then
-        if KHMRaidFrames.healthText == "None" then
-            if frame.__statusText then
-                frame.__statusText:Hide()
-            end
-        end
-    else
-        frame.statusText:Hide()
-    end
-
 end
 
 -- RAID TARGET ICON (STAR, SQUARE, etc)

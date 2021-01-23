@@ -586,7 +586,7 @@ end
 function KHMRaidFrames.RevertStatusText()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         if frame.__statusText then
-            frame.statusText:Hide()
+            frame.__statusText:Hide()
         end
     end
 end
