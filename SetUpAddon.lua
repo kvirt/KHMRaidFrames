@@ -67,8 +67,6 @@ function KHMRaidFrames:Setup()
 end
 
 function KHMRaidFrames:SetInternalVariables()
-    self.componentScale = 1
-
     self:GetRaidProfileSettings()
 
     self.isOpen = false
@@ -363,21 +361,16 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
     self.keepGroupsTogether = settings.keepGroupsTogether
     self.displayBorder = settings.displayBorder
-    self.frameWidth = settings.frameWidth
-    self.frameHeight = settings.frameHeight
     self.displayPowerBar = settings.displayPowerBar
     self.displayPets = settings.displayPets
     self.useClassColors = settings.useClassColors
     self.healthText = settings.healthText
-    self.componentScale = min(self.frameHeight / self.NATIVE_UNIT_FRAME_HEIGHT, self.frameWidth / self.NATIVE_UNIT_FRAME_WIDTH)
 
     local savedProfile = {}
     savedProfile.horizontalGroups = settings.horizontalGroups
     savedProfile.displayMainTankAndAssist = settings.displayMainTankAndAssist
     savedProfile.keepGroupsTogether = settings.keepGroupsTogether
     savedProfile.displayBorder = settings.displayBorder
-    savedProfile.frameWidth = settings.frameWidth
-    savedProfile.frameHeight = settings.frameHeight
     savedProfile.displayPowerBar = settings.displayPowerBar
     savedProfile.displayPets = settings.displayPets
     savedProfile.useCompactPartyFrames = self.useCompactPartyFrames

@@ -164,9 +164,11 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
         name = function()
             self.virtual.groupType = groupType
 
-            self:SetUpVirtual("buffFrames", groupType, self.componentScale)
-            self:SetUpVirtual("debuffFrames", groupType, self.componentScale, true)
-            self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
+            if self.virtual.frame then
+                self:SetUpVirtual("buffFrames", groupType, self.componentScale(self.virtual.frame))
+                self:SetUpVirtual("debuffFrames", groupType, self.componentScale(self.virtual.frame), true)
+                self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
+            end
 
             return L["You are in |cFFC80000<text>|r"]
         end,

@@ -170,7 +170,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, group
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
     local db = self.db.profile[groupType][subFrameType]
-    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1) or 1)
+    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame)) or 1)
     local typedframes = virtual and self.virtual.frames[subFrameType] or frame[subFrameType]
 
     while frameNum <= #typedframes do
@@ -250,9 +250,11 @@ function KHMRaidFrames:RefreshConfig(virtualGroupType)
 
     local isInCombatLockDown = InCombatLockdown()
 
-    self:SetUpVirtual("buffFrames", virtualGroupType, self.componentScale)
-    self:SetUpVirtual("debuffFrames", virtualGroupType, self.componentScale, true)
-    self:SetUpVirtual("dispelDebuffFrames", virtualGroupType, 1)
+    if self.virtual.frame then
+        self:SetUpVirtual("buffFrames", virtualGroupType, self.componentScale(self.virtual.frame))
+        self:SetUpVirtual("debuffFrames", virtualGroupType, self.componentScale(self.virtual.frame), true)
+        self:SetUpVirtual("dispelDebuffFrames", virtualGroupType, 1)
+    end
 
     for group in self.IterateCompactGroups(groupType) do
         self:LayoutGroup(group, groupType, isInCombatLockDown)
@@ -396,7 +398,7 @@ function KHMRaidFrames:SmartAnchoring(frame, groupType, virtual)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
-    local size = db.size * self.componentScale
+    local size = db.size * self.componentScale(frame)
     local bigSize = size * 2
     local rowStart = 1
     local groupType = IsInRaid() and "raid" or "party"
@@ -906,4 +908,9 @@ function KHMRaidFrames.Abbreviate(num, groupType)
     else
         return Round(num / 1000000, precision, "M")
     end
+end
+
+function KHMRaidFrames.componentScale(frame)
+    local scale = min(frame:GetHeight() / KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT, frame:GetWidth() / KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH)
+    return scale ~= 0 and scale or 1
 end

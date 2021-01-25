@@ -82,7 +82,9 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
         size = size.size
     end
 
-    size = size * self.componentScale
+    local parent = debuffFrame:GetParent()
+
+    size = size * self.componentScale(parent)
 
     debuffFrame:SetSize(size, size)
 
@@ -105,8 +107,6 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
     if not debuffFrame.debuffFramesGlowing then
         self.StopGlow(debuffFrame, db.auraGlow.debuffFrames, "debuffFrames", "auraGlow")
     end
-
-    local parent = debuffFrame:GetParent()
 
     parent.debuffFramesGlowing[debuffType] = {name, debuffType, spellId}
     parent.debuffFramesGlowing[name] = {name, debuffType, spellId}
@@ -520,9 +520,9 @@ function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
         return
     end
 
-    local readyCheckSize = 15 * KHMRaidFrames.componentScale
+    local readyCheckSize = 15 * KHMRaidFrames.componentScale(frame)
     frame.readyCheckIcon:ClearAllPoints();
-    frame.readyCheckIcon:SetPoint("BOTTOM", frame, "BOTTOM", 0, KHMRaidFrames.frameHeight / 3 - 4)
+    frame.readyCheckIcon:SetPoint("BOTTOM", frame, "BOTTOM", 0, frame:GetHeight() / 3 - 4)
     frame.readyCheckIcon:SetSize(readyCheckSize, readyCheckSize)
 
     KHMRaidFrames.CompactUnitFrame_UpdateReadyCheckTexture(frame)
@@ -553,9 +553,9 @@ end
 function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
     if not frame.unit or not frame.centerStatusIcon then return end
 
-    local size = 11 * KHMRaidFrames.componentScale * 2
+    local size = 11 * KHMRaidFrames.componentScale(frame) * 2
     frame.centerStatusIcon:ClearAllPoints()
-    frame.centerStatusIcon:SetPoint("CENTER", frame, "BOTTOM", 0, KHMRaidFrames.frameHeight / 3 + 2)
+    frame.centerStatusIcon:SetPoint("CENTER", frame, "BOTTOM", 0, frame:GetHeight() / 3 + 2)
     frame.centerStatusIcon:SetSize(size, size)
 
     KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIconTexture(frame)

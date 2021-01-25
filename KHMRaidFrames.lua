@@ -311,7 +311,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     local flags = db.flag ~= "None" and db.flag or ""
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
 
     name:SetJustifyH(db.hJustify)
 
@@ -379,7 +379,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.statusText
 
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
     local flags = db.flag ~= "None" and db.flag or ""
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
@@ -394,7 +394,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
     local xOffset = xOffset + db.xOffset
-    local yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 2)
+    local yOffset = yOffset + db.yOffset + ((frame:GetHeight() / 3) - 2)
 
     statusText:SetFont(font, size, flags)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
@@ -540,7 +540,7 @@ function KHMRaidFrames:SetUpRaidIcon(frame)
     if index and index >= 1 and index <= 8 then
         local options = UnitPopupButtons["RAID_TARGET_"..index]
         local texture, tCoordLeft, tCoordRight, tCoordTop, tCoordBottom = options.icon, options.tCoordLeft, options.tCoordRight, options.tCoordTop, options.tCoordBottom
-        local size = db.raidIcon.size * (db.frames.autoScaling and self.componentScale or 1)
+        local size = db.raidIcon.size * (db.frames.autoScaling and self.componentScale(frame))
 
         frame.raidIcon:ClearAllPoints()
 
@@ -623,13 +623,13 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
     local readyCheckIcon = frame.readyCheckIcon
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
 
     readyCheckIcon:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("BOTTOM", frame, groupType)
     xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
+    yOffset = yOffset + db.yOffset + ((frame:GetHeight() / 3) - 4)
 
     readyCheckIcon:SetPoint(
         "BOTTOM",
@@ -673,13 +673,13 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
     local centerStatusIcon = frame.centerStatusIcon
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale or 1)
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
 
     centerStatusIcon:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("BOTTOM", frame, groupType)
     xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset + ((self.frameHeight / 3) - 4)
+    yOffset = yOffset + db.yOffset + ((frame:GetHeight() / 3) - 4)
 
     centerStatusIcon:SetPoint(
         "BOTTOM",
@@ -772,7 +772,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
     if not UnitExists(frame.displayedUnit) then return end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
-    local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale or 1)
+    local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale(frame))
 
     local isLeader = UnitIsGroupLeader(frame.unit)
 
