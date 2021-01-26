@@ -363,7 +363,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.displayPets = settings.displayPets
     self.useClassColors = settings.useClassColors
     self.healthText = settings.healthText
-
+    self.PrintV(settings, IsInRaid() and "raid" or "party")
     local savedProfile = {}
     savedProfile.horizontalGroups = settings.horizontalGroups
     savedProfile.displayMainTankAndAssist = settings.displayMainTankAndAssist

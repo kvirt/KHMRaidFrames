@@ -394,7 +394,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
     local xOffset = xOffset + db.xOffset
-    local yOffset = yOffset + db.yOffset + ((frame:GetHeight() / 3) - 2)
+    local yOffset = yOffset + db.yOffset + (((DefaultCompactUnitFrameSetupOptions['height'] or self.NATIVE_UNIT_FRAME_HEIGHT) / 3) - 2)
 
     statusText:SetFont(font, size, flags)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
@@ -634,7 +634,7 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     local xOffset, yOffset = self:Offsets("BOTTOM", frame, groupType)
     xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset + ((frame:GetHeight() / 3) - 4)
+    yOffset = yOffset + db.yOffset + (((DefaultCompactUnitFrameSetupOptions['height'] or KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT) / 3) - 4)
 
     readyCheckIcon:SetPoint(
         "BOTTOM",
@@ -684,7 +684,7 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     local xOffset, yOffset = self:Offsets("BOTTOM", frame, groupType)
     xOffset = xOffset + db.xOffset
-    yOffset = yOffset + db.yOffset + ((frame:GetHeight() / 3) - 4)
+    yOffset = yOffset + db.yOffset + (((DefaultCompactUnitFrameSetupOptions['height'] or KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT) / 3) - 4)
 
     centerStatusIcon:SetPoint(
         "BOTTOM",
