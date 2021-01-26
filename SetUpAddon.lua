@@ -127,10 +127,10 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self.db.RegisterCallback(self, "OnProfileReset", function(...) self:SafeRefresh() end)
 
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
-    self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
     self:RegisterEvent("RAID_TARGET_UPDATE", "OnEvent")
     self:RegisterEvent("PARTY_LEADER_CHANGED", "OnEvent")
+    self:RegisterEvent("GROUP_LEFT", "OnEvent")
 
     self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
@@ -164,15 +164,13 @@ function KHMRaidFrames:OnEvent(event, ...)
 
             self.deffered = false
         end
-    elseif event == "PLAYER_REGEN_DISABLED" and self.isOpen then
-        self.deffered = true
     elseif event == "RAID_TARGET_UPDATE" then
         self:UpdateRaidMark(groupType)
         self:CustomizeOptions()
     elseif event == "PLAYER_ROLES_ASSIGNED" then
         self:UpdateRaidMark(groupType)
         self:CustomizeOptions()
-    elseif event == "PARTY_LEADER_CHANGED" then
+    elseif event == "PARTY_LEADER_CHANGED" or event == "GROUP_LEFT" then
         self.UpdateLeaderIcon()
     end
 end

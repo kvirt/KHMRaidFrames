@@ -910,7 +910,10 @@ function KHMRaidFrames.Abbreviate(num, groupType)
     end
 end
 
-function KHMRaidFrames.componentScale(frame)
-    local scale = min(frame:GetHeight() / KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT, frame:GetWidth() / KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH)
+function KHMRaidFrames.componentScale()
+    local scale = min(
+        DefaultCompactUnitFrameSetupOptions['height'] / KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT,
+        DefaultCompactUnitFrameSetupOptions['width'] / KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH
+    )
     return scale ~= 0 and scale or 1
 end

@@ -165,14 +165,14 @@ end
 
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
-    local bg = frame.healthBar.background
+    local background = frame.healthBar.background
 
-    bg:ClearAllPoints()
-    bg:SetPoint("TOPLEFT", frame.healthBar:GetStatusBarTexture(), "TOPRIGHT")
-    bg:SetPoint("BOTTOMLEFT", frame.healthBar:GetStatusBarTexture(), "BOTTOMRIGHT")
+    background:ClearAllPoints()
+    background:SetPoint("TOPLEFT", frame.healthBar:GetStatusBarTexture(), "TOPRIGHT")
+    background:SetPoint("BOTTOMLEFT", frame.healthBar:GetStatusBarTexture(), "BOTTOMRIGHT")
 
-    bg:SetPoint("TOPRIGHT", frame.healthBar, "TOPRIGHT")
-    bg:SetPoint("BOTTOMRIGHT", frame.healthBar, "BOTTOMRIGHT")
+    background:SetPoint("TOPRIGHT", frame.healthBar, "TOPRIGHT")
+    background:SetPoint("BOTTOMRIGHT", frame.healthBar, "BOTTOMRIGHT")
 
     local db = self.db.profile[groupType].frames
 
@@ -384,9 +384,9 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
     -- i dont know why blizzard frames mess with fonts
-    frame.__statusText = frame.__statusText or frame:CreateFontString(nil, "OVERLAY")
+    frame.KHMStatusText = frame.KHMStatusText or frame:CreateFontString(nil, "OVERLAY")
 
-    local statusText = frame.__statusText
+    local statusText = frame.KHMStatusText
 
     statusText:SetJustifyH(db.hJustify)
 
@@ -443,14 +443,14 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     if not UnitExists(frame.displayedUnit) then return end
     if not frame.statusText then return end
     if not frame.optionTable.displayStatusText then return end
-    if not frame.__statusText then return end
+    if not frame.KHMStatusText then return end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.statusText
 
     if not db.enabled then return end
 
     local health
-    local statusText = frame.__statusText
+    local statusText = frame.KHMStatusText
     local text = frame.statusText:GetText()
 
     if KHMRaidFrames.HideStatusText(frame) then
@@ -462,7 +462,7 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
         statusText:Show()
     end
 
-    if db.notShowStatuses or db.abbreviateNumbers or db.showPercents then
+    if db.notShowStatuses or db.abbreviateNumbers or db.showPercents and (frame.optionTable.healthText == "None") then
         if frame.optionTable.healthText == "losthealth" then
             text = text:gsub("-", "")
         end
@@ -481,11 +481,16 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
             if db.showPercents then
                 local percents = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
                 percents = (percents ~= math.huge and percents ~= -math.huge and percents) or 0
+
+                if frame.optionTable.healthText == "losthealth" then
+                    percents = 100 - percents
+                end
+
                 health = health.." - "..percents.."%"
             end
         end
 
-        if frame.optionTable.healthText == "losthealth" then
+        if frame.optionTable.healthText == "losthealth" and health then
             health = "-"..health
         end
     end
