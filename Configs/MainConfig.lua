@@ -2209,29 +2209,48 @@ function KHMRaidFrames:SetupTexturesAndFrames(groupType)
                     return color[1], color[2], color[3], color[4]
                 end
             },
-            ["outOfRangeColor"] = {
-                name = L["Out of Range"],
-                desc = L["Out of Range"],
-                width = "normal",
-                type = "select",
-                values = {
-                    ["Dark"] = L["Dark"],
-                    ["Light"] = L["Light"],
-                },
+            ["Skip4"] = {
+                type = "header",
+                name = "",
                 order = 6,
-                disabled = function(info)
-                    return not self.db.profile[groupType].frames.colorEnabled
-                end,
-                set = function(info, val)
-                    self.db.profile[groupType].frames.outOfRangeColor = val
+            },
+            ["Transparency"] = {
+                name = L["Transparency"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.05,
+                order = 7,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.alpha = val
 
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
-                    return self.db.profile[groupType].frames.outOfRangeColor
+                    return self.db.profile[groupType].frames.alpha
                 end
             },
-            ["Skip3"] = {
+            ["backgroundTransparency"] = {
+                name = L["Background Transparency"],
+                desc = "",
+                width = "normal",
+                type = "range",
+                min = 0.1,
+                max = 1.0,
+                step = 0.05,
+                order = 8,
+                set = function(info,val)
+                    self.db.profile[groupType].frames.alphaBackgound = val
+
+                    self:SafeRefresh(groupType)
+                end,
+                get = function(info)
+                    return self.db.profile[groupType].frames.alphaBackgound
+                end
+            },
+            ["Skip5"] = {
                 type = "header",
                 name = "",
                 order = 90,
@@ -2384,154 +2403,6 @@ function KHMRaidFrames:SetupTexturesAndFrames(groupType)
                         "powerBarTexture",
                         "powerBarHeight",
                         "showResourceOnlyForHealers",
-                    }
-
-                    self:RestoreDefaultsByTable(groupType, "frames", nil, vars)
-                end,
-            },
-        }
-    }
-
-    options.transparency = {
-        type = "group",
-        order = 3,
-        name = L["Transparency"],
-        desc = "",
-        childGroups = "tab",
-        args = {
-            ["advancedTransparency"] = {
-                name = L["Advanced Transparency"],
-                desc = L["Advanced Transparency"],
-                width = "double",
-                type = "toggle",
-                order = 1,
-                set = function(info,val)
-                    self.db.profile[groupType].frames.advancedTransparency = val
-
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info)
-                    return  self.db.profile[groupType].frames.advancedTransparency
-                end
-            },
-            ["Transparency"] = {
-                name = L["Transparency"],
-                desc = "",
-                width = "full",
-                type = "range",
-                min = 0.1,
-                max = 1.0,
-                step = 0.05,
-                order = 2,
-                hidden = function() return self.db.profile[groupType].frames.advancedTransparency end,
-                set = function(info,val)
-                    self.db.profile[groupType].frames.alpha = val
-
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info)
-                    return self.db.profile[groupType].frames.alpha
-                end
-            },
-            ["backgroundTransparency"] = {
-                name = L["Background Transparency"],
-                desc = "",
-                width = "full",
-                type = "range",
-                min = 0.1,
-                max = 1.0,
-                step = 0.05,
-                order = 3,
-                hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-                set = function(info,val)
-                    self.db.profile[groupType].frames.alphaBackgound = val
-
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info)
-                    return self.db.profile[groupType].frames.alphaBackgound
-                end
-            },
-            ["healthTransparency"] = {
-                name = L["Health Transparency"],
-                desc = "",
-                width = "full",
-                type = "range",
-                min = 0.1,
-                max = 1.0,
-                step = 0.05,
-                order = 4,
-                hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-                set = function(info,val)
-                    self.db.profile[groupType].frames.alphaHealth = val
-
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info)
-                    return self.db.profile[groupType].frames.alphaHealth
-                end
-            },
-            ["powerBarTransparency"] = {
-                name = L["Power Bar Transparency"],
-                desc = "",
-                width = "full",
-                type = "range",
-                min = 0.1,
-                max = 1.0,
-                step = 0.05,
-                order = 5,
-                hidden = function() return not self.db.profile[groupType].frames.advancedTransparency end,
-                set = function(info,val)
-                    self.db.profile[groupType].frames.alphaPowerBar = val
-
-                    self:SafeRefresh(groupType)
-                end,
-                get = function(info)
-                    return self.db.profile[groupType].frames.alphaPowerBar
-                end
-            },
-            ["Skip3"] = {
-                type = "header",
-                name = "",
-                order = 90,
-            },
-            ["Copy"] = {
-                name = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
-                desc = L["Copy settings to |cFFffd100<text>|r"]:gsub("<text>", groupType == "party" and L["Raid"] or L["Party"]),
-                width = "normal",
-                type = "execute",
-                order = 91,
-                confirm = true,
-                func = function(info,val)
-                    local vars = {
-                        "alphaPowerBar",
-                        "alphaHealth",
-                        "advancedTransparency",
-                        "alphaBackgound",
-                        "alpha",
-                    }
-
-                    self:CopySettingsByTable(
-                        self.db.profile[groupType].frames,
-                        self.db.profile[self.ReverseGroupType(groupType)].frames,
-                        vars
-                    )
-                end,
-            },
-            ["Reset"] = {
-                name = L["Reset to Default"],
-                desc = "",
-                width = "normal",
-                type = "execute",
-                confirm = true,
-                order = 92,
-                func = function(info,val)
-                    local vars = {
-                        "alphaPowerBar",
-                        "alphaHealth",
-                        "advancedTransparency",
-                        "alphaBackgound",
-                        "alpha",
                     }
 
                     self:RestoreDefaultsByTable(groupType, "frames", nil, vars)

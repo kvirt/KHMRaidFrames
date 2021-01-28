@@ -31,37 +31,49 @@ function KHMRaidFrames:Setup()
     self:SecureHookScript(self.dialog.general, "OnShow", "OnOptionShow")
     self:SecureHookScript(self.dialog.general, "OnHide", "OnOptionHide")
 
-    self:RegisterChatCommand("khm", function(arg, ...)
-        local args = {}
+    for i, command in ipairs{"khm", "лрь"} do
+        self:RegisterChatCommand(command, function(arg, ...)
+            local args = {}
 
-        for token in string.gmatch(arg, "[^%s]+") do
-            table.insert(args, token)
-        end
+            for token in string.gmatch(arg, "[^%s]+") do
+                table.insert(args, token)
+            end
 
-        if args[1] == "reload" then
-            self:CompactUnitFrameProfiles_ApplyProfile()
-            self:CompactRaidFrameContainer_LayoutFrames()
-            self:Print("Hard Reload")
-            return
-        end
+            if args[1] == "rl" or args[1] == "кд" then
+                self:CompactUnitFrameProfiles_ApplyProfile()
+                self:CompactRaidFrameContainer_LayoutFrames()
+                self:Print("Hard Reload")
+                return
+            end
 
-        if args[1] == "dump" then
-            self.PrintV(_G[args[2]])
-            return
-        end
+            if args[1] == "dump" then
+                self.PrintV(_G[args[2]])
+                return
+            end
 
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-    end)
+            if args[1] == "debug" then
+                self.db.profile.debug = not self.db.profile.debug
 
-    self:RegisterChatCommand("лрь", function()
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-        InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
-    end)
+                if self.db.profile.debug then
+                    _G["KHM"] = self
+                end
 
-    self:RegisterChatCommand("кд", function() ReloadUI() end)
+                self:Print("Debug mode is "..(self.db.profile.debug and "on" or "off"))
+                return
+            end
 
-    self:RegisterChatCommand("rl", function() ReloadUI() end)
+            InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+            InterfaceOptionsFrame_OpenToCategory("KHMRaidFrames")
+        end)
+    end
+
+    for i, command in ipairs{"rl", "кд"} do
+        self:RegisterChatCommand("command", function() ReloadUI() end)
+    end
+
+    if self.db.profile.debug then
+        _G["KHM"] = self
+    end
 
     self:SetInternalVariables()
 end
@@ -304,6 +316,8 @@ function KHMRaidFrames.RefreshProfileSettings()
     KHMRaidFrames.RevertReadyCheckIcon()
     KHMRaidFrames.RevertStatusIcon()
     KHMRaidFrames.ReverseHealthBarColors()
+    KHMRaidFrames.RevertRaidTargetIcon()
+    KHMRaidFrames.RevertLeaderIcon()
 end
 --
 
@@ -363,7 +377,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.displayPets = settings.displayPets
     self.useClassColors = settings.useClassColors
     self.healthText = settings.healthText
-    self.PrintV(settings, IsInRaid() and "raid" or "party")
+
     local savedProfile = {}
     savedProfile.horizontalGroups = settings.horizontalGroups
     savedProfile.displayMainTankAndAssist = settings.displayMainTankAndAssist
@@ -441,17 +455,13 @@ function KHMRaidFrames:Defaults()
             trackingStr = "",
             autoScaling = true,
             showResourceOnlyForHealers = false,
-            advancedTransparency = false,
             alpha = 1.0,
-            alphaHealth = 1.0,
             alphaBackgound = 1.0,
-            alphaPowerBar = 1.0,
             powerBarHeight = 8,
             powerBarTexture = "Blizzard Raid PowerBar",
             colorEnabled = false,
             color = {1, 1, 1},
             backGroundColor = {0.1, 0.1, 0.1},
-            outOfRangeColor = "Dark",
         },
         dispelDebuffFrames = {
             num = 3,

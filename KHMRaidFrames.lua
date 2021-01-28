@@ -108,7 +108,9 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     self:SetUpSubFramesPositionsAndSize(frame, "debuffFrames", groupType)
     self:SetUpSubFramesPositionsAndSize(frame, "dispelDebuffFrames", groupType)
 
-    self:SetUpRaidIcon(frame, groupType)
+    if self.db.profile[groupType].raidIcon.enabled then
+        self.SetUpRaidIcon(frame, groupType)
+    end
 
     if self.db.profile[groupType].nameAndIcons.name.enabled then
         self:SetUpName(frame, groupType)
@@ -144,15 +146,9 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
 
     local backgroundAlpha, healthAplpha, healthBackgroundAlpha, powerBarAlpha
 
-    if db.frames.advancedTransparency then
-        backgroundAlpha = db.frames.alphaBackgound
-        healthAplpha = db.frames.alphaHealth
-        powerBarAlpha = db.frames.alphaPowerBar
-    else
-        backgroundAlpha = db.frames.alpha
-        healthAplpha = db.frames.alpha
-        powerBarAlpha = db.frames.alpha
-    end
+    backgroundAlpha = db.frames.alphaBackgound
+    healthAplpha = db.frames.alpha
+    powerBarAlpha = db.frames.alpha
 
     frame.background:SetAlpha(backgroundAlpha)
     frame.healthBar:SetAlpha(healthAplpha)
@@ -165,26 +161,13 @@ end
 
 -- HEALTHBAR COLOR
 function KHMRaidFrames:CompactUnitFrame_UpdateHealthColor(frame, groupType)
-    local background = frame.healthBar.background
-
-    background:ClearAllPoints()
-    background:SetPoint("TOPLEFT", frame.healthBar:GetStatusBarTexture(), "TOPRIGHT")
-    background:SetPoint("BOTTOMLEFT", frame.healthBar:GetStatusBarTexture(), "BOTTOMRIGHT")
-
-    background:SetPoint("TOPRIGHT", frame.healthBar, "TOPRIGHT")
-    background:SetPoint("BOTTOMRIGHT", frame.healthBar, "BOTTOMRIGHT")
-
     local db = self.db.profile[groupType].frames
 
     local br, bg, bb = db.backGroundColor[1], db.backGroundColor[2], db.backGroundColor[3]
 
     frame.healthBar.background:SetColorTexture(br, bg, bb)
 
-    if db.outOfRangeColor == "Dark" then
-        frame.background:SetColorTexture(0.1, 0.1, 0.1)
-    else
-        frame.background:SetColorTexture(0.5, 0.5, 0.5)
-    end
+    frame.background:Hide()
 
     self:CompactUnitFrame_UpdateHealthColorInternal(frame, groupType)
 end
@@ -462,7 +445,7 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
         statusText:Show()
     end
 
-    if db.notShowStatuses or db.abbreviateNumbers or db.showPercents and (frame.optionTable.healthText == "None") then
+    if (db.notShowStatuses or db.abbreviateNumbers or db.showPercents) and not (frame.optionTable.healthText == "None") then
         if frame.optionTable.healthText == "losthealth" then
             text = text:gsub("-", "")
         end
@@ -514,25 +497,39 @@ end
 
 -- RAID TARGET ICON (STAR, SQUARE, etc)
 function KHMRaidFrames:UpdateRaidMark()
+    local groupType = IsInRaid() and "raid" or "party"
+
     for frame in self.IterateCompactFrames() do
-        self:SetUpRaidIcon(frame)
+        self:SetUpRaidIconInternal(frame, groupType)
     end
 end
 
-function KHMRaidFrames:SetUpRaidIcon(frame)
-    if not frame.unit then return end
-    if not UnitExists(frame.displayedUnit) then return end
-
-    local db = self.db.profile[IsInRaid() and "raid" or "party"]
+function KHMRaidFrames.SetUpRaidIcon(frame, groupType)
+    local db = KHMRaidFrames.db.profile[groupType]
 
     if not frame.raidIcon then
         frame.raidIcon = frame:CreateTexture(nil, "OVERLAY")
     end
 
-    if not db.raidIcon.enabled then
-        frame.raidIcon:Hide()
-        return
-    end
+    local size = db.raidIcon.size * (db.frames.autoScaling and KHMRaidFrames.componentScale(frame))
+
+    frame.raidIcon:ClearAllPoints()
+
+    frame.raidIcon:SetPoint(db.raidIcon.anchorPoint, frame, db.raidIcon.anchorPoint, db.raidIcon.xOffset, db.raidIcon.yOffset)
+    frame.raidIcon:SetSize(size, size)
+    frame.raidIcon:SetAlpha(db.raidIcon.alpha)
+
+    KHMRaidFrames:SetUpRaidIconInternal(frame, groupType)
+end
+
+function KHMRaidFrames:SetUpRaidIconInternal(frame, groupType)
+    if not frame.raidIcon then return end
+    if not frame.unit then return end
+    if not UnitExists(frame.displayedUnit) then return end
+
+    local db = self.db.profile[groupType]
+
+    if not db.raidIcon.enabled then return end
 
     local index = GetRaidTargetIndex(frame.unit)
 
@@ -545,18 +542,9 @@ function KHMRaidFrames:SetUpRaidIcon(frame)
     if index and index >= 1 and index <= 8 then
         local options = UnitPopupButtons["RAID_TARGET_"..index]
         local texture, tCoordLeft, tCoordRight, tCoordTop, tCoordBottom = options.icon, options.tCoordLeft, options.tCoordRight, options.tCoordTop, options.tCoordBottom
-        local size = db.raidIcon.size * (db.frames.autoScaling and self.componentScale(frame))
-
-        frame.raidIcon:ClearAllPoints()
-
-        frame.raidIcon:SetPoint(db.raidIcon.anchorPoint, frame, db.raidIcon.anchorPoint, db.raidIcon.xOffset, db.raidIcon.yOffset)
-        frame.raidIcon:SetSize(size, size)
 
         frame.raidIcon:SetTexture(texture)
-
         frame.raidIcon:SetTexCoord(tCoordLeft, tCoordRight, tCoordTop, tCoordBottom)
-
-        frame.raidIcon:SetAlpha(db.raidIcon.alpha)
 
         frame.raidIcon:Show()
     else
@@ -759,7 +747,7 @@ function KHMRaidFrames.UpdateLeaderIcon()
     local groupType = IsInRaid() and "raid" or "party"
 
     for frame in KHMRaidFrames.IterateCompactFrames() do
-        KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
+        KHMRaidFrames.SetUpLeaderIconInternal(frame, groupType)
     end
 end
 
@@ -768,23 +756,8 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
         frame.leaderIcon = frame:CreateTexture(nil, "OVERLAY")
     end
 
-    if not KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon.enabled then
-        frame.leaderIcon:Hide()
-        return
-    end
-
-    if not frame or not frame.unit then return end
-    if not UnitExists(frame.displayedUnit) then return end
-
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
     local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale(frame))
-
-    local isLeader = UnitIsGroupLeader(frame.unit)
-
-    if not isLeader then
-        frame.leaderIcon:Hide()
-        return
-    end
 
     frame.leaderIcon:ClearAllPoints()
 
@@ -811,7 +784,22 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
         frame.leaderIcon:SetVertexColor(1, 1, 1)
     end
 
-    frame.leaderIcon:Show()
+    KHMRaidFrames.SetUpLeaderIconInternal(frame, groupType)
+end
+
+function KHMRaidFrames.SetUpLeaderIconInternal(frame, groupType)
+    if not frame.leaderIcon then return end
+    if not KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon.enabled then return end
+    if not frame or not frame.unit then return end
+    if not UnitExists(frame.displayedUnit) then return end
+
+    local isLeader = UnitIsGroupLeader(frame.unit)
+
+    if not isLeader then
+        frame.leaderIcon:Hide()
+    else
+        frame.leaderIcon:Show()
+    end
 end
 --
 

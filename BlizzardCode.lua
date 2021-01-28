@@ -633,6 +633,24 @@ function KHMRaidFrames.ReverseHealthBarColors()
     for frame in KHMRaidFrames.IterateCompactFrames() do
         frame.healthBar:SetStatusBarColor(frame.healthBar.r, frame.healthBar.g, frame.healthBar.b)
         frame.healthBar.background:SetColorTexture(br, bg, bb)
-        frame.background:SetColorTexture(br, bg, bb)
+        frame.background:Show()
+    end
+end
+
+
+function KHMRaidFrames.RevertRaidTargetIcon()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.raidIcon then
+            frame.raidIcon:Hide()
+        end
+    end
+end
+
+
+function KHMRaidFrames.RevertLeaderIcon()
+    for frame in KHMRaidFrames.IterateCompactFrames() do
+        if frame.leaderIcon then
+            frame.leaderIcon:Hide()
+        end
     end
 end
