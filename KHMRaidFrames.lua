@@ -70,8 +70,6 @@ function KHMRaidFrames:CompactRaidFrameContainer_LayoutFrames()
 end
 
 function KHMRaidFrames:LayoutGroup(frame, groupType)
-    local db = self.db.profile[groupType]
-
     if self.db.profile[groupType].frames.hideGroupTitles then
         frame.title:Hide()
     else
@@ -144,7 +142,7 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         self:CompactUnitFrame_UpdateHealPrediction(frame)
     end
 
-    local backgroundAlpha, healthAplpha, healthBackgroundAlpha, powerBarAlpha
+    local backgroundAlpha, healthAplpha, powerBarAlpha
 
     backgroundAlpha = db.frames.alphaBackgound
     healthAplpha = db.frames.alpha
@@ -392,11 +390,8 @@ function KHMRaidFrames.HideStatusText(frame)
     local hide = not frame.statusText or not frame.optionTable.displayStatusText
 
     if hide then
-        statusText:Hide()
-        return
+        return hide
     end
-
-    local percents
 
     if not UnitIsConnected(frame.unit) then
         hide = false
@@ -438,7 +433,7 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
     if KHMRaidFrames.HideStatusText(frame) then
         statusText:Hide()
-
+        frame.statusText:Hide()
         return
     else
         frame.statusText:Hide()
