@@ -142,16 +142,16 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
         self:CompactUnitFrame_UpdateHealPrediction(frame)
     end
 
-    local backgroundAlpha, healthAplpha, powerBarAlpha
+    local backgroundAlpha, alpha
 
     backgroundAlpha = db.frames.alphaBackgound
-    healthAplpha = db.frames.alpha
-    powerBarAlpha = db.frames.alpha
+    alpha = db.frames.alpha
+    alpha = db.frames.alpha
 
     frame.background:SetAlpha(backgroundAlpha)
-    frame.healthBar:SetAlpha(healthAplpha)
+    frame.healthBar:SetAlpha(alpha)
     frame.healthBar.background:SetAlpha(backgroundAlpha)
-    frame.powerBar:SetAlpha(powerBarAlpha)
+    frame.powerBar:SetAlpha(alpha)
 
     return deferred
 end
@@ -389,31 +389,39 @@ end
 function KHMRaidFrames.HideStatusText(frame)
     local hide = not frame.statusText or not frame.optionTable.displayStatusText
 
+    local text, percents
+
     if hide then
-        return hide
+        return hide, text, percents
     end
 
     if not UnitIsConnected(frame.unit) then
         hide = false
+        text = PLAYER_OFFLINE or "blizzard bug"
     elseif UnitIsDeadOrGhost(frame.displayedUnit) then
         hide = false
+        text = DEAD or "blizzard bug"
     elseif frame.optionTable.healthText == "health" then
         hide = false
+        text = UnitHealth(frame.displayedUnit)
     elseif frame.optionTable.healthText == "losthealth" then
         local losthealth = UnitHealthMax(frame.displayedUnit) - UnitHealth(frame.displayedUnit)
 
         if losthealth > 0 then
             hide = false
+            text = losthealth
         else
             hide = true
         end
     elseif (frame.optionTable.healthText == "perc") and (UnitHealthMax(frame.displayedUnit) > 0) then
+        percents = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
+        text = percents
         hide = false
     else
         hide = true
     end
 
-    return hide
+    return hide, text, percents
 end
 
 function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
@@ -427,24 +435,20 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
     if not db.enabled then return end
 
-    local health
+    local hide, text, percents = KHMRaidFrames.HideStatusText(frame)
     local statusText = frame.KHMStatusText
-    local text = frame.statusText:GetText()
 
-    if KHMRaidFrames.HideStatusText(frame) then
+    if hide then
         statusText:Hide()
-        frame.statusText:Hide()
         return
     else
         frame.statusText:Hide()
         statusText:Show()
     end
 
-    if (db.notShowStatuses or db.abbreviateNumbers or db.showPercents) and not (frame.optionTable.healthText == "None") then
-        if frame.optionTable.healthText == "losthealth" then
-            text = text:gsub("-", "")
-        end
+    local health
 
+    if (db.notShowStatuses or db.abbreviateNumbers or db.showPercents) and not (frame.optionTable.healthText == "None") then
         health = tonumber(text)
 
         if not health and db.notShowStatuses then
@@ -456,8 +460,8 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
                 health = KHMRaidFrames.Abbreviate(health, groupType)
             end
 
-            if db.showPercents then
-                local percents = math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
+            if db.showPercents and not (frame.optionTable.healthText == "perc") then
+                percents = percents or math.ceil(100 * (UnitHealth(frame.displayedUnit) / UnitHealthMax(frame.displayedUnit)))
                 percents = (percents ~= math.huge and percents ~= -math.huge and percents) or 0
 
                 if frame.optionTable.healthText == "losthealth" then
@@ -473,7 +477,15 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
         end
     end
 
-    statusText:SetText(health or text)
+    health = health or text
+
+    if frame.optionTable.healthText == "losthealth" then
+        health = "-"..health
+    elseif frame.optionTable.healthText == "perc" then
+        health = percents.."%"
+    end
+
+    statusText:SetText(health)
 
     if db.classColoredText then
         local classColor = KHMRaidFrames.ColorByClass(frame.unit)
