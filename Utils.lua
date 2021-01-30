@@ -917,3 +917,13 @@ function KHMRaidFrames.componentScale()
     )
     return scale ~= 0 and scale or 1
 end
+
+function KHMRaidFrames.CureStatusTexts(frame, groupType)
+    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
+
+    local _, fontSize, _ = frame.KHMStatusText:GetFont()
+
+    if fontSize ~= size then
+        KHMRaidFrames.SetUpStatusText(frame, groupType)
+    end
+end

@@ -68,7 +68,7 @@ function KHMRaidFrames:Setup()
     end
 
     for i, command in ipairs{"rl", "кд"} do
-        self:RegisterChatCommand("command", function() ReloadUI() end)
+        self:RegisterChatCommand(command, function() ReloadUI() end)
     end
 
     if self.db.profile.debug then

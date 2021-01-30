@@ -383,6 +383,8 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:SetShadowColor(0, 0, 0, 1)
     statusText:SetShadowOffset(1, -1)
 
+    statusText:SetText("")
+
     self.SetUpStatusTextInternal(frame, groupType)
 end
 
