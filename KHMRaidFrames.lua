@@ -32,6 +32,8 @@ local AbbreviateNumbers = AbbreviateNumbers
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
 local UnitExists = UnitExists
+local UnitIsDeadOrGhost = UnitIsDeadOrGhost
+local UnitIsConnected = UnitIsConnected
 
 
 -- MAIN FUNCTIONS FOR LAYOUT
@@ -292,7 +294,7 @@ function KHMRaidFrames:SetUpName(frame, groupType)
 
     local flags = db.flag ~= "None" and db.flag or ""
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
+    local size = db.size * self.componentScale(groupType)
 
     name:SetJustifyH(db.hJustify)
 
@@ -360,7 +362,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.statusText
 
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
+    local size = db.size * self.componentScale(groupType)
     local flags = db.flag ~= "None" and db.flag or ""
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
@@ -374,8 +376,8 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:ClearAllPoints()
 
     local xOffset, yOffset = self:Offsets("BOTTOMLEFT", frame, groupType, true)
-    local xOffset = xOffset + db.xOffset
-    local yOffset = yOffset + db.yOffset + (((DefaultCompactUnitFrameSetupOptions['height'] or self.NATIVE_UNIT_FRAME_HEIGHT) / 3) - 2)
+    xOffset = xOffset + db.xOffset
+    yOffset = yOffset + db.yOffset + (((DefaultCompactUnitFrameSetupOptions['height'] or self.NATIVE_UNIT_FRAME_HEIGHT) / 3) - 2)
 
     statusText:SetFont(font, size, flags)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
@@ -383,24 +385,18 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     statusText:SetShadowColor(0, 0, 0, 1)
     statusText:SetShadowOffset(1, -1)
 
-    statusText:SetText("")
+    statusText:SetText("text")
 
     self.SetUpStatusTextInternal(frame, groupType)
 end
 
 function KHMRaidFrames.HideStatusText(frame)
-    local hide = not frame.statusText or not frame.optionTable.displayStatusText
-
-    local text, percents
-
-    if hide then
-        return hide, text, percents
-    end
+    local text, percents, hide
 
     if not UnitIsConnected(frame.unit) then
         hide = false
         text = PLAYER_OFFLINE or "blizzard bug"
-    elseif UnitIsDeadOrGhost(frame.displayedUnit) then
+    elseif UnitHealth(frame.displayedUnit) == 0 or (frame.displayedUnit and UnitIsDeadOrGhost(frame.displayedUnit)) then
         hide = false
         text = DEAD or "blizzard bug"
     elseif frame.optionTable.healthText == "health" then
@@ -427,6 +423,7 @@ function KHMRaidFrames.HideStatusText(frame)
 end
 
 function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
+    if not KHMRaidFrames.IsFrameOk(frame) then return end
     if not frame.unit then return end
     if not UnitExists(frame.displayedUnit) then return end
     if not frame.statusText then return end
@@ -450,7 +447,7 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
 
     local health
 
-    if (db.notShowStatuses or db.abbreviateNumbers or db.showPercents) and not (frame.optionTable.healthText == "None") then
+    if (db.notShowStatuses or db.abbreviateNumbers or db.showPercents) and not (frame.optionTable.healthText == "none") then
         health = tonumber(text)
 
         if not health and db.notShowStatuses then
@@ -502,6 +499,13 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
             statusText:SetVertexColor(unpack(db.color))
         end
     end
+
+    --LAST RESORT
+    local size = db.size * KHMRaidFrames.componentScale(groupType)
+    local flags = db.flag ~= "None" and db.flag or ""
+    local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", KHMRaidFrames.font)
+
+    statusText:SetFont(font, size, flags)
 end
 
 -- RAID TARGET ICON (STAR, SQUARE, etc)
@@ -520,7 +524,7 @@ function KHMRaidFrames.SetUpRaidIcon(frame, groupType)
         frame.raidIcon = frame:CreateTexture(nil, "OVERLAY")
     end
 
-    local size = db.raidIcon.size * (db.frames.autoScaling and KHMRaidFrames.componentScale(frame))
+    local size = db.raidIcon.size * KHMRaidFrames.componentScale(groupType)
 
     frame.raidIcon:ClearAllPoints()
 
@@ -625,7 +629,7 @@ function KHMRaidFrames:SetUpReadyCheckIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.readyCheckIcon
     local readyCheckIcon = frame.readyCheckIcon
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
+    local size = db.size * self.componentScale(groupType)
 
     readyCheckIcon:ClearAllPoints()
 
@@ -675,7 +679,7 @@ function KHMRaidFrames:SetUpCenterStatusIcon(frame, groupType)
 
     local db = self.db.profile[groupType].nameAndIcons.centerStatusIcon
     local centerStatusIcon = frame.centerStatusIcon
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
+    local size = db.size * self.componentScale(groupType)
 
     centerStatusIcon:ClearAllPoints()
 
@@ -766,7 +770,7 @@ function KHMRaidFrames.SetUpLeaderIcon(frame, groupType)
     end
 
     local db = KHMRaidFrames.db.profile[groupType].nameAndIcons.leaderIcon
-    local size = db.size * (KHMRaidFrames.db.profile[groupType].frames.autoScaling and KHMRaidFrames.componentScale(frame))
+    local size = db.size * KHMRaidFrames.componentScale(groupType)
 
     frame.leaderIcon:ClearAllPoints()
 

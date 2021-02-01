@@ -84,7 +84,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
 
     local parent = debuffFrame:GetParent()
 
-    size = size * self.componentScale(parent)
+    size = size * self.componentScale(IsInRaid() and "raid" or "party")
 
     debuffFrame:SetSize(size, size)
 
@@ -520,7 +520,7 @@ function KHMRaidFrames.CompactUnitFrame_UpdateReadyCheck(frame)
         return
     end
 
-    local readyCheckSize = 15 * KHMRaidFrames.componentScale(frame)
+    local readyCheckSize = 15 * KHMRaidFrames.componentScale(IsInRaid() and "raid" or "party")
     frame.readyCheckIcon:ClearAllPoints();
     frame.readyCheckIcon:SetPoint("BOTTOM", frame, "BOTTOM", 0, frame:GetHeight() / 3 - 4)
     frame.readyCheckIcon:SetSize(readyCheckSize, readyCheckSize)
@@ -553,7 +553,7 @@ end
 function KHMRaidFrames.CompactUnitFrame_UpdateCenterStatusIcon(frame)
     if not frame.unit or not frame.centerStatusIcon then return end
 
-    local size = 11 * KHMRaidFrames.componentScale(frame) * 2
+    local size = 11 * KHMRaidFrames.componentScale(IsInRaid() and "raid" or "party") * 2
     frame.centerStatusIcon:ClearAllPoints()
     frame.centerStatusIcon:SetPoint("CENTER", frame, "BOTTOM", 0, frame:GetHeight() / 3 + 2)
     frame.centerStatusIcon:SetSize(size, size)

@@ -53,8 +53,8 @@ function KHMRaidFrames:ShowVirtual()
     self.virtual.shown = true
     self.virtual.frame = frame
 
-    self:SetUpVirtual("buffFrames", self.virtual.groupType, self.componentScale(self.virtual.frame))
-    self:SetUpVirtual("debuffFrames", self.virtual.groupType, self.componentScale(self.virtual.frame), true)
+    self:SetUpVirtual("buffFrames", self.virtual.groupType, self.componentScale(self.virtual.groupType))
+    self:SetUpVirtual("debuffFrames", self.virtual.groupType, self.componentScale(self.virtual.groupType), true)
     self:SetUpVirtual("dispelDebuffFrames", self.virtual.groupType, 1)
 end
 

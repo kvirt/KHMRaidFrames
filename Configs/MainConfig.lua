@@ -165,8 +165,8 @@ function KHMRaidFrames:SetupOptionsByType(groupType)
             self.virtual.groupType = groupType
 
             if self.virtual.frame then
-                self:SetUpVirtual("buffFrames", groupType, self.componentScale(self.virtual.frame))
-                self:SetUpVirtual("debuffFrames", groupType, self.componentScale(self.virtual.frame), true)
+                self:SetUpVirtual("buffFrames", groupType, self.componentScale(groupType))
+                self:SetUpVirtual("debuffFrames", groupType, self.componentScale(groupType), true)
                 self:SetUpVirtual("dispelDebuffFrames", groupType, 1)
             end
 

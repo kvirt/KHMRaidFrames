@@ -170,7 +170,7 @@ function KHMRaidFrames:SetUpSubFramesPositionsAndSize(frame, subFrameType, group
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
     local db = self.db.profile[groupType][subFrameType]
-    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame)) or 1)
+    local size = db.size * (subFrameType ~= "dispelDebuffFrames" and self.componentScale(groupType) or 1)
     local typedframes = virtual and self.virtual.frames[subFrameType] or frame[subFrameType]
 
     while frameNum <= #typedframes do
@@ -251,8 +251,8 @@ function KHMRaidFrames:RefreshConfig(virtualGroupType)
     local isInCombatLockDown = InCombatLockdown()
 
     if self.virtual.frame then
-        self:SetUpVirtual("buffFrames", virtualGroupType, self.componentScale(self.virtual.frame))
-        self:SetUpVirtual("debuffFrames", virtualGroupType, self.componentScale(self.virtual.frame), true)
+        self:SetUpVirtual("buffFrames", virtualGroupType, self.componentScale(virtualGroupType))
+        self:SetUpVirtual("debuffFrames", virtualGroupType, self.componentScale(virtualGroupType), true)
         self:SetUpVirtual("dispelDebuffFrames", virtualGroupType, 1)
     end
 
@@ -398,7 +398,7 @@ function KHMRaidFrames:SmartAnchoring(frame, groupType, virtual)
     local frameNum = 1
     local typedframe, anchor1, anchor2, relativeFrame, xOffset, yOffset
 
-    local size = db.size * self.componentScale(frame)
+    local size = db.size * self.componentScale(groupType)
     local bigSize = size * 2
     local rowStart = 1
     local groupType = IsInRaid() and "raid" or "party"
@@ -910,20 +910,13 @@ function KHMRaidFrames.Abbreviate(num, groupType)
     end
 end
 
-function KHMRaidFrames.componentScale()
+function KHMRaidFrames.componentScale(groupType)
+    if not KHMRaidFrames.db.profile[groupType].frames.autoScaling then return 1 end
+
     local scale = min(
         DefaultCompactUnitFrameSetupOptions['height'] / KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT,
         DefaultCompactUnitFrameSetupOptions['width'] / KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH
     )
+
     return scale ~= 0 and scale or 1
-end
-
-function KHMRaidFrames.CureStatusTexts(frame, groupType)
-    local size = db.size * (self.db.profile[groupType].frames.autoScaling and self.componentScale(frame))
-
-    local _, fontSize, _ = frame.KHMStatusText:GetFont()
-
-    if fontSize ~= size then
-        KHMRaidFrames.SetUpStatusText(frame, groupType)
-    end
 end
