@@ -367,7 +367,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
     local font = SharedMedia:Fetch("font", db.font) or SharedMedia:Fetch("font", self.font)
 
     -- i dont know why blizzard frames mess with fonts
-    frame.KHMStatusText = frame.KHMStatusText or frame:CreateFontString(nil, "OVERLAY")
+    frame.KHMStatusText = frame.KHMStatusText or frame:CreateFontString(nil, "ARTWORK")
 
     local statusText = frame.KHMStatusText
 
@@ -381,7 +381,7 @@ function KHMRaidFrames:SetUpStatusText(frame, groupType)
 
     statusText:SetFont(font, size, flags)
     statusText:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
-    statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, yOffset)
+    statusText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", xOffset, yOffset)
     statusText:SetShadowColor(0, 0, 0, 1)
     statusText:SetShadowOffset(1, -1)
 
