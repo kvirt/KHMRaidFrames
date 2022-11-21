@@ -359,7 +359,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
         self.useCompactPartyFrames = true
         self.deffered = true
     else
-        profile = profile or GetActiveRaidProfile()
+        profile = profile or GetRaidProfileName(1)
         settings = GetRaidProfileFlattenedOptions(profile)
 
         if not settings then
@@ -375,7 +375,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     self.displayBorder = settings.displayBorder
     self.displayPowerBar = settings.displayPowerBar
     self.displayPets = settings.displayPets
-    self.useClassColors = settings.useClassColors
+    self.useClassColors = DefaultCompactUnitFrameOptions.useClassColors
     self.healthText = settings.healthText
 
     local savedProfile = {}
@@ -386,7 +386,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     savedProfile.displayPowerBar = settings.displayPowerBar
     savedProfile.displayPets = settings.displayPets
     savedProfile.useCompactPartyFrames = self.useCompactPartyFrames
-    savedProfile.useClassColors = settings.useClassColors
+    savedProfile.useClassColors = DefaultCompactUnitFrameOptions.useClassColors
 
     self.db.profile.current_profile = profile
     self.db.profile.saved_profiles[profile] = savedProfile
