@@ -144,7 +144,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:RegisterEvent("PARTY_LEADER_CHANGED", "OnEvent")
     self:RegisterEvent("GROUP_LEFT", "OnEvent")
 
-    self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
+    self:SecureHook(CompactRaidFrameContainer, 'LayoutFrames', function() self:CompactRaidFrameContainer_LayoutFrames() end)
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
     self:SecureHook("CompactUnitFrame_UpdateAll")
@@ -154,7 +154,7 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     -- custom interface display
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
-    self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
+    self:SecureHook("CompactRaidFrameManager_SetSetting", function() self:CompactUnitFrameProfiles_ApplyProfile() end)
 
     self:SafeRefresh()
 end
