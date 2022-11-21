@@ -369,22 +369,22 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
         self.useCompactPartyFrames = true
     end
 
-    self.horizontalGroups = settings.horizontalGroups
-    self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
-    self.keepGroupsTogether = settings.keepGroupsTogether
-    self.displayBorder = settings.displayBorder
-    self.displayPowerBar = settings.displayPowerBar
-    self.displayPets = settings.displayPets
+    self.horizontalGroups = EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups()
+    self.displayMainTankAndAssist = CompactRaidFrameManager_GetSetting("DisplayMainTankAndAssist")
+    self.keepGroupsTogether = not EditModeManagerFrame:ShouldRaidFrameShowSeparateGroups()
+    self.displayBorder = EditModeManagerFrame:ShouldRaidFrameDisplayBorder()
+    self.displayPowerBar = DefaultCompactUnitFrameSetupOptions.displayPowerBar
+    self.displayPets = CompactRaidFrameManager_GetSetting("DisplayPets")
     self.useClassColors = DefaultCompactUnitFrameOptions.useClassColors
-    self.healthText = settings.healthText
+    self.healthText = DefaultCompactUnitFrameOptions.healthText
 
     local savedProfile = {}
-    savedProfile.horizontalGroups = settings.horizontalGroups
-    savedProfile.displayMainTankAndAssist = settings.displayMainTankAndAssist
-    savedProfile.keepGroupsTogether = settings.keepGroupsTogether
-    savedProfile.displayBorder = settings.displayBorder
-    savedProfile.displayPowerBar = settings.displayPowerBar
-    savedProfile.displayPets = settings.displayPets
+    savedProfile.horizontalGroups = EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups()
+    savedProfile.displayMainTankAndAssist = CompactRaidFrameManager_GetSetting("DisplayMainTankAndAssist")
+    savedProfile.keepGroupsTogether = not EditModeManagerFrame:ShouldRaidFrameShowSeparateGroups()
+    savedProfile.displayBorder = EditModeManagerFrame:ShouldRaidFrameDisplayBorder()
+    savedProfile.displayPowerBar = DefaultCompactUnitFrameSetupOptions.displayPowerBar
+    savedProfile.displayPets = CompactRaidFrameManager_GetSetting("DisplayPets")
     savedProfile.useCompactPartyFrames = self.useCompactPartyFrames
     savedProfile.useClassColors = DefaultCompactUnitFrameOptions.useClassColors
 
