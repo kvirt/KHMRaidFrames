@@ -34,7 +34,7 @@ local UnitExists = UnitExists
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsConnected = UnitIsConnected
 local UnitPopupButtons = {
-    ["RAID_TARGET_ICON"] = { text = RAID_TARGET_ICON, dist = 0, nested = 1 },
+	["RAID_TARGET_ICON"] = { text = RAID_TARGET_ICON, dist = 0, nested = 1 },
 	["RAID_TARGET_1"] = { text = RAID_TARGET_1, dist = 0, checkable = 1, color = {r = 1.0, g = 0.92, b = 0}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0, tCoordRight = 0.25, tCoordTop = 0, tCoordBottom = 0.25 },
 	["RAID_TARGET_2"] = { text = RAID_TARGET_2, dist = 0, checkable = 1, color = {r = 0.98, g = 0.57, b = 0}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.25, tCoordRight = 0.5, tCoordTop = 0, tCoordBottom = 0.25 },
 	["RAID_TARGET_3"] = { text = RAID_TARGET_3, dist = 0, checkable = 1, color = {r = 0.83, g = 0.22, b = 0.9}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.5, tCoordRight = 0.75, tCoordTop = 0, tCoordBottom = 0.25 },
@@ -599,6 +599,7 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType, role)
     )
 
     roleIcon:SetSize(size, size)
+    roleIcon:SetDrawLayer("OVERLAY")
 
     self:SetUpRoleIconInternal(frame, groupType, role)
 end
