@@ -631,9 +631,11 @@ function KHMRaidFrames.ReverseHealthBarColors()
     local br, bg, bb = unpack(KHMRaidFrames:Defaults().profile.party.frames.backGroundColor)
 
     for frame in KHMRaidFrames.IterateCompactFrames() do
-        frame.healthBar:SetStatusBarColor(frame.healthBar.r, frame.healthBar.g, frame.healthBar.b)
-        frame.healthBar.background:SetColorTexture(br, bg, bb)
-        frame.background:Show()
+        if frame.healthBar.r ~= nil then
+            frame.healthBar:SetStatusBarColor(frame.healthBar.r, frame.healthBar.g, frame.healthBar.b)
+            frame.healthBar.background:SetColorTexture(br, bg, bb)
+            frame.background:Show()
+        end
     end
 end
 
