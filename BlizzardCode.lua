@@ -385,7 +385,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAuras(frame)
                     frame["hasDispel"..debuffType] = true
                     numUsedDispelDebuffs = numUsedDispelDebuffs + 1
                     local dispellDebuffFrame = frame.dispelDebuffFrames[numUsedDispelDebuffs]
-                    CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, debuffType, index)
+                    CompactUnitFrame_UtilSetDispelDebuff(dispellDebuffFrame, {dispelName=debuffType, auraInstanceID=index})
                     if numUsedDispelDebuffs == maxDispelDebuffs then
                         doneWithDispelDebuffs = true
                     end
