@@ -134,9 +134,9 @@ end
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
-    self.db.RegisterCallback(self, "OnProfileChanged", function(...) self:SafeRefresh() end)
-    self.db.RegisterCallback(self, "OnProfileCopied", function(...) self:SafeRefresh() end)
-    self.db.RegisterCallback(self, "OnProfileReset", function(...) self:SafeRefresh() end)
+    self.db.RegisterCallback(self, "OnProfileChanged", function(...) self:CompactUnitFrameProfiles_ApplyProfile() end)
+    self.db.RegisterCallback(self, "OnProfileCopied", function(...) self:CompactUnitFrameProfiles_ApplyProfile() end)
+    self.db.RegisterCallback(self, "OnProfileReset", function(...) self:CompactUnitFrameProfiles_ApplyProfile() end)
 
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
@@ -148,6 +148,9 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
     self:SecureHook("CompactUnitFrame_UpdateAll")
+    
+    self:SecureHook(EditModeManagerFrame, 'SaveLayouts', function() self:SafeRefresh() end)
+    self:SecureHook(EditModeManagerFrame, 'ExitEditMode', function() self:SafeRefresh() end)
 
     self.RefreshProfileSettings()
 
@@ -359,8 +362,21 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
         self.useCompactPartyFrames = true
         self.deffered = true
     else
-        profile = profile or GetRaidProfileName(1)
-        settings = GetRaidProfileFlattenedOptions(profile)
+        --profile = profile or EditModeManagerFrame.layoutInfo.layouts[EditModeManagerFrame.layoutInfo.activeLayout].layoutName
+        profile = profile or "Primary"
+        settings = {        
+            displayPowerBar = DefaultCompactUnitFrameSetupOptions.displayPowerBar,
+            frameHeight = self.NATIVE_UNIT_FRAME_HEIGHT,
+            frameWidth = self.NATIVE_UNIT_FRAME_WIDTH,
+            displayBorder = EditModeManagerFrame:ShouldRaidFrameDisplayBorder(),
+            keepGroupsTogether = not EditModeManagerFrame:ShouldRaidFrameShowSeparateGroups(),
+            displayPets = CompactRaidFrameManager_GetSetting("DisplayPets"),
+            useCompactPartyFrames = true,
+            horizontalGroups = EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups(),
+            displayMainTankAndAssist = CompactRaidFrameManager_GetSetting("DisplayMainTankAndAssist"),
+            useClassColors = DefaultCompactUnitFrameOptions.useClassColors,
+            healthText = DefaultCompactUnitFrameOptions.healthText
+        }
 
         if not settings then
             settings = self.db.profile.saved_profiles[profile] or self.db.profile.saved_profiles.default
@@ -369,24 +385,24 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
         self.useCompactPartyFrames = true
     end
 
-    self.horizontalGroups = EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups()
-    self.displayMainTankAndAssist = CompactRaidFrameManager_GetSetting("DisplayMainTankAndAssist")
-    self.keepGroupsTogether = not EditModeManagerFrame:ShouldRaidFrameShowSeparateGroups()
-    self.displayBorder = EditModeManagerFrame:ShouldRaidFrameDisplayBorder()
-    self.displayPowerBar = DefaultCompactUnitFrameSetupOptions.displayPowerBar
-    self.displayPets = CompactRaidFrameManager_GetSetting("DisplayPets")
-    self.useClassColors = DefaultCompactUnitFrameOptions.useClassColors
-    self.healthText = DefaultCompactUnitFrameOptions.healthText
+    self.horizontalGroups = settings.horizontalGroups
+    self.displayMainTankAndAssist = settings.displayMainTankAndAssist
+    self.keepGroupsTogether = settings.keepGroupsTogether
+    self.displayBorder = settings.displayBorder
+    self.displayPowerBar = settings.displayPowerBar
+    self.displayPets = settings.displayPets
+    self.useClassColors = settings.useClassColors
+    self.healthText = settings.healthText
 
     local savedProfile = {}
-    savedProfile.horizontalGroups = EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups()
-    savedProfile.displayMainTankAndAssist = CompactRaidFrameManager_GetSetting("DisplayMainTankAndAssist")
-    savedProfile.keepGroupsTogether = not EditModeManagerFrame:ShouldRaidFrameShowSeparateGroups()
-    savedProfile.displayBorder = EditModeManagerFrame:ShouldRaidFrameDisplayBorder()
-    savedProfile.displayPowerBar = DefaultCompactUnitFrameSetupOptions.displayPowerBar
-    savedProfile.displayPets = CompactRaidFrameManager_GetSetting("DisplayPets")
+    savedProfile.horizontalGroups = settings.horizontalGroups
+    savedProfile.displayMainTankAndAssist = settings.displayMainTankAndAssist
+    savedProfile.keepGroupsTogether = settings.keepGroupsTogether
+    savedProfile.displayBorder = settings.displayBorder
+    savedProfile.displayPowerBar = settings.displayPowerBar
+    savedProfile.displayPets = settings.displayPets
     savedProfile.useCompactPartyFrames = self.useCompactPartyFrames
-    savedProfile.useClassColors = DefaultCompactUnitFrameOptions.useClassColors
+    savedProfile.useClassColors = settings.useClassColors
 
     self.db.profile.current_profile = profile
     self.db.profile.saved_profiles[profile] = savedProfile
