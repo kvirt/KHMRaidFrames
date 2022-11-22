@@ -485,7 +485,6 @@ function KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
     frame.roleIcon:ClearAllPoints()
     frame.roleIcon:SetPoint("TOPLEFT", 3, -2)
     frame.roleIcon:SetSize(12, 12)
-    frame.roleIcon:SetDrawLayer("OVERLAY")
 
     if IsInGroup() then
         frame.roleIcon:Show()
