@@ -725,12 +725,11 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.roleIcon.enabled = val
 
+                    self.RefreshProfileSettings(true)
                     if not val then
                         self.RevertRoleIcon()
-                    else
-                        self.RefreshProfileSettings(true)
-                        self:SafeRefresh(groupType)
                     end
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.roleIcon.enabled
