@@ -1668,6 +1668,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
                     if not val then
                         self.UpdateLeaderIcon()
+                        self.RefreshProfileSettings(true)
                     end
 
                     self:SafeRefresh(groupType)
@@ -1833,6 +1834,7 @@ function KHMRaidFrames:SetupRaidIconOptions(groupType)
             set = function(info,val)
                 self.db.profile[groupType].raidIcon.enabled = val
                 self:SafeRefresh(groupType)
+                self.RefreshProfileSettings(true)
             end,
             get = function(info)
                 return self.db.profile[groupType].raidIcon.enabled
