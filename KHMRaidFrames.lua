@@ -65,7 +65,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateAll(frame)
 
     local lastGroupType = self.processedFrames[name]
 
-    if groupType ~= lastGroupType then
+    if groupType ~= lastGroupType or groupType == "party" then
         self:LayoutFrame(frame, groupType, isInCombatLockDown)
         self.processedFrames[name] = groupType
     end
@@ -599,7 +599,6 @@ function KHMRaidFrames:SetUpRoleIcon(frame, groupType, role)
     )
 
     roleIcon:SetSize(size, size)
-    roleIcon:SetDrawLayer("OVERLAY")
 
     self:SetUpRoleIconInternal(frame, groupType, role)
 end
