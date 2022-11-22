@@ -31,6 +31,7 @@ local englishClasses = {
     "MONK",
     "DRUID",
     "DEMONHUNTER",
+    "EVOKER",
 }
 
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
