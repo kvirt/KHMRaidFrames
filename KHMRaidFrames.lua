@@ -164,6 +164,8 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.healthBar:SetAlpha(alpha)
     frame.healthBar.background:SetAlpha(backgroundAlpha)
     frame.powerBar:SetAlpha(alpha)
+	
+    frame.roleIcon:SetDrawLayer("OVERLAY")
 
     return deferred
 end
