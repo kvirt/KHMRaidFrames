@@ -440,6 +440,8 @@ function KHMRaidFrames:ShowRaidFrame()
     if not InCombatLockdown() and not IsInGroup() and self.useCompactPartyFrames then
         CompactRaidFrameContainer:Show()
         CompactRaidFrameManager:Show()
+        CompactPartyFrame:Show()
+        CompactPartyFrame_RefreshMembers()
     end
 end
 
@@ -447,6 +449,7 @@ function KHMRaidFrames:HideRaidFrame()
     if not self.db.profile.party.frames.showPartySolo and not InCombatLockdown() and not IsInGroup() and self.useCompactPartyFrames then
         CompactRaidFrameContainer:Hide()
         CompactRaidFrameManager:Hide()
+        CompactPartyFrame:Hide()
     end
 
     self:HideVirtual()
