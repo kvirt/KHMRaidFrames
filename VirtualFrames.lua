@@ -16,7 +16,7 @@ function KHMRaidFrames:GetVirtualFrames()
 
             frame.texture = texture
 
-            text = frame:CreateFontString(frame, "OVERLAY", "GameTooltipText")
+            text = frame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
             text:SetFont("Fonts\\FRIZQT__.TTF", 11, "THICKOUTLINE, MONOCHROME")
             text:SetPoint("CENTER", 0, 0)
             text:SetText(i)

@@ -134,9 +134,9 @@ end
 function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:Setup()
 
-    self.db.RegisterCallback(self, "OnProfileChanged", function(...) self:SafeRefresh() end)
-    self.db.RegisterCallback(self, "OnProfileCopied", function(...) self:SafeRefresh() end)
-    self.db.RegisterCallback(self, "OnProfileReset", function(...) self:SafeRefresh() end)
+    self.db.RegisterCallback(self, "OnProfileChanged", function(...) self:CompactUnitFrameProfiles_ApplyProfile() end)
+    self.db.RegisterCallback(self, "OnProfileCopied", function(...) self:CompactUnitFrameProfiles_ApplyProfile() end)
+    self.db.RegisterCallback(self, "OnProfileReset", function(...) self:CompactUnitFrameProfiles_ApplyProfile() end)
 
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnEvent")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "OnEvent")
@@ -144,17 +144,20 @@ function KHMRaidFrames:COMPACT_UNIT_FRAME_PROFILES_LOADED()
     self:RegisterEvent("PARTY_LEADER_CHANGED", "OnEvent")
     self:RegisterEvent("GROUP_LEFT", "OnEvent")
 
-    self:SecureHook("CompactRaidFrameContainer_LayoutFrames")
+    self:SecureHook(CompactRaidFrameContainer, 'LayoutFrames', function() self:CompactRaidFrameContainer_LayoutFrames() end)
     self:SecureHook("CompactUnitFrame_UpdateHealPrediction")
     self:SecureHook("CompactUnitFrame_UpdateAuras")
     self:SecureHook("CompactUnitFrame_UpdateAll")
+    
+    self:SecureHook(EditModeManagerFrame, 'SaveLayouts', function() self:SafeRefresh() end)
+    self:SecureHook(EditModeManagerFrame, 'ExitEditMode', function() self:SafeRefresh() end)
 
     self.RefreshProfileSettings()
 
     -- custom interface display
     self:SecureHook(self.dialog, "FeedGroup", function() self:CustomizeOptions() end)
 
-    self:SecureHook("CompactUnitFrameProfiles_ApplyProfile")
+    self:SecureHook("CompactRaidFrameManager_SetSetting", function() self:CompactUnitFrameProfiles_ApplyProfile() end)
 
     self:SafeRefresh()
 end
@@ -359,8 +362,21 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
         self.useCompactPartyFrames = true
         self.deffered = true
     else
-        profile = profile or GetActiveRaidProfile()
-        settings = GetRaidProfileFlattenedOptions(profile)
+        --profile = profile or EditModeManagerFrame.layoutInfo.layouts[EditModeManagerFrame.layoutInfo.activeLayout].layoutName
+        profile = profile or "Primary"
+        settings = {        
+            displayPowerBar = DefaultCompactUnitFrameSetupOptions.displayPowerBar,
+            frameHeight = self.NATIVE_UNIT_FRAME_HEIGHT,
+            frameWidth = self.NATIVE_UNIT_FRAME_WIDTH,
+            displayBorder = EditModeManagerFrame:ShouldRaidFrameDisplayBorder(),
+            keepGroupsTogether = not EditModeManagerFrame:ShouldRaidFrameShowSeparateGroups(),
+            displayPets = CompactRaidFrameManager_GetSetting("DisplayPets"),
+            useCompactPartyFrames = true,
+            horizontalGroups = EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups(),
+            displayMainTankAndAssist = CompactRaidFrameManager_GetSetting("DisplayMainTankAndAssist"),
+            useClassColors = DefaultCompactUnitFrameOptions.useClassColors,
+            healthText = DefaultCompactUnitFrameOptions.healthText
+        }
 
         if not settings then
             settings = self.db.profile.saved_profiles[profile] or self.db.profile.saved_profiles.default
@@ -370,7 +386,7 @@ function KHMRaidFrames:GetRaidProfileSettings(profile)
     end
 
     self.horizontalGroups = settings.horizontalGroups
-    self.displayMainTankAndAssist =  settings.displayMainTankAndAssist
+    self.displayMainTankAndAssist = settings.displayMainTankAndAssist
     self.keepGroupsTogether = settings.keepGroupsTogether
     self.displayBorder = settings.displayBorder
     self.displayPowerBar = settings.displayPowerBar
@@ -424,6 +440,8 @@ function KHMRaidFrames:ShowRaidFrame()
     if not InCombatLockdown() and not IsInGroup() and self.useCompactPartyFrames then
         CompactRaidFrameContainer:Show()
         CompactRaidFrameManager:Show()
+        CompactPartyFrame:Show()
+        CompactPartyFrame_RefreshMembers()
     end
 end
 
@@ -431,6 +449,7 @@ function KHMRaidFrames:HideRaidFrame()
     if not self.db.profile.party.frames.showPartySolo and not InCombatLockdown() and not IsInGroup() and self.useCompactPartyFrames then
         CompactRaidFrameContainer:Hide()
         CompactRaidFrameManager:Hide()
+        CompactPartyFrame:Hide()
     end
 
     self:HideVirtual()

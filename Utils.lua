@@ -31,6 +31,7 @@ local englishClasses = {
     "MONK",
     "DRUID",
     "DEMONHUNTER",
+    "EVOKER",
 }
 
 KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT = 36
@@ -912,10 +913,14 @@ end
 
 function KHMRaidFrames.componentScale(groupType)
     if not KHMRaidFrames.db.profile[groupType].frames.autoScaling then return 1 end
-
+    
+    local type = not IsInRaid()
+    local width = EditModeManagerFrame:GetRaidFrameWidth(type)
+    local height = EditModeManagerFrame:GetRaidFrameHeight(type)
+    
     local scale = min(
-        DefaultCompactUnitFrameSetupOptions['height'] / KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT,
-        DefaultCompactUnitFrameSetupOptions['width'] / KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH
+        height / KHMRaidFrames.NATIVE_UNIT_FRAME_HEIGHT,
+        width / KHMRaidFrames.NATIVE_UNIT_FRAME_WIDTH 
     )
 
     return scale ~= 0 and scale or 1
