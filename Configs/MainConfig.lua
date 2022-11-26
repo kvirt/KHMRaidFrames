@@ -278,6 +278,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.hide = val
+                    if not val then
+                        self.RefreshProfileSettings(true)
+                    end
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
