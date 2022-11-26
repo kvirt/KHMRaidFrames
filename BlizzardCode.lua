@@ -501,6 +501,7 @@ end
 
 function KHMRaidFrames.RevertRoleIcon()
     for frame in KHMRaidFrames.IterateCompactFrames() do
+
         if frame.unit then
             KHMRaidFrames.CompactUnitFrame_UpdateRoleIcon(frame)
         end
@@ -588,6 +589,7 @@ function KHMRaidFrames.RevertStatusText()
         if frame.KHMStatusText then
             frame.KHMStatusText:Hide()
         end
+        frame.statusText:Show()
     end
 end
 
