@@ -589,7 +589,8 @@ function KHMRaidFrames.RevertStatusText()
         if frame.KHMStatusText then
             frame.KHMStatusText:Hide()
         end
-        frame.statusText:Show()
+        local hide, text, percents = KHMRaidFrames.HideStatusText(frame)
+        frame.statusText:SetShown(not hide)
     end
 end
 
