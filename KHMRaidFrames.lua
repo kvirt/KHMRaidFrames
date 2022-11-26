@@ -166,7 +166,8 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.powerBar:SetAlpha(alpha)
 	
     frame.roleIcon:SetDrawLayer("OVERLAY")
-
+    frame.totalAbsorbOverlay:SetDrawLayer("ARTWORK", 1)
+	
     return deferred
 end
 --
