@@ -278,6 +278,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.name.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.name.hide = val
+                    if not val then
+                        self.RefreshProfileSettings(true)
+                    end
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
@@ -462,10 +465,10 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
                     if not val then
                         self.RevertStatusText()
-                    else
-                        self.RefreshProfileSettings(true)
-                        self:SafeRefresh(groupType)
                     end
+                    self.RefreshProfileSettings(true)
+                    self:SafeRefresh(groupType)
+                    
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.statusText.enabled
@@ -659,6 +662,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 width = "normal",
                 type = "toggle",
                 order = 14,
+                disabled = function() return not self.db.profile[groupType].nameAndIcons.statusText.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.statusText.notShowStatuses = val
 
@@ -1032,10 +1036,9 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
 
                     if not val then
                         self.RevertReadyCheckIcon()
-                    else
-                        self.RefreshProfileSettings(true)
-                        self:SafeRefresh(groupType)
                     end
+                    self.RefreshProfileSettings(true)
+                    self:SafeRefresh(groupType)
                 end,
                 get = function(info)
                     return self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled
@@ -1050,6 +1053,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.readyCheckIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.readyCheckIcon.hide = val
+                    self.RefreshProfileSettings(true)
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)
@@ -1306,6 +1310,7 @@ function KHMRaidFrames:SetupNameAndIconsOptions(groupType)
                 disabled = function() return not self.db.profile[groupType].nameAndIcons.centerStatusIcon.enabled end,
                 set = function(info,val)
                     self.db.profile[groupType].nameAndIcons.centerStatusIcon.hide = val
+                    self.RefreshProfileSettings(true)
                     self:SafeRefresh(groupType)
                 end,
                 get = function(info)

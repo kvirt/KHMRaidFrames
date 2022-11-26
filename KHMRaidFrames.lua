@@ -124,6 +124,10 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
 
     if self.db.profile[groupType].nameAndIcons.name.enabled then
         self:SetUpName(frame, groupType)
+    else
+        if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
+            self:RevertName()
+        end
     end
 
     if self.db.profile[groupType].nameAndIcons.statusText.enabled then
@@ -164,8 +168,9 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
     frame.healthBar:SetAlpha(alpha)
     frame.healthBar.background:SetAlpha(backgroundAlpha)
     frame.powerBar:SetAlpha(alpha)
-	
+    
     frame.roleIcon:SetDrawLayer("OVERLAY")
+    frame.totalAbsorbOverlay:SetDrawLayer("ARTWORK", 1)
 
     return deferred
 end
@@ -229,7 +234,7 @@ function KHMRaidFrames:CompactUnitFrame_UpdateHealPrediction(frame)
     if not self.db.profile[IsInRaid() and "raid" or "party"].frames.enhancedAbsorbs then return end
 
     local absorbBar = frame.totalAbsorb
-    if not absorbBar or absorbBar:IsForbidden()then return end
+    if not absorbBar or absorbBar:IsForbidden() then return end
 
     local absorbOverlay = frame.totalAbsorbOverlay
     if not absorbOverlay or absorbOverlay:IsForbidden() or not absorbOverlay.tileSize then return end
@@ -455,6 +460,11 @@ function KHMRaidFrames.SetUpStatusTextInternal(frame, groupType)
     else
         frame.statusText:Hide()
         statusText:Show()
+    end
+    
+    if db.notShowStatuses and not tonumber(text) then
+        statusText:Hide()
+        return
     end
 
     local health
