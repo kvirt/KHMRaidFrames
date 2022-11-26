@@ -124,6 +124,10 @@ function KHMRaidFrames:LayoutFrame(frame, groupType, isInCombatLockDown)
 
     if self.db.profile[groupType].nameAndIcons.name.enabled then
         self:SetUpName(frame, groupType)
+    else
+        if self.db.profile[groupType].nameAndIcons.roleIcon.enabled then
+            self:RevertName()
+        end
     end
 
     if self.db.profile[groupType].nameAndIcons.statusText.enabled then
