@@ -42,6 +42,7 @@ function KHMRaidFrames:CompactUnitFrame_UtilSetDebuff(debuffFrame, unit, index, 
         debuffFrame.count:Hide()
     end
     debuffFrame:SetID(index)
+    debuffFrame.auraInstanceID = aura.auraInstanceID;
     local enabled = aura.expirationTime and aura.expirationTime ~= 0
     if enabled then
         local startTime = aura.expirationTime - aura.duration
