@@ -204,9 +204,10 @@ function KHMRaidFrames:CompactUnitFrame_UpdateHealthColorInternal(frame, groupTy
     end
 
     local cache = self.coloredFrames[name]
+    local fR, fG, fB, fA = frame.healthBar:GetStatusBarColor()
 
     if not self.useClassColors then
-        if frame.healthBar.r ~= cache.health.r or frame.healthBar.g ~= cache.health.g or frame.healthBar.b ~= cache.health.b then
+        if fR ~= cache.health.r or fG ~= cache.health.g or fB ~= cache.health.b then
             if frame.unit and not UnitIsConnected(frame.unit) then
                 r, g, b = 0.5, 0.5, 0.5
             elseif CompactUnitFrame_IsTapDenied(frame) then
@@ -215,15 +216,14 @@ function KHMRaidFrames:CompactUnitFrame_UpdateHealthColorInternal(frame, groupTy
                 r, g, b = db.color[1], db.color[2], db.color[3]
             end
 
-            frame.healthBar:SetStatusBarColor(r, g, b)
-
-            self.coloredFrames[name].health = {
-                r=frame.healthBar.r,
-                g=frame.healthBar.g,
-                b=frame.healthBar.b,
+           frame.healthBar:SetStatusBarColor(r, g, b)              
+           self.coloredFrames[name].health = {
+                r=r,
+                g=g,
+                b=b,
             }
         end
-    end
+    end 
 end
 --
 

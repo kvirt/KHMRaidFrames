@@ -1,7 +1,7 @@
-## Interface: 100002
+## Interface: 100007
 ## Title: KHM Raid Frames
 ## Notes: Extended Standart Raid\Party Frames
-## Version: 1.3.4
+## Version: 1.3.5
 ## Author: kvirtx
 ## SavedVariables: KHMRaidFramesDB
 ## SavedVariablesPerCharacter: KHMRaidFrames_SyncProfiles
